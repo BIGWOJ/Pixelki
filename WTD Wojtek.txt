@@ -1,0 +1,3 @@
+1. Dokończyć scrapNumerAlbumu
+2. Jakoś może w funkcję wrzucić wykonywanie ssl_error?
+3. Może do każdej funkcji dodać parametr addToBase i clearTableCondition jak Mateusz to zrobił, bo tak to z "maina" można będzie tym zarządzać a nie wchodzić w funkcję
