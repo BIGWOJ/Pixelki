@@ -1,0 +1,197 @@
+/* Reset some default styles */
+body, h1, h2, h3, p, ul, ol, li, table, th, td {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    line-height: 1.6;
+    background-color: #f8f9fa;
+    color: #333;
+    margin: 0;
+}
+
+.container {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #90ac75;
+    color: white;
+    padding: 10px 20px;
+}
+
+header .logo img {
+    max-height: 40px;
+}
+
+header .theme-controls button {
+    background-color: white;
+    color: #90ac75;
+    border: none;
+    padding: 5px 10px;
+    margin-left: 10px;
+    cursor: pointer;
+    border-radius: 4px;
+}
+
+header .theme-controls button:hover {
+    background-color: #0056b3;
+    color: white;
+}
+
+.navigation {
+    display: flex;
+    margin-top:30px;
+    justify-content: center;
+    gap:30px;
+
+    padding: 10px 0;
+}
+
+i {
+    font-size: 24px;
+    color: #325019;
+}
+.icon-and-text {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.navigation button {
+    background-color: #ffffff;
+    color: #90ac75;
+    border-style: solid;
+    border-color: #90ac75;
+    font-weight: bold;
+
+    padding: 8px 12px;
+    cursor: pointer;
+    border-radius: 4px;
+}
+
+.navigation button:hover {
+    background-color: #90ac75;
+    color: white;
+}
+
+.month-year-controls {
+    display: flex;
+    margin-top: 15px;
+    justify-content: center;
+
+}
+
+.month-year-controls span {
+    margin: 0 10px;
+}
+
+.month-year-controls button {
+    background-color: #90ac75;
+    border-radius: 20%;
+    border:none;
+    color: white;
+    cursor: pointer;
+    width: 30px;
+}
+
+main {
+    display: flex;
+    flex: 1;
+    padding: 20px;
+    gap: 20px;
+}
+
+.calendar {
+    flex: 2;
+    background-color: white;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}
+
+.calendar table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.calendar th, .calendar td {
+    border: 1px solid #ddd;
+    text-align: center;
+    padding: 5px;
+}
+
+.calendar th {
+    background-color: #90ac75;
+    color: white;
+}
+
+.calendar .highlight {
+    background-color: #ffeeba;
+}
+
+.filters {
+    flex: 1;
+    background-color: white;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}
+
+.filters label {
+    display: block;
+    margin-top: 10px;
+    font-weight: bold;
+}
+
+.filters input {
+    width: 80%;
+    padding: 5px;
+    margin-top: 5px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}
+
+.filter-buttons {
+    display: flex;
+    justify-content: center;
+    margin-top: 15px;
+}
+
+.filters button {
+    width: 100%;
+    background-color: #90ac75;
+    color: white;
+    border: none;
+    padding: 8px 12px;
+    cursor: pointer;
+    border-radius: 4px;
+    margin-right: 10px;
+}
+
+.manage-button{
+    display: flex;
+    justify-content: center;
+    margin-top: 10px;
+}
+.filters button:hover {
+    background-color: #90ac75;
+}
+
+footer {
+    display: flex;
+    justify-content: space-between;
+    background-color: #e9ecef;
+    padding: 10px 20px;
+    border-top: 1px solid #ddd;
+}
+
+
