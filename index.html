@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kalendarz</title>
+    <link rel="stylesheet" href="css.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+
+</head>
+<body>
+<div class="container">
+    <header>
+        <div class="logo">
+            <img src="logo-placeholder.png" alt="Logo">
+        </div>
+        <div class="theme-controls">
+            <button>Zmień Motyw</button>
+            <button>Zmień Czcionkę</button>
+        </div>
+    </header>
+
+    <nav class="navigation">
+        <div class="icon-and-text">
+            <i class="fas fa-share-square share-icon" title="Udostępnij"></i>
+            <i class="fas fa-calendar"></i>
+            <button>Plan Dnia</button>
+        </div>
+        <button>Dzień</button>
+        <button>Tydzień</button>
+        <button>Miesiąc</button>
+        <button>Semestr</button>
+
+    </nav>
+
+
+    <div class="month-year-controls">
+        <button>&lt;</button>
+        <span>Miesiąc / Rok</span>
+        <button>&gt;</button>
+    </div>
+
+    <main>
+        <section class="calendar">
+            <table class="week-view">
+                <thead>
+                <tr>
+                    <th></th>
+                    <th>pon. 30.12</th>
+                    <th>wt. 31.12</th>
+                    <th>śr. 1.01</th>
+                    <th>czw. 2.01</th>
+                    <th>pt. 3.01</th>
+                    <th>sob. 4.01</th>
+                    <th>niedz. 5.01</th>
+                </tr>
+                </thead>
+
+                <tbody>
+                <tr>
+                    <td>07</td><td></td><td></td><td class="highlight"></td><td></td><td></td><td></td><td></td>
+                </tr>
+                <tr>
+                    <td>08</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>
+                </tr>
+                <tr>
+                    <td>09</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>
+                </tr>
+                <tr>
+                    <td>10</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>
+                </tr>
+                <tr>
+                    <td>11</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>
+                </tr>
+                <tr>
+                    <td>12</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>
+                </tr>
+                <tr>
+                    <td>13</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>
+                </tr>
+                <tr>
+                    <td>14</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>
+                </tr>
+                <tr>
+                    <td>15</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>
+                </tr>
+                <tr>
+                    <td>16</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>
+                </tr>
+                <tr>
+                    <td>17</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>
+                </tr>
+                <tr>
+                    <td>18</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>
+                </tr>
+                <tr>
+                    <td>19</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>
+                </tr>
+                </tbody>
+            </table>
+        </section>
+
+        <aside class="filters">
+            <label for="lecturer">Wykładowca:</label>
+            <input type="text" id="lecturer" name="lecturer">
+
+            <label for="room">Sala:</label>
+            <input type="text" id="room" name="room">
+
+            <label for="subject">Przedmiot:</label>
+            <input type="text" id="subject" name="subject">
+
+            <label for="group">Grupa:</label>
+            <input type="text" id="group" name="group">
+
+            <label for="album-number">Numer Albumu:</label>
+            <input type="text" id="album-number" name="album-number">
+
+            <label for="class-type">Forma Zajęć:</label>
+            <input type="text" id="class-type" name="class-type">
+
+            <div class="filter-buttons">
+                <button>Filtruj</button>
+                <button>Wyczyść</button>
+            </div>
+            <div class="manage-button">
+            <button>Zarządzaj Swoimi Kafelkami</button>
+            </div>
+        </aside>
+    </main>
+
+    <footer>
+        <div class="statistics">
+            <!-- Miejsce na statystyki -->
+        </div>
+        <div class="legend">
+            <!-- Miejsce na legendę -->
+        </div>
+    </footer>
+</div>
+</body>
+</html>
