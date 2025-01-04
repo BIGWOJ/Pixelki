@@ -28,7 +28,7 @@ create table wydzial
 (
     wydzialID integer not null
         constraint wydzialPK
-            primary key,
+            primary key autoincrement,
     nazwa     TEXT    not null
 );
 
@@ -40,7 +40,7 @@ create table sala
     wydzialID integer not null
         constraint salaWydzialFK
             references wydzial,
-    numerSali integer not null,
+    numerSali integer,
     budynek   TEXT    not null
 );
 
@@ -89,5 +89,4 @@ create table studentLekcja
         constraint studentLekcjaLekcjaFK
             references lekcja
 );
-
 
