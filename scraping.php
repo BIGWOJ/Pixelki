@@ -225,12 +225,37 @@ function scrapWydzial($pdo) {       // funkcja scrapowania danych do tabeli wydz
     }
 }*/
 
-function scrapNumerAlbumu($pdo, $ssl_error=False) {
+function scrapNumerAlbumu($pdo, $ssl_error=False, $clearTableCondition=True, $addToBase=True, $test=False) {
     try {
-        $url = 'https://plan.zut.edu.pl/schedule_student.php?number={album_index}&start=2024-10-01T00%3A00%3A00%2B01%3A00&end=2025-06-23T00%3A00%3A00%2B01%3A00';
 
-        //Start jako pierwszy dzień zajęć, end jako ostatni dzień zajęć
-        for ($album_index = 53894; $album_index <= 53900; $album_index++) {
+        if ($clearTableCondition) {
+            try {
+                $clearTable = $pdo->prepare("DELETE FROM numerAlbumu");
+                $clearTable -> execute();
+
+                $clearIndexes = $pdo->prepare("DELETE FROM sqlite_sequence WHERE name = 'numerAlbumu'");
+                $clearIndexes -> execute();
+            } catch (PDOException $e) {
+                echo "Blad zapytania: " . $e -> getMessage();
+                exit();
+            }
+        }
+
+        //Start i end jako pierwszy miesiąc nauki
+        $url = 'https://plan.zut.edu.pl/schedule_student.php?number={album_index}&start=2024-10-01T00%3A00%3A00%2B01%3A00&end=2025-11-01T00%3A00%3A00%2B01%3A00';
+
+        if ($test) {
+            //Dodatkowa pomocnicza zmienna do testowania
+            $iteracja = 0;
+        }
+
+        //Iterowanie dopóki nie znajdziemy indeksu, dla którego jest jakiś plan zajęć
+        //=============== 59622 to największy numer albumu w bazie z planem zajęć, więc na szybko można od niego startować ===============
+        for ($album_index = 59623; $album_index >= 1; $album_index--) {
+            if ($test) {
+                $iteracja += 1;
+            }
+
             $url_replaced = str_replace('{album_index}', $album_index, $url);
             if ($ssl_error) {
                 //Opcje dla file_get_contents, bo bez tego były błędy związane z certyfikatem SSL
@@ -242,37 +267,45 @@ function scrapNumerAlbumu($pdo, $ssl_error=False) {
                 ];
                 $context = stream_context_create($options);
                 $response = file_get_contents($url_replaced, false, $context);
-            }
-            else {
+            } else {
                 $response = file_get_contents($url_replaced);
             }
 
             $data = json_decode($response, true);
 
-            //Warunek gdy chcemy zeby przed scrapowaniem tablica sie czyscila, jesli nie to ustawic na false
-            $clearTableCondition = true;
-            if ($clearTableCondition) {
-                try {
-                    $clearTable = $pdo->prepare("DELETE FROM numerAlbumu");
-                    $clearTable -> execute();
-
-                    $clearIndexes = $pdo->prepare("DELETE FROM sqlite_sequence WHERE name = 'numerAlbumu'");
-                    $clearIndexes -> execute();
-                } catch (PDOException $e) {
-                    echo "Blad zapytania: " . $e -> getMessage();
-                    exit();
+            //Jeżeli zapytanie zwróciło więcej niż jeden element, to znaczy, że jest jakiś plan zajęć -> poprawny numer albumu
+            if (count($data) > 1) {
+                if ($test) {
+                    echo "Koniec na albumie: " . $album_index . "\n";
                 }
+                break;
             }
-
-            //Jeżeli opisany zakres czasowy zwrócił 1 rekord, to znaczy, że nie ma zajęć (pusta lista)
-            if (count($data) == 1) {
-                $puste+=1;
-            }
-            else {
-                $dodac+=1;
+            if ($test) {
+                echo $iteracja . "\n";
             }
         }
-        echo "Puste: " . $puste . "\n";
+
+        $the_largest_index = $album_index;
+
+        if ($addToBase) {
+            $sqlInsert = "INSERT INTO numerAlbumu (numer) VALUES (:numerAlbumu)";
+            $statement = $pdo->prepare($sqlInsert);
+
+            //Dodawanie wszystkich albumów do największego, jaki ma jakiś plan zajęć
+            $pdo->beginTransaction();
+            try {
+                for ($index = 1; $index <= $the_largest_index; $index++) {
+                    $statement -> bindParam(':numerAlbumu', $index, PDO::PARAM_INT);
+                    $statement -> execute();
+                }
+                $pdo->commit();
+
+            } catch (PDOException $e) {
+                $pdo->rollBack();
+                echo "Blad zapytania: " . $e -> getMessage();
+                exit();
+            }
+        }
 
     } catch (PDOException $e) {
         echo "Blad polaczenia z API: " . $e -> getMessage();
@@ -283,6 +316,15 @@ function scrapNumerAlbumu($pdo, $ssl_error=False) {
 //Ustawić na True, jeśli występuje błąd związany z certyfikatem SSL
 $ssl_error = True;
 
+//Ustawić na True, jeśli chcemy wyczyścić tabelę przed scrapowaniem
+$clearTableCondition = True;
+
+//Ustawić na True, jeśli chcemy dodawać dane do tabeli
+$addToBase = True;
+
+//Ustawić na True, jeżeli chcemy mieć podgląd do zmiannych testowych w konsoli podczas scrapNumerAlbumu
+$test = False;
+
 $dbPath = 'sqlite:./data.db';   // link do bazy danych
 
 $pdo = dbConnection($dbPath);   // polaczenie z baza danych
@@ -291,4 +333,4 @@ $pdo = dbConnection($dbPath);   // polaczenie z baza danych
 
 #scrapWydzial($pdo);
 
-scrapNumerAlbumu($pdo, $ssl_error);
+scrapNumerAlbumu($pdo, $ssl_error, $clearTableCondition, $addToBase, $test);
