@@ -1,0 +1,10 @@
+=== PHP ===
+
+1. scrapNumerAlbumu może poprawić jakoś, żeby nie dodawał w ciemno tych numerów w dół?
+2. Jakoś może w funkcję wrzucić wykonywanie ssl_error?
+
+=== CSS ===
+
+1. Szerokość headera i footera poprawić, lewy bok jest za krótki
+2. Przyciski miesiąc/rok na środki nie są kalendarza
+3. Wysokość bloku filtrów po prawej stronie powinna być wysokości kalendarza
