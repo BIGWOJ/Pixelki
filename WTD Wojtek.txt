@@ -1,3 +1,11 @@
+=== PHP ===
+
 1. Dokończyć scrapNumerAlbumu
 2. Jakoś może w funkcję wrzucić wykonywanie ssl_error?
 3. Może do każdej funkcji dodać parametr addToBase i clearTableCondition jak Mateusz to zrobił, bo tak to z "maina" można będzie tym zarządzać a nie wchodzić w funkcję
+
+=== CSS ===
+
+1. Szerokość headera i footera poprawić, lewy bok jest za krótki
+2. Przyciski miesiąc/rok na środki nie są kalendarza
+3. Wysokość bloku filtrów po prawej stronie powinna być wysokości kalendarza
