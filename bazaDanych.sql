@@ -16,12 +16,10 @@ create table numerAlbumu
 
 create table przedmiot
 (
-    przedmiotID  integer not null
+    przedmiotID integer not null
         constraint przedmiotPK
             primary key autoincrement,
-    nazwa        TEXT    not null,
-    formaStudiow TEXT    not null,
-    wydzial      TEXT    not null
+    nazwa       TEXT    not null
 );
 
 create table wydzial
@@ -40,8 +38,7 @@ create table sala
     wydzialID integer not null
         constraint salaWydzialFK
             references wydzial,
-    numerSali integer,
-    budynek   TEXT    not null
+    pokoj     TEXT
 );
 
 create table wykladowca
