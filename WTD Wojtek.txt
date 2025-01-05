@@ -8,3 +8,7 @@
 1. Szerokość headera i footera poprawić, lewy bok jest za krótki
 2. Przyciski miesiąc/rok na środki nie są kalendarza
 3. Wysokość bloku filtrów po prawej stronie powinna być wysokości kalendarza
+
+=== FIGMA ===
+
+1. Header mobilkę zmienić, żeby było w pionie
