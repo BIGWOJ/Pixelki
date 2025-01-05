@@ -16,7 +16,7 @@ body {
     display: flex;
     flex-direction: column;
     min-height: 100vh;
-    padding: 0 20px;
+
 }
 
 .navigation {
@@ -35,7 +35,7 @@ header {
     background-color: #90ac75;
     color: white;
     padding: 10px 20px;
-    width: 100%;
+    /*width: 100%;*/
 }
 
 header .logo img {
@@ -144,7 +144,7 @@ main {
 .filters {
     flex: 1;
     background-color: white;
-    padding: 0 10px;
+    padding: 10px 10px;
     border: 1px solid #ddd;
     border-radius: 4px;
     margin-top: 20px;
@@ -161,6 +161,7 @@ main {
     box-sizing: border-box;
     border: 1px solid #ddd;
     border-radius: 4px;
+    height: 30px;
 }
 
 .filters button {
@@ -196,7 +197,7 @@ footer {
 
 @media (min-width: 768px) {
     .container {
-        padding: 0 40px;
+
     }
 
     .navigation {
@@ -216,4 +217,23 @@ footer {
     main {
         flex-direction: column-reverse;
     }
+}
+
+@media (max-width: 400px) {
+    header{
+       flex-direction: column;
+        align-items: center;
+        gap: 30px;
+
+    }
+
+    .theme-controls{
+        display: flex;
+        gap: 15px;
+        flex-direction: column;
+        width: 70%;
+    }
+
+
+
 }
