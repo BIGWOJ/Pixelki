@@ -1131,10 +1131,6 @@ function scrapLekcjaNumberAlbumu($pdo, $albumNumber, $ssl_error=False, $addToBas
         #print_r($sqlLessonResult);
 
 
-
-
-
-
         $lessonsArray = [];
 
         // ustawienie zeby pobieralo tylko lekcje do 1 miesiaca w przod
@@ -2088,6 +2084,127 @@ function scrapLekcjaGrupa($pdo, $group, $ssl_error=False, $addToBase=True) {
     }
 }
 
+function scrapNumerAlbumuGrupa($pdo, $albumNumber, $ssl_error=False, $addToBase=True) {
+    try {
+        // przygotowywanie poprawnego linka do APi
+
+        $sqlGroupsName = "SELECT g.nazwa, na.numer from NumerAlbumuGrupa n
+                         JOIN grupa g ON n.grupaID = g.grupaID
+                         JOIN numerAlbumu na ON n.numerAlbumuID = na.numerAlbumuID";
+        $sqlGroupsNameResult = $pdo->query($sqlGroupsName);
+        $sqlGroupsNameResult = $sqlGroupsNameResult -> fetchAll(PDO::FETCH_ASSOC);
+
+        #print_r($sqlGroupsNameResult);
+
+
+        $groupsArray = [];
+        $arrayGroupAdd = [];
+        $newGroup = [];
+
+        // ustawienie zeby pobieralo tylko lekcje do 1 miesiaca w przod
+        $dateNow = new DateTime();
+        $dateNow = $dateNow->format("Y-m-d");
+
+        $dateMonth = new DateTime();
+        $dateMonth = $dateMonth->modify("+1 month");
+        $dateMonth = $dateMonth->format("Y-m-d");
+
+
+        $url = 'https://plan.zut.edu.pl/schedule_student.php?number=';    // link do API
+        // przygotowanie nazwy pokoju dla api
+
+        $url = $url . $albumNumber . "&start=" . $dateNow . "T00%3A00%3A00%2B01%3A00&end=" . $dateMonth . "T00%3A00%3A00%2B01%3A00";
+        echo $url . "\n";
+
+        if ($ssl_error) {
+            $options = [
+                "ssl" => [
+                    "verify_peer" => false,
+                    "verify_peer_name" => false,
+                ],
+            ];
+            $context = stream_context_create($options);
+            #Pobranie zawartosci ze zwrotki z API
+            $response = file_get_contents($url, false, $context);
+        }
+
+        else {
+            $response = file_get_contents($url);
+        }         // pobranie zawartosci ze zwrotki z API
+        echo "Pomyslnie otrzymano zwrot z API \n";
+        $data = json_decode($response, true);                                                 // dekodowania zawartosci do JSON
+
+
+
+        foreach ($data as $group) {
+            if(isset($group["group_name"])){               // sprawdzanie czy API nie zwrocilo pustego wyniku
+                $groupsArray[] = $group["group_name"];
+            }
+        }
+        $groupsArray = array_unique($groupsArray);
+
+        #print_r($groupsArray);
+
+        foreach($groupsArray as $group){
+            $newGroup[] = ["nazwa" => $group, "numer" => $albumNumber];
+        }
+
+        #print_r($newGroup);
+
+
+        // dodawania tylko nowych rekordow
+        foreach ($newGroup as $group) {
+            $uniqueKey = $group["nazwa"] . "-" . $group["numer"];
+
+            $elementExists = false;
+
+            foreach ($sqlGroupsNameResult as $key) {
+                $existingKey = $key["nazwa"] . "-" . $key["numer"];
+                if ($existingKey == $uniqueKey) {
+                    $elementExists = true;
+                    break;
+                }
+            }
+            if (!$elementExists) {
+                $arrayGroupAdd[] = $group;
+            }
+        }
+
+        #print_r($groupsArray);
+
+        if ($addToBase) {
+
+            $sqlInsert = "INSERT INTO NumerAlbumuGrupa (grupaID, numerAlbumuID) VALUES (:grupaID, :numberAlbumuID)";                                 // wstawianie do tabeli
+            $statement = $pdo->prepare($sqlInsert);
+
+            foreach ($arrayGroupAdd as $group) {                                               // wstawianie do tabeli
+                $sqlGroupNumberID = "SELECT grupaID FROM grupa WHERE nazwa = :nazwa";
+                $sqlGroupNumberIDResult = $pdo->prepare($sqlGroupNumberID);
+                $sqlGroupNumberIDResult->BindParam(':nazwa', $group["nazwa"], PDO::PARAM_STR);
+                $sqlGroupNumberIDResult->execute();
+                $sqlGroupNumberIDResult = $sqlGroupNumberIDResult -> fetch(PDO::FETCH_ASSOC);
+                $sqlGroupNumberIDResult = $sqlGroupNumberIDResult["grupaID"];
+
+                $statement -> bindParam(':grupaID', $sqlGroupNumberIDResult, PDO::PARAM_STR);
+                $statement -> bindParam(':numberAlbumuID', $albumNumber, PDO::PARAM_INT);
+
+                try {
+                    $statement -> execute();
+                } catch (PDOException $e) {
+                    echo "Blad zapytania insert: " . $e -> getMessage();
+                    exit();
+                }
+            }
+        }
+
+    } catch (PDOException $e) {
+        echo "Blad polaczenia z API: " . $e -> getMessage();
+        exit();
+    }
+}
+
+
+
 //Ustawić na True, jeśli występuje błąd związany z certyfikatem SSL
 $ssl_error = True;
 
@@ -2138,6 +2255,9 @@ $pdo = dbConnection($dbPath);   // polaczenie z baza danych
 #scrapLekcjaPrzedmiot($pdo, $subject = "Sieci komputerowe (L)", $ssl_error=False, $addToBase=True);
 
 #scrapLekcjaGrupa($pdo, $group = "SJO/WBIHZ/S1/s.3/Krupka/l", $ssl_error=False, $addToBase=True);
+
+// dodawania rekordow do tabeli numerAlbumuGrupa
+#scrapNumerAlbumuGrupa($pdo, $albumNumber = "53731", $ssl_error=False, $addToBase=True);
 
 
 
