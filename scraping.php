@@ -328,7 +328,7 @@ function scrapNumerAlbumu($pdo, $ssl_error=False, $clearTableCondition=True, $ad
 }
 
 //Funkcja poprawiająca numery albumu, usuwając te, które nie mają planu zajęć
-function poprawaNumerAlbumu($pdo, $ssl_error=False, $console_write=False) {
+function poprawaNumerAlbumu($pdo, $ssl_error=False, $console_write=False, $start_index=1) {
     try {
         //Pobranie wszystkich numerów albumów
         $sql = "SELECT numer FROM numerAlbumu";
@@ -341,8 +341,9 @@ function poprawaNumerAlbumu($pdo, $ssl_error=False, $console_write=False) {
 
             $deleteStatement = $pdo->prepare("DELETE FROM numerAlbumu WHERE numer = :numer");
 
-            foreach ($numerAlbumu as $numer) {
-                $url_replaced = str_replace('{album_index}', $numer['numer'], $url);
+            //Start_index przydatny do zaczęcia iterowania od konkretnego indeksu (zaoszczędzenie czasu)
+            for ($i = $start_index; $i < count($numerAlbumu); $i++) {
+                $url_replaced = str_replace('{album_index}', $numerAlbumu[$i]['numer'], $url);
 
                 if ($ssl_error) {
                     //Opcje dla file_get_contents, bo bez tego były błędy związane z certyfikatem SSL
@@ -363,15 +364,15 @@ function poprawaNumerAlbumu($pdo, $ssl_error=False, $console_write=False) {
                 //Jeżeli zapytanie zwróciło tylko jeden element, to znaczy, że nie ma planu zajęć -> usuwamy numer
                 if (count($data) == 1) {
                     if ($console_write) {
-                        echo "Usuwany numer: " . $numer['numer'] . "\n";
+                        echo "Usuwany numer: " . $numerAlbumu[$i]['numer'] . "\n";
                     }
-                    $deleteStatement->bindParam(':numer', $numer['numer'], PDO::PARAM_INT);
+                    $deleteStatement->bindParam(':numer', $numerAlbumu[$i]['numer'], PDO::PARAM_INT);
                     $deleteStatement->execute();
                 }
                 //W przeciwnym razie numer jest używany, więc nie usuwamy z bazy
                 else {
                     if ($console_write) {
-                        echo "\t\tUżywany numer: " . $numer['numer'] . "\n";
+                        echo "\t\tUżywany numer: " . $numerAlbumu[$i]['numer'] . "\n";
                     }
                 }
             }
@@ -521,4 +522,4 @@ $pdo = dbConnection($dbPath);   // polaczenie z baza danych
 
 #scrapPrzedmiot($pdo, $ssl_error, $clearTableCondition, $addToBase);
 
-poprawaNumerAlbumu($pdo, $ssl_error, $console_write);
+poprawaNumerAlbumu($pdo, $ssl_error, $console_write, $start_index=55);
