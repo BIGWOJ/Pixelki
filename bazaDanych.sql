@@ -14,6 +14,19 @@ create table numerAlbumu
     numer         INTEGER not null
 );
 
+create table NumerAlbumuGrupa
+(
+    numerAlbumuGrupaID integer not null
+        constraint NumerAlbumuGrupaPK
+            primary key,
+    grupaID            integer not null
+        constraint grupaIDFK
+            references grupa,
+    numerAlbumuID      integer not null
+        constraint numerAlbumuIDFK
+            references numerAlbumu
+);
+
 create table przedmiot
 (
     przedmiotID integer not null
@@ -71,19 +84,6 @@ create table lekcja
     opis         TEXT    not null,
     start        TEXT    not null,
     koniec       TEXT    not null,
-    formaZajec   TEXT    not null
-);
-
-create table studentLekcja
-(
-    studentLekcjaID integer not null
-        constraint studentLekcjaPK
-            primary key autoincrement,
-    numberAlbumuID  integer not null
-        constraint studentLekcjaNumberAlbumuFK
-            references numerAlbumu,
-    lekcjaID        integer not null
-        constraint studentLekcjaLekcjaFK
-            references lekcja
+    formaZajec   TEXT
 );
 
