@@ -1151,7 +1151,7 @@ $pdo = dbConnection($dbPath);   // polaczenie z baza danych
 
 #scrapPrzedmiot($pdo, $ssl_error, $clearTableCondition, $addToBase);
 
-#poprawaNumerAlbumu($pdo, $ssl_error, $console_write, $start_index=55);
+#poprawaNumerAlbumu($pdo, $ssl_error, $console_write, $start_index=92);
 
 #scrapGrupyNumberAlbumu($pdo, $albumNumber = "53731", $ssl_error, $clearTableCondition = True, $addToBase = True);
 
@@ -1164,4 +1164,5 @@ $pdo = dbConnection($dbPath);   // polaczenie z baza danych
 #scrapGrupyGrupa($pdo, $subject = "SD_1 sem_S 1_Grześkowiak", $ssl_error, $clearTableCondition = True, $addToBase = True);
 
 #scrapGrupyTest($pdo, $ssl_error, $clearTableCondition, $addToBase); // ta funkcja zbiera wszystkie grupy
+
 
