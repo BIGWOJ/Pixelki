@@ -1,6 +1,5 @@
 <?php
 
-
 function dbConnection($path){       // funkcja laczenia z baza, zwraca zmienna polaczenia z baza
     try {
         $pdo = new PDO($path);
@@ -13,7 +12,6 @@ function dbConnection($path){       // funkcja laczenia z baza, zwraca zmienna p
 
     return $pdo;
 }
-
 
 function scrapWykladowca($pdo, $ssl_error=False, $clearTableCondition=True, $addToBase=True) {       // funkcja scrapowania danych do tabeli wykladowca, argument = zmienna laczenia z baza
     try {
@@ -750,7 +748,7 @@ function scrapGrupySala($pdo, $room, $ssl_error=False, $clearTableCondition=True
         // przygotowanie nazwy pokoju dla api
 
         $url = $url . $room . "&start=" . $dateNow . "T00%3A00%3A00%2B01%3A00&end=" . $dateMonth . "T00%3A00%3A00%2B01%3A00";
-        echo $url . "\n";
+        #echo $url . "\n";
 
         if ($ssl_error) {
             $options = [
@@ -1122,8 +1120,973 @@ function scrapGrupyTest($pdo, $ssl_error=False, $clearTableCondition=True, $addT
     }
 }
 
+function scrapLekcjaNumberAlbumu($pdo, $albumNumber, $ssl_error=False, $addToBase=True) {
+    try {
+        // przygotowywanie poprawnego linka do APi
+
+        $sqlLesson = "SELECT * from lekcja";
+        $sqlLessonResult = $pdo->query($sqlLesson);
+        $sqlLessonResult = $sqlLessonResult -> fetchAll(PDO::FETCH_ASSOC);
+
+        #print_r($sqlLessonResult);
 
 
+
+
+
+
+        $lessonsArray = [];
+
+        // ustawienie zeby pobieralo tylko lekcje do 1 miesiaca w przod
+        $dateNow = new DateTime();
+        $dateNow = $dateNow->format("Y-m-d");
+
+        $dateMonth = new DateTime();
+        $dateMonth = $dateMonth->modify("+1 month");
+        $dateMonth = $dateMonth->format("Y-m-d");
+
+        $url = 'https://plan.zut.edu.pl/schedule_student.php?number=';    // link do API
+        // przygotowanie nazwy pokoju dla api
+
+        $url = $url . $albumNumber . "&start=" . $dateNow . "T00%3A00%3A00%2B01%3A00&end=" . $dateMonth . "T00%3A00%3A00%2B01%3A00";
+        echo $url . "\n";
+
+        if ($ssl_error) {
+            $options = [
+                "ssl" => [
+                    "verify_peer" => false,
+                    "verify_peer_name" => false,
+                ],
+            ];
+            $context = stream_context_create($options);
+            #Pobranie zawartosci ze zwrotki z API
+            $response = file_get_contents($url, false, $context);
+        }
+
+        else {
+            $response = file_get_contents($url);
+        }         // pobranie zawartosci ze zwrotki z API
+        echo "Pomyslnie otrzymano zwrot z API \n";
+        $data = json_decode($response, true);                                                 // dekodowania zawartosci do JSON
+
+
+        foreach ($data as $lesson) {
+            if(count($lesson) > 0) {
+                if(isset($lesson)){               // sprawdzanie czy API nie zwrocilo pustego wyniku
+                    $wykladowca = $lesson["worker"];
+                    $grupa = $lesson["group_name"];
+                    $sala = $lesson["room"];
+                    $przedmiot = $lesson["subject"];
+                    $tytul = $lesson["title"];
+                    $opis = $lesson["description"];
+                    $lessonStart = $lesson["start"];
+                    $lessonEnd = $lesson["end"];
+                    $form = $lesson["lesson_form"];
+
+                    $lessonsArray[] = [
+                        "worker" => $wykladowca,
+                        "group_name" => $grupa,
+                        "room" => $sala,
+                        "subject" => $przedmiot,
+                        "title" => $tytul,
+                        "description" => $opis,
+                        "start" => $lessonStart,
+                        "end" => $lessonEnd,
+                        "lesson_form" => $form];
+                }
+            }
+
+        }
+
+
+        $arrayLessonsAdd = [];
+
+
+        // dodawania tylko nowych lekcji
+        foreach ($lessonsArray as $lesson) {
+            $uniqueKey = $lesson["title"] . "-" . $lesson["description"] . "-" . $lesson["start"] . "-" . $lesson["end"] . "-" . $lesson["lesson_form"];
+
+            $elementExists = false;
+
+            foreach ($sqlLessonResult as $key) {
+                $existingKey = $key["tytul"] . "-" . $key["opis"] . "-" . $key["start"] . "-" . $key["koniec"] . "-" . $key["formaZajec"];
+                if ($existingKey == $uniqueKey) {
+                    $elementExists = true;
+                    break;
+                }
+            }
+            if (!$elementExists) {
+                $arrayLessonsAdd[] = $lesson;
+            }
+        }
+
+        #print_r($arrayLessonsAdd);
+
+
+
+        if ($addToBase) {
+
+            $sqlInsert = "INSERT INTO lekcja (wykladowcaID, grupaID, salaID, przedmiotID, tytul, opis, start, koniec, formaZajec) VALUES (:wykladowcaID, :grupaID, :salaID, :przedmiotID, :tytul, :opis, :start, :koniec, :formaZajec)";                                 // wstawianie do tabeli
+            $statement = $pdo->prepare($sqlInsert);
+
+            foreach ($arrayLessonsAdd as $lesson) {
+
+                // pobranie id wykladowcy
+                list($lastName, $name) = explode(" ", (string)$lesson["worker"], 2);             // rozbijanie stringa na imie i nazwisko
+                #echo "wykladowca: " . $lastName . " " . $name . "\n";
+                $queryWykladowcaID = "SELECT wykladowcaID FROM wykladowca WHERE (Imie = :name AND Nazwisko = :lastName)";
+                $wykladowcaID = $pdo->prepare($queryWykladowcaID);
+                $wykladowcaID->bindParam(':name', $name, PDO::PARAM_STR);
+                $wykladowcaID->bindParam(':lastName', $lastName, PDO::PARAM_STR);
+                $wykladowcaID->execute();
+                $wykladowcaIDresult = $wykladowcaID->fetch(PDO::FETCH_ASSOC);
+                $wykladowcaIDresult = (string)$wykladowcaIDresult["wykladowcaID"];
+
+                // pobranie id grupy
+                $grupa = $lesson["group_name"];
+
+                $queryGrupaID = "SELECT grupaID FROM grupa WHERE nazwa = :nazwaGrupy";
+                $grupaID = $pdo->prepare($queryGrupaID);
+                $grupaID->bindParam(':nazwaGrupy', $grupa, PDO::PARAM_STR);
+                $grupaID->execute();
+                $grupaIDresult = $grupaID->fetch(PDO::FETCH_ASSOC);
+                $grupaIDresult = (string)$grupaIDresult["grupaID"];
+
+                #echo $grupaIDresult . "\n";
+
+                // pobranie id sali
+                $room = $lesson["room"];
+
+                list($nazwaWydzialu, $nazwaPokoju) = explode(" ", (string)$lesson["room"], 2);             // rozbijanie stringa na wydzial i pokoj
+
+
+                $querySalaID = "SELECT s.salaID FROM sala s
+                                JOIN wydzial w ON s.wydzialID = w.wydzialID
+                                WHERE s.pokoj = :nazwaPokoju AND w.nazwa = :nazwaWydzialu";
+                $salaID = $pdo->prepare($querySalaID);
+                $salaID->bindParam(':nazwaPokoju', $nazwaPokoju, PDO::PARAM_STR);
+                $salaID->bindParam(':nazwaWydzialu', $nazwaWydzialu, PDO::PARAM_STR);
+                $salaID->execute();
+                $salaIDresult = $salaID->fetch(PDO::FETCH_ASSOC);
+                $salaIDresult = (string)$salaIDresult["salaID"];
+
+                #echo $salaIDresult . "\n";
+
+                // pobieranie id przedmiotu
+                $przedmiot = $lesson["subject"];
+
+                $queryPrzedmiotID = "SELECT przedmiotID FROM przedmiot WHERE nazwa = :nazwaPrzedmiotu";
+                $przedmiotID = $pdo->prepare($queryPrzedmiotID);
+                $przedmiotID->bindParam(':nazwaPrzedmiotu', $przedmiot, PDO::PARAM_STR);
+                $przedmiotID->execute();
+                $przedmiotIDresult = $przedmiotID->fetch(PDO::FETCH_ASSOC);
+                $przedmiotIDresult = (string)$przedmiotIDresult["przedmiotID"];
+
+                #echo $przedmiotIDresult . "\n";
+
+
+                // wstawianie do tabeli
+
+                $statement->bindParam(':wykladowcaID', $wykladowcaIDresult, PDO::PARAM_STR);
+                $statement->bindParam(':grupaID', $grupaIDresult, PDO::PARAM_STR);
+                $statement->bindParam(':salaID', $salaIDresult, PDO::PARAM_STR);
+                $statement->bindParam(':przedmiotID', $przedmiotIDresult, PDO::PARAM_STR);
+                $statement->bindParam(':tytul', $lesson["title"], PDO::PARAM_STR);
+                $statement->bindParam(':opis', $lesson["description"], PDO::PARAM_STR);
+                $statement->bindParam(':start', $lesson["start"], PDO::PARAM_STR);
+                $statement->bindParam(':koniec', $lesson["end"], PDO::PARAM_STR);
+                $statement->bindParam(':formaZajec', $lesson["lesson_form"], PDO::PARAM_STR);
+
+
+                try {
+                    $statement -> execute();
+                } catch (PDOException $e) {
+                    echo "Blad zapytania: " . $e -> getMessage();
+                    exit();
+                }
+
+
+            }
+        }
+
+    } catch (PDOException $e) {
+        echo "Blad polaczenia z API: " . $e -> getMessage();
+        exit();
+    }
+}
+
+function scrapLekcjaWykladowca($pdo, $teacherName, $ssl_error=False, $addToBase=True) {
+    try {
+        // przygotowywanie poprawnego linka do APi
+
+        $sqlLesson = "SELECT * from lekcja";
+        $sqlLessonResult = $pdo->query($sqlLesson);
+        $sqlLessonResult = $sqlLessonResult -> fetchAll(PDO::FETCH_ASSOC);
+
+        #print_r($sqlLessonResult);
+
+        $lessonsArray = [];
+
+        // ustawienie zeby pobieralo tylko lekcje do 1 miesiaca w przod
+        $dateNow = new DateTime();
+        $dateNow = $dateNow->format("Y-m-d");
+
+        $dateMonth = new DateTime();
+        $dateMonth = $dateMonth->modify("+1 month");
+        $dateMonth = $dateMonth->format("Y-m-d");
+
+
+        list($lastName, $name) = explode(" ", $teacherName, 2);
+
+
+        $url = 'https://plan.zut.edu.pl/schedule_student.php?teacher=';    // link do API
+        // przygotowanie nazwy pokoju dla api
+
+        $url = $url . $lastName . "%20" . $name . "&start=" . $dateNow . "T00%3A00%3A00%2B01%3A00&end=" . $dateMonth . "T00%3A00%3A00%2B01%3A00";
+        echo $url . "\n";
+
+        if ($ssl_error) {
+            $options = [
+                "ssl" => [
+                    "verify_peer" => false,
+                    "verify_peer_name" => false,
+                ],
+            ];
+            $context = stream_context_create($options);
+            #Pobranie zawartosci ze zwrotki z API
+            $response = file_get_contents($url, false, $context);
+        }
+
+        else {
+            $response = file_get_contents($url);
+        }         // pobranie zawartosci ze zwrotki z API
+        echo "Pomyslnie otrzymano zwrot z API \n";
+        $data = json_decode($response, true);                                                 // dekodowania zawartosci do JSON
+
+
+        foreach ($data as $lesson) {
+            if(count($lesson) > 0) {
+                if(isset($lesson)){               // sprawdzanie czy API nie zwrocilo pustego wyniku
+                    $wykladowca = $lesson["worker"];
+                    $grupa = $lesson["group_name"];
+                    $sala = $lesson["room"];
+                    $przedmiot = $lesson["subject"];
+                    $tytul = $lesson["title"];
+                    $opis = $lesson["description"];
+                    $lessonStart = $lesson["start"];
+                    $lessonEnd = $lesson["end"];
+                    $form = $lesson["lesson_form"];
+
+                    $lessonsArray[] = [
+                        "worker" => $wykladowca,
+                        "group_name" => $grupa,
+                        "room" => $sala,
+                        "subject" => $przedmiot,
+                        "title" => $tytul,
+                        "description" => $opis,
+                        "start" => $lessonStart,
+                        "end" => $lessonEnd,
+                        "lesson_form" => $form];
+                }
+            }
+
+        }
+
+
+        $arrayLessonsAdd = [];
+
+
+        // dodawania tylko nowych lekcji
+        foreach ($lessonsArray as $lesson) {
+            $uniqueKey = $lesson["title"] . "-" . $lesson["description"] . "-" . $lesson["start"] . "-" . $lesson["end"] . "-" . $lesson["lesson_form"];
+
+            $elementExists = false;
+
+            foreach ($sqlLessonResult as $key) {
+                $existingKey = $key["tytul"] . "-" . $key["opis"] . "-" . $key["start"] . "-" . $key["koniec"] . "-" . $key["formaZajec"];
+                if ($existingKey == $uniqueKey) {
+                    $elementExists = true;
+                    break;
+                }
+            }
+            if (!$elementExists) {
+                $arrayLessonsAdd[] = $lesson;
+            }
+        }
+
+        #print_r($arrayLessonsAdd);
+
+
+
+        if ($addToBase) {
+
+            $sqlInsert = "INSERT INTO lekcja (wykladowcaID, grupaID, salaID, przedmiotID, tytul, opis, start, koniec, formaZajec) VALUES (:wykladowcaID, :grupaID, :salaID, :przedmiotID, :tytul, :opis, :start, :koniec, :formaZajec)";                                 // wstawianie do tabeli
+            $statement = $pdo->prepare($sqlInsert);
+
+            foreach ($arrayLessonsAdd as $lesson) {
+
+                // pobranie id wykladowcy
+                list($lastName, $name) = explode(" ", (string)$lesson["worker"], 2);             // rozbijanie stringa na imie i nazwisko
+                #echo "wykladowca: " . $lastName . " " . $name . "\n";
+                $queryWykladowcaID = "SELECT wykladowcaID FROM wykladowca WHERE (Imie = :name AND Nazwisko = :lastName)";
+                $wykladowcaID = $pdo->prepare($queryWykladowcaID);
+                $wykladowcaID->bindParam(':name', $name, PDO::PARAM_STR);
+                $wykladowcaID->bindParam(':lastName', $lastName, PDO::PARAM_STR);
+                $wykladowcaID->execute();
+                $wykladowcaIDresult = $wykladowcaID->fetch(PDO::FETCH_ASSOC);
+                $wykladowcaIDresult = (string)$wykladowcaIDresult["wykladowcaID"];
+
+                // pobranie id grupy
+                $grupa = $lesson["group_name"];
+
+                $queryGrupaID = "SELECT grupaID FROM grupa WHERE nazwa = :nazwaGrupy";
+                $grupaID = $pdo->prepare($queryGrupaID);
+                $grupaID->bindParam(':nazwaGrupy', $grupa, PDO::PARAM_STR);
+                $grupaID->execute();
+                $grupaIDresult = $grupaID->fetch(PDO::FETCH_ASSOC);
+                $grupaIDresult = (string)$grupaIDresult["grupaID"];
+
+                #echo $grupaIDresult . "\n";
+
+                // pobranie id sali
+                $room = $lesson["room"];
+
+                list($nazwaWydzialu, $nazwaPokoju) = explode(" ", (string)$lesson["room"], 2);             // rozbijanie stringa na wydzial i pokoj
+
+
+                $querySalaID = "SELECT s.salaID FROM sala s
+                                JOIN wydzial w ON s.wydzialID = w.wydzialID
+                                WHERE s.pokoj = :nazwaPokoju AND w.nazwa = :nazwaWydzialu";
+                $salaID = $pdo->prepare($querySalaID);
+                $salaID->bindParam(':nazwaPokoju', $nazwaPokoju, PDO::PARAM_STR);
+                $salaID->bindParam(':nazwaWydzialu', $nazwaWydzialu, PDO::PARAM_STR);
+                $salaID->execute();
+                $salaIDresult = $salaID->fetch(PDO::FETCH_ASSOC);
+                $salaIDresult = (string)$salaIDresult["salaID"];
+
+                #echo $salaIDresult . "\n";
+
+                // pobieranie id przedmiotu
+                $przedmiot = $lesson["subject"];
+
+                $queryPrzedmiotID = "SELECT przedmiotID FROM przedmiot WHERE nazwa = :nazwaPrzedmiotu";
+                $przedmiotID = $pdo->prepare($queryPrzedmiotID);
+                $przedmiotID->bindParam(':nazwaPrzedmiotu', $przedmiot, PDO::PARAM_STR);
+                $przedmiotID->execute();
+                $przedmiotIDresult = $przedmiotID->fetch(PDO::FETCH_ASSOC);
+                $przedmiotIDresult = (string)$przedmiotIDresult["przedmiotID"];
+
+                #echo $przedmiotIDresult . "\n";
+
+
+                // wstawianie do tabeli
+
+                $statement->bindParam(':wykladowcaID', $wykladowcaIDresult, PDO::PARAM_STR);
+                $statement->bindParam(':grupaID', $grupaIDresult, PDO::PARAM_STR);
+                $statement->bindParam(':salaID', $salaIDresult, PDO::PARAM_STR);
+                $statement->bindParam(':przedmiotID', $przedmiotIDresult, PDO::PARAM_STR);
+                $statement->bindParam(':tytul', $lesson["title"], PDO::PARAM_STR);
+                $statement->bindParam(':opis', $lesson["description"], PDO::PARAM_STR);
+                $statement->bindParam(':start', $lesson["start"], PDO::PARAM_STR);
+                $statement->bindParam(':koniec', $lesson["end"], PDO::PARAM_STR);
+                $statement->bindParam(':formaZajec', $lesson["lesson_form"], PDO::PARAM_STR);
+
+
+                try {
+                    $statement -> execute();
+                } catch (PDOException $e) {
+                    echo "Blad zapytania: " . $e -> getMessage();
+                    exit();
+                }
+
+
+            }
+        }
+
+    } catch (PDOException $e) {
+        echo "Blad polaczenia z API: " . $e -> getMessage();
+        exit();
+    }
+}
+
+function scrapLekcjaSala($pdo, $room, $ssl_error=False, $addToBase=True) {
+    try {
+        // przygotowywanie poprawnego linka do APi
+
+        $sqlLesson = "SELECT * from lekcja";
+        $sqlLessonResult = $pdo->query($sqlLesson);
+        $sqlLessonResult = $sqlLessonResult -> fetchAll(PDO::FETCH_ASSOC);
+
+        #print_r($sqlLessonResult);
+
+        $lessonsArray = [];
+
+        // ustawienie zeby pobieralo tylko lekcje do 1 miesiaca w przod
+        $dateNow = new DateTime();
+        $dateNow = $dateNow->format("Y-m-d");
+
+        $dateMonth = new DateTime();
+        $dateMonth = $dateMonth->modify("+1 month");
+        $dateMonth = $dateMonth->format("Y-m-d");
+
+
+        $room = str_replace(" ", "%20", $room);
+
+
+        $url = 'https://plan.zut.edu.pl/schedule_student.php?room=';    // link do API
+        // przygotowanie nazwy pokoju dla api
+
+        $url = $url . $room . "&start=" . $dateNow . "T00%3A00%3A00%2B01%3A00&end=" . $dateMonth . "T00%3A00%3A00%2B01%3A00";
+        echo $url . "\n";
+
+        if ($ssl_error) {
+            $options = [
+                "ssl" => [
+                    "verify_peer" => false,
+                    "verify_peer_name" => false,
+                ],
+            ];
+            $context = stream_context_create($options);
+            #Pobranie zawartosci ze zwrotki z API
+            $response = file_get_contents($url, false, $context);
+        }
+
+        else {
+            $response = file_get_contents($url);
+        }         // pobranie zawartosci ze zwrotki z API
+        echo "Pomyslnie otrzymano zwrot z API \n";
+        $data = json_decode($response, true);                                                 // dekodowania zawartosci do JSON
+
+
+        foreach ($data as $lesson) {
+            if(count($lesson) > 0) {
+                if(isset($lesson)){               // sprawdzanie czy API nie zwrocilo pustego wyniku
+                    $wykladowca = $lesson["worker"];
+                    $grupa = $lesson["group_name"];
+                    $sala = $lesson["room"];
+                    $przedmiot = $lesson["subject"];
+                    $tytul = $lesson["title"];
+                    $opis = $lesson["description"];
+                    $lessonStart = $lesson["start"];
+                    $lessonEnd = $lesson["end"];
+                    $form = $lesson["lesson_form"];
+
+                    $lessonsArray[] = [
+                        "worker" => $wykladowca,
+                        "group_name" => $grupa,
+                        "room" => $sala,
+                        "subject" => $przedmiot,
+                        "title" => $tytul,
+                        "description" => $opis,
+                        "start" => $lessonStart,
+                        "end" => $lessonEnd,
+                        "lesson_form" => $form];
+                }
+            }
+
+        }
+
+
+        $arrayLessonsAdd = [];
+
+
+        // dodawania tylko nowych lekcji
+        foreach ($lessonsArray as $lesson) {
+            $uniqueKey = $lesson["title"] . "-" . $lesson["description"] . "-" . $lesson["start"] . "-" . $lesson["end"] . "-" . $lesson["lesson_form"];
+
+            $elementExists = false;
+
+            foreach ($sqlLessonResult as $key) {
+                $existingKey = $key["tytul"] . "-" . $key["opis"] . "-" . $key["start"] . "-" . $key["koniec"] . "-" . $key["formaZajec"];
+                if ($existingKey == $uniqueKey) {
+                    $elementExists = true;
+                    break;
+                }
+            }
+            if (!$elementExists) {
+                $arrayLessonsAdd[] = $lesson;
+            }
+        }
+
+        #print_r($arrayLessonsAdd);
+
+
+
+        if ($addToBase) {
+
+            $sqlInsert = "INSERT INTO lekcja (wykladowcaID, grupaID, salaID, przedmiotID, tytul, opis, start, koniec, formaZajec) VALUES (:wykladowcaID, :grupaID, :salaID, :przedmiotID, :tytul, :opis, :start, :koniec, :formaZajec)";                                 // wstawianie do tabeli
+            $statement = $pdo->prepare($sqlInsert);
+
+            foreach ($arrayLessonsAdd as $lesson) {
+
+                // pobranie id wykladowcy
+                list($lastName, $name) = explode(" ", (string)$lesson["worker"], 2);             // rozbijanie stringa na imie i nazwisko
+                #echo "wykladowca: " . $lastName . " " . $name . "\n";
+                $queryWykladowcaID = "SELECT wykladowcaID FROM wykladowca WHERE (Imie = :name AND Nazwisko = :lastName)";
+                $wykladowcaID = $pdo->prepare($queryWykladowcaID);
+                $wykladowcaID->bindParam(':name', $name, PDO::PARAM_STR);
+                $wykladowcaID->bindParam(':lastName', $lastName, PDO::PARAM_STR);
+                $wykladowcaID->execute();
+                $wykladowcaIDresult = $wykladowcaID->fetch(PDO::FETCH_ASSOC);
+                $wykladowcaIDresult = (string)$wykladowcaIDresult["wykladowcaID"];
+
+                // pobranie id grupy
+                $grupa = $lesson["group_name"];
+
+                $queryGrupaID = "SELECT grupaID FROM grupa WHERE nazwa = :nazwaGrupy";
+                $grupaID = $pdo->prepare($queryGrupaID);
+                $grupaID->bindParam(':nazwaGrupy', $grupa, PDO::PARAM_STR);
+                $grupaID->execute();
+                $grupaIDresult = $grupaID->fetch(PDO::FETCH_ASSOC);
+                $grupaIDresult = (string)$grupaIDresult["grupaID"];
+
+                #echo $grupaIDresult . "\n";
+
+                // pobranie id sali
+                $room = $lesson["room"];
+
+                list($nazwaWydzialu, $nazwaPokoju) = explode(" ", (string)$lesson["room"], 2);             // rozbijanie stringa na wydzial i pokoj
+
+
+                $querySalaID = "SELECT s.salaID FROM sala s
+                                JOIN wydzial w ON s.wydzialID = w.wydzialID
+                                WHERE s.pokoj = :nazwaPokoju AND w.nazwa = :nazwaWydzialu";
+                $salaID = $pdo->prepare($querySalaID);
+                $salaID->bindParam(':nazwaPokoju', $nazwaPokoju, PDO::PARAM_STR);
+                $salaID->bindParam(':nazwaWydzialu', $nazwaWydzialu, PDO::PARAM_STR);
+                $salaID->execute();
+                $salaIDresult = $salaID->fetch(PDO::FETCH_ASSOC);
+                $salaIDresult = (string)$salaIDresult["salaID"];
+
+                #echo $salaIDresult . "\n";
+
+                // pobieranie id przedmiotu
+                $przedmiot = $lesson["subject"];
+
+                $queryPrzedmiotID = "SELECT przedmiotID FROM przedmiot WHERE nazwa = :nazwaPrzedmiotu";
+                $przedmiotID = $pdo->prepare($queryPrzedmiotID);
+                $przedmiotID->bindParam(':nazwaPrzedmiotu', $przedmiot, PDO::PARAM_STR);
+                $przedmiotID->execute();
+                $przedmiotIDresult = $przedmiotID->fetch(PDO::FETCH_ASSOC);
+                $przedmiotIDresult = (string)$przedmiotIDresult["przedmiotID"];
+
+                #echo $przedmiotIDresult . "\n";
+
+
+                // wstawianie do tabeli
+
+                $statement->bindParam(':wykladowcaID', $wykladowcaIDresult, PDO::PARAM_STR);
+                $statement->bindParam(':grupaID', $grupaIDresult, PDO::PARAM_STR);
+                $statement->bindParam(':salaID', $salaIDresult, PDO::PARAM_STR);
+                $statement->bindParam(':przedmiotID', $przedmiotIDresult, PDO::PARAM_STR);
+                $statement->bindParam(':tytul', $lesson["title"], PDO::PARAM_STR);
+                $statement->bindParam(':opis', $lesson["description"], PDO::PARAM_STR);
+                $statement->bindParam(':start', $lesson["start"], PDO::PARAM_STR);
+                $statement->bindParam(':koniec', $lesson["end"], PDO::PARAM_STR);
+                $statement->bindParam(':formaZajec', $lesson["lesson_form"], PDO::PARAM_STR);
+
+
+                try {
+                    $statement -> execute();
+                } catch (PDOException $e) {
+                    echo "Blad zapytania: " . $e -> getMessage();
+                    exit();
+                }
+
+
+            }
+        }
+
+    } catch (PDOException $e) {
+        echo "Blad polaczenia z API: " . $e -> getMessage();
+        exit();
+    }
+}
+
+function scrapLekcjaPrzedmiot($pdo, $subject, $ssl_error=False, $addToBase=True) {
+    try {
+        // przygotowywanie poprawnego linka do APi
+
+        $sqlLesson = "SELECT * from lekcja";
+        $sqlLessonResult = $pdo->query($sqlLesson);
+        $sqlLessonResult = $sqlLessonResult -> fetchAll(PDO::FETCH_ASSOC);
+
+        #print_r($sqlLessonResult);
+
+        $lessonsArray = [];
+
+        // ustawienie zeby pobieralo tylko lekcje do 1 miesiaca w przod
+        $dateNow = new DateTime();
+        $dateNow = $dateNow->format("Y-m-d");
+
+        $dateMonth = new DateTime();
+        $dateMonth = $dateMonth->modify("+1 month");
+        $dateMonth = $dateMonth->format("Y-m-d");
+
+        $subject = str_replace(" ", "%20", $subject);
+
+        $url = 'https://plan.zut.edu.pl/schedule_student.php?subject=';    // link do API
+        // przygotowanie nazwy pokoju dla api
+
+        $url = $url . $subject . "&start=" . $dateNow . "T00%3A00%3A00%2B01%3A00&end=" . $dateMonth . "T00%3A00%3A00%2B01%3A00";
+        echo $url . "\n";
+
+        if ($ssl_error) {
+            $options = [
+                "ssl" => [
+                    "verify_peer" => false,
+                    "verify_peer_name" => false,
+                ],
+            ];
+            $context = stream_context_create($options);
+            #Pobranie zawartosci ze zwrotki z API
+            $response = file_get_contents($url, false, $context);
+        }
+
+        else {
+            $response = file_get_contents($url);
+        }         // pobranie zawartosci ze zwrotki z API
+        echo "Pomyslnie otrzymano zwrot z API \n";
+        $data = json_decode($response, true);                                                 // dekodowania zawartosci do JSON
+
+
+        foreach ($data as $lesson) {
+            if(count($lesson) > 0) {
+                if(isset($lesson)){               // sprawdzanie czy API nie zwrocilo pustego wyniku
+                    $wykladowca = $lesson["worker"];
+                    $grupa = $lesson["group_name"];
+                    $sala = $lesson["room"];
+                    $przedmiot = $lesson["subject"];
+                    $tytul = $lesson["title"];
+                    $opis = $lesson["description"];
+                    $lessonStart = $lesson["start"];
+                    $lessonEnd = $lesson["end"];
+                    $form = $lesson["lesson_form"];
+
+                    $lessonsArray[] = [
+                        "worker" => $wykladowca,
+                        "group_name" => $grupa,
+                        "room" => $sala,
+                        "subject" => $przedmiot,
+                        "title" => $tytul,
+                        "description" => $opis,
+                        "start" => $lessonStart,
+                        "end" => $lessonEnd,
+                        "lesson_form" => $form];
+                }
+            }
+
+        }
+
+
+        $arrayLessonsAdd = [];
+
+
+        // dodawania tylko nowych lekcji
+        foreach ($lessonsArray as $lesson) {
+            $uniqueKey = $lesson["title"] . "-" . $lesson["description"] . "-" . $lesson["start"] . "-" . $lesson["end"] . "-" . $lesson["lesson_form"];
+
+            $elementExists = false;
+
+            foreach ($sqlLessonResult as $key) {
+                $existingKey = $key["tytul"] . "-" . $key["opis"] . "-" . $key["start"] . "-" . $key["koniec"] . "-" . $key["formaZajec"];
+                if ($existingKey == $uniqueKey) {
+                    $elementExists = true;
+                    break;
+                }
+            }
+            if (!$elementExists) {
+                $arrayLessonsAdd[] = $lesson;
+            }
+        }
+
+        #print_r($arrayLessonsAdd);
+
+
+
+        if ($addToBase) {
+
+            $sqlInsert = "INSERT INTO lekcja (wykladowcaID, grupaID, salaID, przedmiotID, tytul, opis, start, koniec, formaZajec) VALUES (:wykladowcaID, :grupaID, :salaID, :przedmiotID, :tytul, :opis, :start, :koniec, :formaZajec)";                                 // wstawianie do tabeli
+            $statement = $pdo->prepare($sqlInsert);
+
+            foreach ($arrayLessonsAdd as $lesson) {
+
+                // pobranie id wykladowcy
+                list($lastName, $name) = explode(" ", (string)$lesson["worker"], 2);             // rozbijanie stringa na imie i nazwisko
+                #echo "wykladowca: " . $lastName . " " . $name . "\n";
+                $queryWykladowcaID = "SELECT wykladowcaID FROM wykladowca WHERE (Imie = :name AND Nazwisko = :lastName)";
+                $wykladowcaID = $pdo->prepare($queryWykladowcaID);
+                $wykladowcaID->bindParam(':name', $name, PDO::PARAM_STR);
+                $wykladowcaID->bindParam(':lastName', $lastName, PDO::PARAM_STR);
+                $wykladowcaID->execute();
+                $wykladowcaIDresult = $wykladowcaID->fetch(PDO::FETCH_ASSOC);
+                $wykladowcaIDresult = (string)$wykladowcaIDresult["wykladowcaID"];
+
+                // pobranie id grupy
+                $grupa = $lesson["group_name"];
+
+                $queryGrupaID = "SELECT grupaID FROM grupa WHERE nazwa = :nazwaGrupy";
+                $grupaID = $pdo->prepare($queryGrupaID);
+                $grupaID->bindParam(':nazwaGrupy', $grupa, PDO::PARAM_STR);
+                $grupaID->execute();
+                $grupaIDresult = $grupaID->fetch(PDO::FETCH_ASSOC);
+                $grupaIDresult = (string)$grupaIDresult["grupaID"];
+
+                #echo $grupaIDresult . "\n";
+
+                // pobranie id sali
+                $room = $lesson["room"];
+
+                list($nazwaWydzialu, $nazwaPokoju) = explode(" ", (string)$lesson["room"], 2);             // rozbijanie stringa na wydzial i pokoj
+
+
+                $querySalaID = "SELECT s.salaID FROM sala s
+                                JOIN wydzial w ON s.wydzialID = w.wydzialID
+                                WHERE s.pokoj = :nazwaPokoju AND w.nazwa = :nazwaWydzialu";
+                $salaID = $pdo->prepare($querySalaID);
+                $salaID->bindParam(':nazwaPokoju', $nazwaPokoju, PDO::PARAM_STR);
+                $salaID->bindParam(':nazwaWydzialu', $nazwaWydzialu, PDO::PARAM_STR);
+                $salaID->execute();
+                $salaIDresult = $salaID->fetch(PDO::FETCH_ASSOC);
+                $salaIDresult = (string)$salaIDresult["salaID"];
+
+                #echo $salaIDresult . "\n";
+
+                // pobieranie id przedmiotu
+                $przedmiot = $lesson["subject"];
+
+                $queryPrzedmiotID = "SELECT przedmiotID FROM przedmiot WHERE nazwa = :nazwaPrzedmiotu";
+                $przedmiotID = $pdo->prepare($queryPrzedmiotID);
+                $przedmiotID->bindParam(':nazwaPrzedmiotu', $przedmiot, PDO::PARAM_STR);
+                $przedmiotID->execute();
+                $przedmiotIDresult = $przedmiotID->fetch(PDO::FETCH_ASSOC);
+                $przedmiotIDresult = (string)$przedmiotIDresult["przedmiotID"];
+
+                #echo $przedmiotIDresult . "\n";
+
+
+                // wstawianie do tabeli
+
+                $statement->bindParam(':wykladowcaID', $wykladowcaIDresult, PDO::PARAM_STR);
+                $statement->bindParam(':grupaID', $grupaIDresult, PDO::PARAM_STR);
+                $statement->bindParam(':salaID', $salaIDresult, PDO::PARAM_STR);
+                $statement->bindParam(':przedmiotID', $przedmiotIDresult, PDO::PARAM_STR);
+                $statement->bindParam(':tytul', $lesson["title"], PDO::PARAM_STR);
+                $statement->bindParam(':opis', $lesson["description"], PDO::PARAM_STR);
+                $statement->bindParam(':start', $lesson["start"], PDO::PARAM_STR);
+                $statement->bindParam(':koniec', $lesson["end"], PDO::PARAM_STR);
+                $statement->bindParam(':formaZajec', $lesson["lesson_form"], PDO::PARAM_STR);
+
+
+                try {
+                    $statement -> execute();
+                } catch (PDOException $e) {
+                    echo "Blad zapytania: " . $e -> getMessage();
+                    exit();
+                }
+
+
+            }
+        }
+
+    } catch (PDOException $e) {
+        echo "Blad polaczenia z API: " . $e -> getMessage();
+        exit();
+    }
+}
+
+function scrapLekcjaGrupa($pdo, $group, $ssl_error=False, $addToBase=True) {
+    try {
+        // przygotowywanie poprawnego linka do APi
+
+        $sqlLesson = "SELECT * from lekcja";
+        $sqlLessonResult = $pdo->query($sqlLesson);
+        $sqlLessonResult = $sqlLessonResult -> fetchAll(PDO::FETCH_ASSOC);
+
+        #print_r($sqlLessonResult);
+
+        $lessonsArray = [];
+
+        // ustawienie zeby pobieralo tylko lekcje do 1 miesiaca w przod
+        $dateNow = new DateTime();
+        $dateNow = $dateNow->format("Y-m-d");
+
+        $dateMonth = new DateTime();
+        $dateMonth = $dateMonth->modify("+1 month");
+        $dateMonth = $dateMonth->format("Y-m-d");
+
+        $group = str_replace(" ", "%20", $group);
+
+
+        $url = 'https://plan.zut.edu.pl/schedule_student.php?group=';    // link do API
+        // przygotowanie nazwy pokoju dla api
+
+        $url = $url . $group . "&start=" . $dateNow . "T00%3A00%3A00%2B01%3A00&end=" . $dateMonth . "T00%3A00%3A00%2B01%3A00";
+        echo $url . "\n";
+
+        if ($ssl_error) {
+            $options = [
+                "ssl" => [
+                    "verify_peer" => false,
+                    "verify_peer_name" => false,
+                ],
+            ];
+            $context = stream_context_create($options);
+            #Pobranie zawartosci ze zwrotki z API
+            $response = file_get_contents($url, false, $context);
+        }
+
+        else {
+            $response = file_get_contents($url);
+        }         // pobranie zawartosci ze zwrotki z API
+        echo "Pomyslnie otrzymano zwrot z API \n";
+        $data = json_decode($response, true);                                                 // dekodowania zawartosci do JSON
+
+
+        foreach ($data as $lesson) {
+            if(count($lesson) > 0) {
+                if(isset($lesson)){               // sprawdzanie czy API nie zwrocilo pustego wyniku
+                    $wykladowca = $lesson["worker"];
+                    $grupa = $lesson["group_name"];
+                    $sala = $lesson["room"];
+                    $przedmiot = $lesson["subject"];
+                    $tytul = $lesson["title"];
+                    $opis = $lesson["description"];
+                    $lessonStart = $lesson["start"];
+                    $lessonEnd = $lesson["end"];
+                    $form = $lesson["lesson_form"];
+
+                    $lessonsArray[] = [
+                        "worker" => $wykladowca,
+                        "group_name" => $grupa,
+                        "room" => $sala,
+                        "subject" => $przedmiot,
+                        "title" => $tytul,
+                        "description" => $opis,
+                        "start" => $lessonStart,
+                        "end" => $lessonEnd,
+                        "lesson_form" => $form];
+                }
+            }
+
+        }
+
+
+        $arrayLessonsAdd = [];
+
+
+        // dodawania tylko nowych lekcji
+        foreach ($lessonsArray as $lesson) {
+            $uniqueKey = $lesson["title"] . "-" . $lesson["description"] . "-" . $lesson["start"] . "-" . $lesson["end"] . "-" . $lesson["lesson_form"];
+
+            $elementExists = false;
+
+            foreach ($sqlLessonResult as $key) {
+                $existingKey = $key["tytul"] . "-" . $key["opis"] . "-" . $key["start"] . "-" . $key["koniec"] . "-" . $key["formaZajec"];
+                if ($existingKey == $uniqueKey) {
+                    $elementExists = true;
+                    break;
+                }
+            }
+            if (!$elementExists) {
+                $arrayLessonsAdd[] = $lesson;
+            }
+        }
+
+        #print_r($arrayLessonsAdd);
+
+
+
+        if ($addToBase) {
+
+            $sqlInsert = "INSERT INTO lekcja (wykladowcaID, grupaID, salaID, przedmiotID, tytul, opis, start, koniec, formaZajec) VALUES (:wykladowcaID, :grupaID, :salaID, :przedmiotID, :tytul, :opis, :start, :koniec, :formaZajec)";                                 // wstawianie do tabeli
+            $statement = $pdo->prepare($sqlInsert);
+
+            foreach ($arrayLessonsAdd as $lesson) {
+
+                // pobranie id wykladowcy
+                list($lastName, $name) = explode(" ", (string)$lesson["worker"], 2);             // rozbijanie stringa na imie i nazwisko
+                #echo "wykladowca: " . $lastName . " " . $name . "\n";
+                $queryWykladowcaID = "SELECT wykladowcaID FROM wykladowca WHERE (Imie = :name AND Nazwisko = :lastName)";
+                $wykladowcaID = $pdo->prepare($queryWykladowcaID);
+                $wykladowcaID->bindParam(':name', $name, PDO::PARAM_STR);
+                $wykladowcaID->bindParam(':lastName', $lastName, PDO::PARAM_STR);
+                $wykladowcaID->execute();
+                $wykladowcaIDresult = $wykladowcaID->fetch(PDO::FETCH_ASSOC);
+                $wykladowcaIDresult = (string)$wykladowcaIDresult["wykladowcaID"];
+
+                // pobranie id grupy
+                $grupa = $lesson["group_name"];
+
+                $queryGrupaID = "SELECT grupaID FROM grupa WHERE nazwa = :nazwaGrupy";
+                $grupaID = $pdo->prepare($queryGrupaID);
+                $grupaID->bindParam(':nazwaGrupy', $grupa, PDO::PARAM_STR);
+                $grupaID->execute();
+                $grupaIDresult = $grupaID->fetch(PDO::FETCH_ASSOC);
+                $grupaIDresult = (string)$grupaIDresult["grupaID"];
+
+                #echo $grupaIDresult . "\n";
+
+                // pobranie id sali
+                $room = $lesson["room"];
+
+                list($nazwaWydzialu, $nazwaPokoju) = explode(" ", (string)$lesson["room"], 2);             // rozbijanie stringa na wydzial i pokoj
+
+
+                $querySalaID = "SELECT s.salaID FROM sala s
+                                JOIN wydzial w ON s.wydzialID = w.wydzialID
+                                WHERE s.pokoj = :nazwaPokoju AND w.nazwa = :nazwaWydzialu";
+                $salaID = $pdo->prepare($querySalaID);
+                $salaID->bindParam(':nazwaPokoju', $nazwaPokoju, PDO::PARAM_STR);
+                $salaID->bindParam(':nazwaWydzialu', $nazwaWydzialu, PDO::PARAM_STR);
+                $salaID->execute();
+                $salaIDresult = $salaID->fetch(PDO::FETCH_ASSOC);
+                $salaIDresult = (string)$salaIDresult["salaID"];
+
+                #echo $salaIDresult . "\n";
+
+                // pobieranie id przedmiotu
+                $przedmiot = $lesson["subject"];
+
+                $queryPrzedmiotID = "SELECT przedmiotID FROM przedmiot WHERE nazwa = :nazwaPrzedmiotu";
+                $przedmiotID = $pdo->prepare($queryPrzedmiotID);
+                $przedmiotID->bindParam(':nazwaPrzedmiotu', $przedmiot, PDO::PARAM_STR);
+                $przedmiotID->execute();
+                $przedmiotIDresult = $przedmiotID->fetch(PDO::FETCH_ASSOC);
+                $przedmiotIDresult = (string)$przedmiotIDresult["przedmiotID"];
+
+                #echo $przedmiotIDresult . "\n";
+
+
+                // wstawianie do tabeli
+
+                $statement->bindParam(':wykladowcaID', $wykladowcaIDresult, PDO::PARAM_STR);
+                $statement->bindParam(':grupaID', $grupaIDresult, PDO::PARAM_STR);
+                $statement->bindParam(':salaID', $salaIDresult, PDO::PARAM_STR);
+                $statement->bindParam(':przedmiotID', $przedmiotIDresult, PDO::PARAM_STR);
+                $statement->bindParam(':tytul', $lesson["title"], PDO::PARAM_STR);
+                $statement->bindParam(':opis', $lesson["description"], PDO::PARAM_STR);
+                $statement->bindParam(':start', $lesson["start"], PDO::PARAM_STR);
+                $statement->bindParam(':koniec', $lesson["end"], PDO::PARAM_STR);
+                $statement->bindParam(':formaZajec', $lesson["lesson_form"], PDO::PARAM_STR);
+
+
+                try {
+                    $statement -> execute();
+                } catch (PDOException $e) {
+                    echo "Blad zapytania: " . $e -> getMessage();
+                    exit();
+                }
+
+
+            }
+        }
+
+    } catch (PDOException $e) {
+        echo "Blad polaczenia z API: " . $e -> getMessage();
+        exit();
+    }
+}
 
 //Ustawić na True, jeśli występuje błąd związany z certyfikatem SSL
 $ssl_error = True;
@@ -1140,6 +2103,7 @@ $console_write = True;
 $dbPath = 'sqlite:./data.db';   // link do bazy danych
 
 $pdo = dbConnection($dbPath);   // polaczenie z baza danych
+
 
 #scrapWykladowca($pdo, $ssl_error);
 
@@ -1161,8 +2125,22 @@ $pdo = dbConnection($dbPath);   // polaczenie z baza danych
 
 #scrapGrupyPrzedmiot($pdo, $subject = "Sieci komputerowe (L)", $ssl_error, $clearTableCondition = True, $addToBase = True);
 
-#scrapGrupyGrupa($pdo, $subject = "SD_1 sem_S 1_Grześkowiak", $ssl_error, $clearTableCondition = True, $addToBase = True);
+#scrapGrupyGrupa($pdo, $group = "SD_1 sem_S 1_Grześkowiak", $ssl_error, $clearTableCondition = True, $addToBase = True);
 
 #scrapGrupyTest($pdo, $ssl_error, $clearTableCondition, $addToBase); // ta funkcja zbiera wszystkie grupy
+
+#scrapLekcjaNumberAlbumu($pdo, $albumNumber = "53873", $ssl_error=False, $addToBase=True);
+
+#scrapLekcjaWykladowca($pdo, $teacherName = "Kondyjowska-Dziechciarz Marzena", $ssl_error=False, $addToBase=True);
+
+#scrapLekcjaSala($pdo, $teacherName = "WI WI1- 007", $ssl_error=False, $addToBase=True);
+
+#scrapLekcjaPrzedmiot($pdo, $subject = "Sieci komputerowe (L)", $ssl_error=False, $addToBase=True);
+
+#scrapLekcjaGrupa($pdo, $group = "SJO/WBIHZ/S1/s.3/Krupka/l", $ssl_error=False, $addToBase=True);
+
+
+
+
 
 
