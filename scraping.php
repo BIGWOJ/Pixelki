@@ -493,6 +493,635 @@ function scrapPrzedmiot($pdo, $ssl_error=False, $clearTableCondition=True, $addT
     }
 }
 
+// scrapGrupy bedzie tylko uzywana tylko w momencie wyszukania przez uzytkownika swojego numer albumu, wykladowcy, sali lub przedmiotu
+function scrapGrupyNumberAlbumu($pdo, $albumNumber, $ssl_error=False, $clearTableCondition=True, $addToBase=True) {
+    try {
+        // przygotowywanie poprawnego linka do APi
+
+        $sqlGroupsName = "SELECT nazwa from grupa";
+        $sqlGroupsNameResult = $pdo->query($sqlGroupsName);
+        $sqlGroupsNameResult = $sqlGroupsNameResult -> fetchAll(PDO::FETCH_ASSOC);
+
+
+        $flattenedGroupsNameResult = [];
+
+        foreach($sqlGroupsNameResult as $row){
+            $flattenedGroupsNameResult[] = $row["nazwa"];
+        }
+
+
+        if ($clearTableCondition){
+            try {
+                $clearTable = $pdo->prepare("DELETE FROM grupa");  // czyszczenie tablicy
+                $clearTable -> execute();
+
+                $clearIndexes = $pdo->prepare("DELETE FROM sqlite_sequence WHERE name = 'grupa'"); // czyszczenie indexow tablicy
+                $clearIndexes -> execute();
+            } catch (PDOException $e) {
+                echo "Blad zapytania: " . $e -> getMessage();
+                exit();
+            }
+        }
+
+
+
+        $groupsArray = [];
+
+        // ustawienie zeby pobieralo tylko lekcje do 1 miesiaca w przod
+        $dateNow = new DateTime();
+        $dateNow = $dateNow->format("Y-m-d");
+
+        $dateMonth = new DateTime();
+        $dateMonth = $dateMonth->modify("+1 month");
+        $dateMonth = $dateMonth->format("Y-m-d");
+
+
+        $url = 'https://plan.zut.edu.pl/schedule_student.php?number=';    // link do API
+        // przygotowanie nazwy pokoju dla api
+
+        $url = $url . $albumNumber . "&start=" . $dateNow . "T00%3A00%3A00%2B01%3A00&end=" . $dateMonth . "T00%3A00%3A00%2B01%3A00";
+        #echo $url . "\n";
+
+        if ($ssl_error) {
+                $options = [
+                    "ssl" => [
+                        "verify_peer" => false,
+                        "verify_peer_name" => false,
+                    ],
+                ];
+                $context = stream_context_create($options);
+                #Pobranie zawartosci ze zwrotki z API
+                $response = file_get_contents($url, false, $context);
+            }
+
+        else {
+                $response = file_get_contents($url);
+            }         // pobranie zawartosci ze zwrotki z API
+        echo "Pomyslnie otrzymano zwrot z API \n";
+        $data = json_decode($response, true);                                                 // dekodowania zawartosci do JSON
+
+
+        foreach ($data as $group) {
+            if(isset($group["group_name"])){               // sprawdzanie czy API nie zwrocilo pustego wyniku
+                $groupsArray[] = $group["group_name"];
+            }
+        }
+        $groupsArray = array_unique($groupsArray);
+
+        $groupsArray = array_merge($flattenedGroupsNameResult, $groupsArray);
+        $groupsArray = array_unique($groupsArray);
+
+
+
+        if ($addToBase) {
+
+            $sqlInsert = "INSERT INTO grupa (nazwa) VALUES (:nazwa)";                                 // wstawianie do tabeli
+            $statement = $pdo->prepare($sqlInsert);
+
+            foreach ($groupsArray as $group) {                                               // wstawianie do tabeli
+
+                $statement -> bindParam(':nazwa', $group, PDO::PARAM_STR);
+
+                try {
+                    $statement -> execute();
+                } catch (PDOException $e) {
+                    echo "Blad zapytania: " . $e -> getMessage();
+                    exit();
+                }
+            }
+        }
+
+    } catch (PDOException $e) {
+        echo "Blad polaczenia z API: " . $e -> getMessage();
+        exit();
+    }
+}
+
+function scrapGrupyWykladowca($pdo, $teacherName, $ssl_error=False, $clearTableCondition=True, $addToBase=True) {
+    try {
+        // przygotowywanie poprawnego linka do APi
+
+        $sqlGroupsName = "SELECT nazwa from grupa";
+        $sqlGroupsNameResult = $pdo->query($sqlGroupsName);
+        $sqlGroupsNameResult = $sqlGroupsNameResult -> fetchAll(PDO::FETCH_ASSOC);
+
+
+        $flattenedGroupsNameResult = [];
+
+        foreach($sqlGroupsNameResult as $row){
+            $flattenedGroupsNameResult[] = $row["nazwa"];
+        }
+
+
+        if ($clearTableCondition){
+            try {
+                $clearTable = $pdo->prepare("DELETE FROM grupa");  // czyszczenie tablicy
+                $clearTable -> execute();
+
+                $clearIndexes = $pdo->prepare("DELETE FROM sqlite_sequence WHERE name = 'grupa'"); // czyszczenie indexow tablicy
+                $clearIndexes -> execute();
+            } catch (PDOException $e) {
+                echo "Blad zapytania: " . $e -> getMessage();
+                exit();
+            }
+        }
+
+
+
+        $groupsArray = [];
+
+        // ustawienie zeby pobieralo tylko lekcje do 1 miesiaca w przod
+        $dateNow = new DateTime();
+        $dateNow = $dateNow->format("Y-m-d");
+
+        $dateMonth = new DateTime();
+        $dateMonth = $dateMonth->modify("+1 month");
+        $dateMonth = $dateMonth->format("Y-m-d");
+
+        list($lastName, $name) = explode(" ", $teacherName, 2);
+
+
+        $url = 'https://plan.zut.edu.pl/schedule_student.php?teacher=';    // link do API
+        // przygotowanie nazwy pokoju dla api
+
+        $url = $url . $lastName . "%20" . $name . "&start=" . $dateNow . "T00%3A00%3A00%2B01%3A00&end=" . $dateMonth . "T00%3A00%3A00%2B01%3A00";
+        #echo $url . "\n";
+
+        if ($ssl_error) {
+            $options = [
+                "ssl" => [
+                    "verify_peer" => false,
+                    "verify_peer_name" => false,
+                ],
+            ];
+            $context = stream_context_create($options);
+            #Pobranie zawartosci ze zwrotki z API
+            $response = file_get_contents($url, false, $context);
+        }
+
+        else {
+            $response = file_get_contents($url);
+        }         // pobranie zawartosci ze zwrotki z API
+        echo "Pomyslnie otrzymano zwrot z API \n";
+        $data = json_decode($response, true);                                                 // dekodowania zawartosci do JSON
+
+
+        foreach ($data as $group) {
+            if(isset($group["group_name"])){               // sprawdzanie czy API nie zwrocilo pustego wyniku
+                $groupsArray[] = $group["group_name"];
+            }
+        }
+        $groupsArray = array_unique($groupsArray);
+
+        $groupsArray = array_merge($flattenedGroupsNameResult, $groupsArray);
+        $groupsArray = array_unique($groupsArray);
+
+
+
+        if ($addToBase) {
+
+            $sqlInsert = "INSERT INTO grupa (nazwa) VALUES (:nazwa)";                                 // wstawianie do tabeli
+            $statement = $pdo->prepare($sqlInsert);
+
+            foreach ($groupsArray as $group) {                                               // wstawianie do tabeli
+
+                $statement -> bindParam(':nazwa', $group, PDO::PARAM_STR);
+
+                try {
+                    $statement -> execute();
+                } catch (PDOException $e) {
+                    echo "Blad zapytania: " . $e -> getMessage();
+                    exit();
+                }
+            }
+        }
+
+    } catch (PDOException $e) {
+        echo "Blad polaczenia z API: " . $e -> getMessage();
+        exit();
+    }
+}
+
+function scrapGrupySala($pdo, $room, $ssl_error=False, $clearTableCondition=True, $addToBase=True) {
+    try {
+        // przygotowywanie poprawnego linka do APi
+
+        $sqlGroupsName = "SELECT nazwa from grupa";
+        $sqlGroupsNameResult = $pdo->query($sqlGroupsName);
+        $sqlGroupsNameResult = $sqlGroupsNameResult -> fetchAll(PDO::FETCH_ASSOC);
+
+
+        $flattenedGroupsNameResult = [];
+
+        foreach($sqlGroupsNameResult as $row){
+            $flattenedGroupsNameResult[] = $row["nazwa"];
+        }
+
+
+        if ($clearTableCondition){
+            try {
+                $clearTable = $pdo->prepare("DELETE FROM grupa");  // czyszczenie tablicy
+                $clearTable -> execute();
+
+                $clearIndexes = $pdo->prepare("DELETE FROM sqlite_sequence WHERE name = 'grupa'"); // czyszczenie indexow tablicy
+                $clearIndexes -> execute();
+            } catch (PDOException $e) {
+                echo "Blad zapytania: " . $e -> getMessage();
+                exit();
+            }
+        }
+
+
+
+        $groupsArray = [];
+
+        // ustawienie zeby pobieralo tylko lekcje do 1 miesiaca w przod
+        $dateNow = new DateTime();
+        $dateNow = $dateNow->format("Y-m-d");
+
+        $dateMonth = new DateTime();
+        $dateMonth = $dateMonth->modify("+1 month");
+        $dateMonth = $dateMonth->format("Y-m-d");
+
+        $room = str_replace(" ", "%20", $room);
+
+
+        $url = 'https://plan.zut.edu.pl/schedule_student.php?room=';    // link do API
+        // przygotowanie nazwy pokoju dla api
+
+        $url = $url . $room . "&start=" . $dateNow . "T00%3A00%3A00%2B01%3A00&end=" . $dateMonth . "T00%3A00%3A00%2B01%3A00";
+        echo $url . "\n";
+
+        if ($ssl_error) {
+            $options = [
+                "ssl" => [
+                    "verify_peer" => false,
+                    "verify_peer_name" => false,
+                ],
+            ];
+            $context = stream_context_create($options);
+            #Pobranie zawartosci ze zwrotki z API
+            $response = file_get_contents($url, false, $context);
+        }
+
+        else {
+            $response = file_get_contents($url);
+        }         // pobranie zawartosci ze zwrotki z API
+        echo "Pomyslnie otrzymano zwrot z API \n";
+        $data = json_decode($response, true);                                                 // dekodowania zawartosci do JSON
+
+
+        foreach ($data as $group) {
+            if(isset($group["group_name"])){               // sprawdzanie czy API nie zwrocilo pustego wyniku
+                $groupsArray[] = $group["group_name"];
+            }
+        }
+        $groupsArray = array_unique($groupsArray);
+
+        $groupsArray = array_merge($flattenedGroupsNameResult, $groupsArray);
+        $groupsArray = array_unique($groupsArray);
+
+
+
+        if ($addToBase) {
+
+            $sqlInsert = "INSERT INTO grupa (nazwa) VALUES (:nazwa)";                                 // wstawianie do tabeli
+            $statement = $pdo->prepare($sqlInsert);
+
+            foreach ($groupsArray as $group) {                                               // wstawianie do tabeli
+
+                $statement -> bindParam(':nazwa', $group, PDO::PARAM_STR);
+
+                try {
+                    $statement -> execute();
+                } catch (PDOException $e) {
+                    echo "Blad zapytania: " . $e -> getMessage();
+                    exit();
+                }
+            }
+        }
+
+    } catch (PDOException $e) {
+        echo "Blad polaczenia z API: " . $e -> getMessage();
+        exit();
+    }
+}
+
+function scrapGrupyPrzedmiot($pdo, $subject, $ssl_error=False, $clearTableCondition=True, $addToBase=True) {
+    try {
+        // przygotowywanie poprawnego linka do APi
+
+        $sqlGroupsName = "SELECT nazwa from grupa";
+        $sqlGroupsNameResult = $pdo->query($sqlGroupsName);
+        $sqlGroupsNameResult = $sqlGroupsNameResult -> fetchAll(PDO::FETCH_ASSOC);
+
+
+        $flattenedGroupsNameResult = [];
+
+        foreach($sqlGroupsNameResult as $row){
+            $flattenedGroupsNameResult[] = $row["nazwa"];
+        }
+
+
+        if ($clearTableCondition){
+            try {
+                $clearTable = $pdo->prepare("DELETE FROM grupa");  // czyszczenie tablicy
+                $clearTable -> execute();
+
+                $clearIndexes = $pdo->prepare("DELETE FROM sqlite_sequence WHERE name = 'grupa'"); // czyszczenie indexow tablicy
+                $clearIndexes -> execute();
+            } catch (PDOException $e) {
+                echo "Blad zapytania: " . $e -> getMessage();
+                exit();
+            }
+        }
+
+
+
+        $groupsArray = [];
+
+        // ustawienie zeby pobieralo tylko lekcje do 1 miesiaca w przod
+        $dateNow = new DateTime();
+        $dateNow = $dateNow->format("Y-m-d");
+
+        $dateMonth = new DateTime();
+        $dateMonth = $dateMonth->modify("+1 month");
+        $dateMonth = $dateMonth->format("Y-m-d");
+
+        $subject = str_replace(" ", "%20", $subject);
+
+
+        $url = 'https://plan.zut.edu.pl/schedule_student.php?subject=';    // link do API
+        // przygotowanie nazwy pokoju dla api
+
+        $url = $url . $subject . "&start=" . $dateNow . "T00%3A00%3A00%2B01%3A00&end=" . $dateMonth . "T00%3A00%3A00%2B01%3A00";
+        echo $url . "\n";
+
+        if ($ssl_error) {
+            $options = [
+                "ssl" => [
+                    "verify_peer" => false,
+                    "verify_peer_name" => false,
+                ],
+            ];
+            $context = stream_context_create($options);
+            #Pobranie zawartosci ze zwrotki z API
+            $response = file_get_contents($url, false, $context);
+        }
+
+        else {
+            $response = file_get_contents($url);
+        }         // pobranie zawartosci ze zwrotki z API
+        echo "Pomyslnie otrzymano zwrot z API \n";
+        $data = json_decode($response, true);                                                 // dekodowania zawartosci do JSON
+
+
+        foreach ($data as $group) {
+            if(isset($group["group_name"])){               // sprawdzanie czy API nie zwrocilo pustego wyniku
+                $groupsArray[] = $group["group_name"];
+            }
+        }
+        $groupsArray = array_unique($groupsArray);
+
+        $groupsArray = array_merge($flattenedGroupsNameResult, $groupsArray);
+        $groupsArray = array_unique($groupsArray);
+
+
+
+        if ($addToBase) {
+
+            $sqlInsert = "INSERT INTO grupa (nazwa) VALUES (:nazwa)";                                 // wstawianie do tabeli
+            $statement = $pdo->prepare($sqlInsert);
+
+            foreach ($groupsArray as $group) {                                               // wstawianie do tabeli
+
+                $statement -> bindParam(':nazwa', $group, PDO::PARAM_STR);
+
+                try {
+                    $statement -> execute();
+                } catch (PDOException $e) {
+                    echo "Blad zapytania: " . $e -> getMessage();
+                    exit();
+                }
+            }
+        }
+
+    } catch (PDOException $e) {
+        echo "Blad polaczenia z API: " . $e -> getMessage();
+        exit();
+    }
+}
+
+function scrapGrupyGrupa($pdo, $group, $ssl_error=False, $clearTableCondition=True, $addToBase=True) {
+    try {
+        // przygotowywanie poprawnego linka do APi
+
+        $sqlGroupsName = "SELECT nazwa from grupa";
+        $sqlGroupsNameResult = $pdo->query($sqlGroupsName);
+        $sqlGroupsNameResult = $sqlGroupsNameResult -> fetchAll(PDO::FETCH_ASSOC);
+
+
+        $flattenedGroupsNameResult = [];
+
+        foreach($sqlGroupsNameResult as $row){
+            $flattenedGroupsNameResult[] = $row["nazwa"];
+        }
+
+
+        if ($clearTableCondition){
+            try {
+                $clearTable = $pdo->prepare("DELETE FROM grupa");  // czyszczenie tablicy
+                $clearTable -> execute();
+
+                $clearIndexes = $pdo->prepare("DELETE FROM sqlite_sequence WHERE name = 'grupa'"); // czyszczenie indexow tablicy
+                $clearIndexes -> execute();
+            } catch (PDOException $e) {
+                echo "Blad zapytania: " . $e -> getMessage();
+                exit();
+            }
+        }
+
+
+
+        $groupsArray = [];
+
+        // ustawienie zeby pobieralo tylko lekcje do 1 miesiaca w przod
+        $dateNow = new DateTime();
+        $dateNow = $dateNow->format("Y-m-d");
+
+        $dateMonth = new DateTime();
+        $dateMonth = $dateMonth->modify("+1 month");
+        $dateMonth = $dateMonth->format("Y-m-d");
+
+        $group = str_replace(" ", "%20", $group);
+
+
+        $url = 'https://plan.zut.edu.pl/schedule_student.php?group=';    // link do API
+        // przygotowanie nazwy pokoju dla api
+
+        $url = $url . $group . "&start=" . $dateNow . "T00%3A00%3A00%2B01%3A00&end=" . $dateMonth . "T00%3A00%3A00%2B01%3A00";
+        echo $url . "\n";
+
+        if ($ssl_error) {
+            $options = [
+                "ssl" => [
+                    "verify_peer" => false,
+                    "verify_peer_name" => false,
+                ],
+            ];
+            $context = stream_context_create($options);
+            #Pobranie zawartosci ze zwrotki z API
+            $response = file_get_contents($url, false, $context);
+        }
+
+        else {
+            $response = file_get_contents($url);
+        }         // pobranie zawartosci ze zwrotki z API
+        echo "Pomyslnie otrzymano zwrot z API \n";
+        $data = json_decode($response, true);                                                 // dekodowania zawartosci do JSON
+
+
+        foreach ($data as $group) {
+            if(isset($group["group_name"])){               // sprawdzanie czy API nie zwrocilo pustego wyniku
+                $groupsArray[] = $group["group_name"];
+            }
+        }
+        $groupsArray = array_unique($groupsArray);
+
+        $groupsArray = array_merge($flattenedGroupsNameResult, $groupsArray);
+        $groupsArray = array_unique($groupsArray);
+
+
+
+        if ($addToBase) {
+
+            $sqlInsert = "INSERT INTO grupa (nazwa) VALUES (:nazwa)";                                 // wstawianie do tabeli
+            $statement = $pdo->prepare($sqlInsert);
+
+            foreach ($groupsArray as $group) {                                               // wstawianie do tabeli
+
+                $statement -> bindParam(':nazwa', $group, PDO::PARAM_STR);
+
+                try {
+                    $statement -> execute();
+                } catch (PDOException $e) {
+                    echo "Blad zapytania: " . $e -> getMessage();
+                    exit();
+                }
+            }
+        }
+
+    } catch (PDOException $e) {
+        echo "Blad polaczenia z API: " . $e -> getMessage();
+        exit();
+    }
+}
+
+// ta funkcja scrapuje wszystkie mozliwe grupy (nie wiem czy na pewno wszystkie)
+function scrapGrupyTest($pdo, $ssl_error=False, $clearTableCondition=True, $addToBase=True) {
+    try {
+        // przygotowywanie poprawnego linka do APi
+
+        $sqlGroupsName = "SELECT nazwa from grupa";
+        $sqlGroupsNameResult = $pdo->query($sqlGroupsName);
+        $sqlGroupsNameResult = $sqlGroupsNameResult -> fetchAll(PDO::FETCH_ASSOC);
+
+
+        $flattenedGroupsNameResult = [];
+
+        foreach($sqlGroupsNameResult as $row){
+            $flattenedGroupsNameResult[] = $row["nazwa"];
+        }
+
+
+        if ($clearTableCondition){
+            try {
+                $clearTable = $pdo->prepare("DELETE FROM grupa");  // czyszczenie tablicy
+                $clearTable -> execute();
+
+                $clearIndexes = $pdo->prepare("DELETE FROM sqlite_sequence WHERE name = 'grupa'"); // czyszczenie indexow tablicy
+                $clearIndexes -> execute();
+            } catch (PDOException $e) {
+                echo "Blad zapytania: " . $e -> getMessage();
+                exit();
+            }
+        }
+
+
+
+        $groupsArray = [];
+
+        // ustawienie zeby pobieralo tylko lekcje do 1 miesiaca w przod
+        $dateNow = new DateTime();
+        $dateNow = $dateNow->format("Y-m-d");
+
+        $dateMonth = new DateTime();
+        $dateMonth = $dateMonth->modify("+1 month");
+        $dateMonth = $dateMonth->format("Y-m-d");
+
+
+
+        $url = 'https://plan.zut.edu.pl/schedule_student.php?subject=';    // link do API
+        // przygotowanie nazwy pokoju dla api
+
+        $url = $url . "test" . "&start=" . $dateNow . "T00%3A00%3A00%2B01%3A00&end=" . $dateMonth . "T00%3A00%3A00%2B01%3A00";
+        echo $url . "\n";
+
+        if ($ssl_error) {
+            $options = [
+                "ssl" => [
+                    "verify_peer" => false,
+                    "verify_peer_name" => false,
+                ],
+            ];
+            $context = stream_context_create($options);
+            #Pobranie zawartosci ze zwrotki z API
+            $response = file_get_contents($url, false, $context);
+        }
+
+        else {
+            $response = file_get_contents($url);
+        }         // pobranie zawartosci ze zwrotki z API
+        echo "Pomyslnie otrzymano zwrot z API \n";
+        $data = json_decode($response, true);                                                 // dekodowania zawartosci do JSON
+
+
+        foreach ($data as $group) {
+            if(isset($group["group_name"])){               // sprawdzanie czy API nie zwrocilo pustego wyniku
+                $groupsArray[] = $group["group_name"];
+            }
+        }
+        $groupsArray = array_unique($groupsArray);
+
+        $groupsArray = array_merge($flattenedGroupsNameResult, $groupsArray);
+        $groupsArray = array_unique($groupsArray);
+
+
+
+        if ($addToBase) {
+
+            $sqlInsert = "INSERT INTO grupa (nazwa) VALUES (:nazwa)";                                 // wstawianie do tabeli
+            $statement = $pdo->prepare($sqlInsert);
+
+            foreach ($groupsArray as $group) {                                               // wstawianie do tabeli
+
+                $statement -> bindParam(':nazwa', $group, PDO::PARAM_STR);
+
+                try {
+                    $statement -> execute();
+                } catch (PDOException $e) {
+                    echo "Blad zapytania: " . $e -> getMessage();
+                    exit();
+                }
+            }
+        }
+
+    } catch (PDOException $e) {
+        echo "Blad polaczenia z API: " . $e -> getMessage();
+        exit();
+    }
+}
+
 
 
 
@@ -522,4 +1151,18 @@ $pdo = dbConnection($dbPath);   // polaczenie z baza danych
 
 #scrapPrzedmiot($pdo, $ssl_error, $clearTableCondition, $addToBase);
 
-poprawaNumerAlbumu($pdo, $ssl_error, $console_write, $start_index=92);
+#poprawaNumerAlbumu($pdo, $ssl_error, $console_write, $start_index=92);
+
+#scrapGrupyNumberAlbumu($pdo, $albumNumber = "53731", $ssl_error, $clearTableCondition = True, $addToBase = True);
+
+#scrapGrupyWykladowca($pdo, "Abramek Karol", $ssl_error, $clearTableCondition = True, $addToBase = True);
+
+#scrapGrupySala($pdo, $room = "WI WI1- 007", $ssl_error, $clearTableCondition = True, $addToBase = True);
+
+#scrapGrupyPrzedmiot($pdo, $subject = "Sieci komputerowe (L)", $ssl_error, $clearTableCondition = True, $addToBase = True);
+
+#scrapGrupyGrupa($pdo, $subject = "SD_1 sem_S 1_Grześkowiak", $ssl_error, $clearTableCondition = True, $addToBase = True);
+
+#scrapGrupyTest($pdo, $ssl_error, $clearTableCondition, $addToBase); // ta funkcja zbiera wszystkie grupy
+
+
