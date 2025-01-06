@@ -522,4 +522,4 @@ $pdo = dbConnection($dbPath);   // polaczenie z baza danych
 
 #scrapPrzedmiot($pdo, $ssl_error, $clearTableCondition, $addToBase);
 
-poprawaNumerAlbumu($pdo, $ssl_error, $console_write, $start_index=55);
+poprawaNumerAlbumu($pdo, $ssl_error, $console_write, $start_index=92);
