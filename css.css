@@ -1,3 +1,12 @@
+:root {
+    --color_primary: #90ac75;
+    --color_secondary: #0056b3;
+    --color_white: #f8f9fa;
+    --color_black: #333;
+    --color_beige: #faf9f6;
+    --color_border_gray: #ddd;
+}
+
 body, h1, h2, h3, p, ul, ol, li, table, th, td {
     margin: 0;
     padding: 0;
@@ -7,11 +16,8 @@ body, h1, h2, h3, p, ul, ol, li, table, th, td {
 body {
     font-family: Arial, sans-serif;
     line-height: 1.6;
-    background-color: #f8f9fa;
-    color: #333;
-}
-
-.container {
+    background-color: var(--color_white);
+    color: var(--color_black);
     display: flex;
     flex-direction: column;
     min-height: 100vh;
@@ -29,8 +35,8 @@ body {
 header {
     display: flex;
     justify-content: space-between;
-    background-color: #90ac75;
-    color: white;
+    background-color: var(--color_primary);
+    color: var(--color_beige);
     padding: 10px 20px;
 }
 
@@ -38,9 +44,9 @@ header .logo img {
     max-height: 40px;
 }
 
-header .theme-controls button {
-    background-color: white;
-    color: #90ac75;
+header .theme-buttons button {
+    background-color: var(--color_beige);
+    color: var(--color_primary);
     border: none;
     padding: 5px 10px;
     margin-left: 10px;
@@ -48,27 +54,27 @@ header .theme-controls button {
     border-radius: 4px;
 }
 
-header .theme-controls button:hover {
-    background-color: #0056b3;
-    color: white;
+header .theme-buttons button:hover {
+    background-color: var(--color_secondary);
+    color: var(--color_beige);
 }
 
 i {
     font-size: 24px;
-    color: #325019;
+    color: var(--color_primary);
 }
 
-.icon-and-text {
+.navigation .icons {
     display: flex;
     align-items: center;
     gap: 16px;
 }
 
 .navigation button {
-    background-color: #ffffff;
-    color: #90ac75;
+    background-color: var(--color_beige);
+    color: var(--color_primary);
     border-style: solid;
-    border-color: #90ac75;
+    border-color: var(--color_primary);
     font-weight: bold;
     padding: 8px 12px;
     cursor: pointer;
@@ -76,25 +82,25 @@ i {
 }
 
 .navigation button:hover {
-    background-color: #90ac75;
-    color: white;
+    background-color: var(--color_primary);
+    color: var(--color_beige);
 }
 
-.month-year-controls {
+.calendar_range {
     display: flex;
     justify-content: center;
     margin-bottom: 10px;
 }
 
-.month-year-controls span {
+.calendar_range span {
     margin: 0 10px;
 }
 
-.month-year-controls button {
-    background-color: #90ac75;
+.calendar_range button {
+    background-color: var(--color_primary);
     border-radius: 20%;
     border:none;
-    color: white;
+    color: var(--color_beige);
     cursor: pointer;
     width: 30px;
 }
@@ -110,9 +116,9 @@ main {
 
 .calendar {
     flex: 2;
-    background-color: white;
+    background-color: var(--color_beige);
     padding: 10px;
-    border: 1px solid #ddd;
+    border: 1px solid var(--color_border_gray);
     border-radius: 4px;
     height: 70vh;
 }
@@ -123,14 +129,14 @@ main {
 }
 
 .calendar th, .calendar td {
-    border: 1px solid #ddd;
+    border: 1px solid var(--color_border_gray);
     text-align: center;
     padding: 5px;
 }
 
 .calendar th {
-    background-color: #90ac75;
-    color: white;
+    background-color: var(--color_primary);
+    color: var(--color_beige);
 }
 
 .calendar .highlight {
@@ -139,9 +145,9 @@ main {
 
 .filters {
     flex: 1;
-    background-color: white;
+    background-color: var(--color_beige);
     padding: 10px 10px;
-    border: 1px solid #ddd;
+    border: 1px solid var(--color_border_gray);
     border-radius: 4px;
     margin-top: 20px;
     height: 70vh;
@@ -155,7 +161,7 @@ main {
 
 .filters input {
     width: 100%;
-    border: 1px solid #ddd;
+    border: 1px solid var(--color_border_gray);
     border-radius: 4px;
     height: 30px;
 }
@@ -168,8 +174,8 @@ main {
 
 .filters button {
     width: 100%;
-    background-color: #90ac75;
-    color: white;
+    background-color: var(--color_primary);
+    color: var(--color_beige);
     border: none;
     padding: 8px 12px;
     cursor: pointer;
@@ -180,7 +186,7 @@ main {
 }
 
 .filters button:hover {
-    background-color: #90ac75;
+    background-color: var(--color_primary);
 }
 
 .manage-button{
@@ -190,20 +196,20 @@ main {
 }
 
 .legend {
-    background-color: white;
+    background-color: var(--color_beige);
     padding: 10px;
     margin-top: 20px;
-    border: 1px solid #ddd;
+    border: 1px solid var(--color_border_gray);
     border-radius: 4px;
     text-align: right;
 }
 
 
 .statistics {
-    background-color: white;
+    background-color: var(--color_beige);
     padding: 10px;
     margin-top: 10px;
-    border: 1px solid #ddd;
+    border: 1px solid var(--color_border_gray);
     border-radius: 4px;
     text-align: center;
 }
@@ -213,15 +219,18 @@ footer {
     justify-content: center;
     background-color: #e9ecef;
     padding: 15px 0;
-    border-top: 1px solid #ddd;
+    border-top: 1px solid var(--color_border_gray);
     width: 100%;
 }
 
+.navigation {
+    cursor: pointer;
+}
+
 @media (min-width: 768px) {
-    .container {
+    .body {
 
     }
-
     .navigation {
         gap: 30px;
     }
@@ -248,7 +257,7 @@ footer {
         gap: 30px;
     }
 
-    .theme-controls{
+    .theme-buttons{
         display: flex;
         gap: 15px;
         flex-direction: column;
