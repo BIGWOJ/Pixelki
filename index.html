@@ -5,42 +5,40 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Kalendarz</title>
     <link rel="stylesheet" href="css.css">
+    <!--Link do użycia czcionki Awesome, czyli ikonek np. strzałki prawo/lewo, kalendarz zakresowy, kopiowanie filtrów-->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
-
 </head>
 <body>
-<div class="container">
     <header>
         <div class="logo">
             <img src="logo-placeholder.png" alt="Logo">
         </div>
-        <div class="theme-controls">
+        <div class="theme-buttons">
             <button>Zmień Motyw</button>
             <button>Zmień Czcionkę</button>
         </div>
     </header>
 
     <nav class="navigation">
-        <div class="icon-and-text">
-            <i class="fas fa-share-square share-icon" title="Udostępnij"></i>
-            <i class="fas fa-calendar"></i>
+        <div class="icons">
+            <i class="fas fa-share-square filter-share" title="Udostępnij"></i>
+            <i class="fas fa-calendar range-calendar"></i>
             <button>Plan Dnia</button>
         </div>
         <button>Dzień</button>
         <button>Tydzień</button>
         <button>Miesiąc</button>
         <button>Semestr</button>
-
     </nav>
 
     <main>
         <section class="calendar">
-            <div class="month-year-controls">
+            <div class="calendar_range">
                 <button>&lt;</button>
                 <span>Miesiąc / Rok</span>
                 <button>&gt;</button>
             </div>
-            <table class="week-view">
+            <table class="calendar_view">
                 <thead>
                 <tr>
                     <th></th>
@@ -137,6 +135,6 @@
     <footer>
         <span>Pixelki 2025</span>
     </footer>
-</div>
+    <script src="Js.js"></script>
 </body>
 </html>
