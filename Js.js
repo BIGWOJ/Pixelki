@@ -65,9 +65,22 @@ document.querySelector(".filter-buttons button:nth-child(2)").addEventListener("
 });
 
 //Zarządzanie kafelkami
-document.querySelector(".manage-button").addEventListener("click", () => {
-    console.log("Zarządzanie kafelkami\nJeszcze nie zrobione");
+
+const cellsButtonContainer = document.querySelector(".cells-buttons");
+document.querySelector(".manage-button").addEventListener("click", (e) => {
+    e.stopPropagation();    // zapobieganie zniknieciu przyciskow po kliknieciu glownego przycisku
+    cellsButtonContainer.style.display = "flex";
+    //console.log("Zarządzanie kafelkami\nJeszcze nie zrobione");
 });
+
+document.addEventListener("click", () => {
+    cellsButtonContainer.style.display = "none";
+});
+
+cellsButtonContainer.addEventListener("click", (e) => {
+    e.stopPropagation();
+})
+
 
 if (theme === "dark") {
     document.querySelector("body").classList.add("dark");

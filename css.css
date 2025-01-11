@@ -281,6 +281,23 @@ footer {
     }
 }
 
+.cells-buttons {
+    display: none;
+    gap: 10px;
+    width: 100%;
+}
+
+.cells-buttons button {
+    padding: 20px 20px;
+    font-size: 14px;
+    cursor: pointer;
+    background-color: white;
+    color: var(--color_primary);
+    border: 5px solid var(--color_primary);
+    border-radius: 10px;
+    width: 33%;
+}
+
 /*Zmiana motywu respektując ustawiony motyw systemowy/przeglądarkowy użytkownika*/
 /*@media (prefers-color-scheme: dark) {*/
 /*    :root {*/
