@@ -38,6 +38,97 @@ header .logo img {
     max-height: 40px;
 }
 
+.hidden {
+    display: none;
+}
+
+.modal-content {
+    width: 400px;
+    height: 20%;
+    position: fixed;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    z-index: 1000;
+    top: 50%;
+    background-color: #cdd8c3;
+    border: 1px solid rgba(144, 172, 117, 0.76);
+}
+#filter-title{
+    width: 100%;
+    height: 40%;
+    border: 1px solid rgba(144, 172, 117, 0.76);
+    background-color: rgba(144, 172, 117, 0.52);
+    border-radius: 10px;
+
+}
+.button-container{
+    display: flex;
+    justify-content: center;
+    margin-top: 20px;
+    gap: 10px;
+}
+
+#save-filter, #cancel-filter{
+    background-color: rgba(144, 172, 117, 0.52);
+    border: 1px solid rgba(144, 172, 117, 0.76);
+    border-radius: 10px;
+    color: #325019;
+    width: 25%;
+    height: 25px;
+}
+
+.favorites {
+    position: absolute;
+    top: 48px;
+    right: 20px;
+    padding: 20px;
+    width: 250px;
+    z-index: 1000;
+    background-color: #cdd8c3;
+    border: 2px solid rgba(144, 172, 117, 0.76);
+    border-radius: 10px;
+    color: #325019;
+    display: none;
+}
+
+#favorites-list button{
+    width: 100%;
+    background-color: rgba(144, 172, 117, 0.52);
+    border: 1px solid rgba(144, 172, 117, 0.76);
+    border-radius: 10px;
+    color: #325019;
+}
+
+.favorite-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 5px;
+}
+
+button {
+    padding: 5px 10px;
+    font-size: 14px;
+    cursor: pointer;
+}
+
+.delete {
+    font-size: 16px;
+    color: #333;
+    cursor: pointer;
+}
+
+.delete:hover {
+    color: red; /* Zmiana koloru na hover */
+}
+
+h2{
+    text-align: center;
+}
+
 header .theme-controls button {
     background-color: white;
     color: #90ac75;
@@ -48,15 +139,23 @@ header .theme-controls button {
     border-radius: 4px;
 }
 
-header .theme-controls button:hover {
-    background-color: #0056b3;
-    color: white;
+.fas.fa-heart{
+    color:white;
+
 }
+
+header .theme-controls button:hover {
+    background-color: #325019;
+    color: rgb(255, 255, 255);
+}
+
+
 
 i {
     font-size: 24px;
     color: #325019;
 }
+
 
 .icon-and-text {
     display: flex;
@@ -101,7 +200,7 @@ i {
 
 main {
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
     flex: 1;
     padding: 20px;
     gap: 20px;
