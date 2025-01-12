@@ -4,10 +4,12 @@ let theme = localStorage.getItem("theme");
 //Czynności wykonywane po załadowaniu strony
 document.addEventListener("DOMContentLoaded", () => {
     //Czyszczenie inputów po odświeżeniu strony
-    let filter_inputs = document.querySelectorAll("input");
+/*    let filter_inputs = document.querySelectorAll("input");
     filter_inputs.forEach(input => {
         input.value = "";
-    });
+    });*/
+
+    // zakomentowalem to bo nie potrzebne a komplikuje sie z kopiowaniem linku
 
     //Inicjalizacja motywu na podstawie preferencji systemowych / przeglądarkowych
     if (!theme) {
@@ -41,10 +43,6 @@ document.querySelector(".theme-buttons button:nth-child(2)").addEventListener("c
     console.log("Zmiana czcionki\nJeszcze nie zrobione");
 });
 
-//Kopiowanie filtrów
-document.querySelector(".filter-share").addEventListener("click", () => {
-    console.log("Kopiowanie filtrów\nJeszcze nie zrobione");
-});
 
 //Kalendarz zakresowy
 document.querySelector(".range-calendar").addEventListener("click", () => {
