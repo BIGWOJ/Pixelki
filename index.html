@@ -131,17 +131,90 @@
             </div>
 
             <div class="cells-buttons">
-                <button>Dodaj</button>
-                <button>Usuń</button>
-                <button>Edytuj</button>
+                <button class="cellAdd">Dodaj</button>
+                <button class="cellDelete">Usuń</button>
+                <button class="cellEdit">Edytuj</button>
             </div>
 
+
+
         </aside>
+
+
     </main>
+
+    <div class="cellContainer">
+        <h2>Dodaj Kafelek</h2>
+        <div class="cellName">
+            <label class="cellLabel">Nazwa</label>
+            <input type="text" class="cellDate" id="cellName">
+        </div>
+        <div class="cellDateTime">
+            <label class="cellLabel">Wybierz datę i godzinę</label>
+            <input type="date" class="cellDate" id="cellDate">
+            <div class="cellTimeInputs"><div>
+                <label class="cellLabel">Od:</label>
+                <input class="cellTime" type="time" id="inputTimeFrom">
+            </div>
+                <div>
+                    <label class="cellLabel">Do:</label>
+                    <input class="cellTime" type="time" id="inputTimeTo">
+                </div>
+            </div
+            ></div>
+        <div class="cellDescription">
+            <label class="cellLabel">Dodaj Opis</label>
+            <textarea id="cellDescription" class="cellDescriptionText"></textarea>
+        </div><button class="cellAddButton">Dodaj</button>
+    </div>
+
+    <div class="cellContainerDelete">
+        <h2>Usuń Kafelek</h2>
+        <div class="cellTile">
+            <span>Nazwa</span>
+            <button class="tileDelete">🗑️</button>
+        </div>
+    </div>
+
+    <div class="cellContainerEdit">
+        <h2>Edytuj Kafelek</h2>
+        <div class="cellTileEdit">
+            <span>Test</span>
+            <button class="fa fa-edit" id="cellEdit"></button>
+        </div>
+    </div>
+
+    <div class="cellContainerEditEdit">
+        <h2>Edytuj Kafelek</h2>
+        <div class="cellName">
+            <label class="cellLabel">Nazwa</label>
+            <input type="text" class="cellDate" id="cellNameEdit">
+        </div>
+        <div class="cellDateTime">
+            <label class="cellLabel">Wybierz datę i godzinę</label>
+            <input type="date" class="cellDate" id="cellDateEdit">
+            <div class="cellTimeInputs"><div>
+                <label class="cellLabel">Od:</label>
+                <input class="cellTime" type="time" id="inputTimeFromEdit">
+            </div>
+                <div>
+                    <label class="cellLabel">Do:</label>
+                    <input class="cellTime" type="time" id="inputTimeToEdit">
+                </div>
+            </div
+            ></div>
+        <div class="cellDescription">
+            <label class="cellLabel">Dodaj Opis</label>
+            <textarea id="cellDescriptionEdit" class="cellDescriptionText"></textarea>
+        </div><button class="cellAddButton" id="cellEditButton">Zatwierdź</button>
+    </div>
 
     <footer>
         <span>Pixelki 2025</span>
     </footer>
     <script src="Js.js"></script>
+    <script src="kafelki.js"></script>
+
+
 </body>
 </html>
