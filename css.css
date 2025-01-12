@@ -291,12 +291,182 @@ footer {
     padding: 20px 20px;
     font-size: 14px;
     cursor: pointer;
-    background-color: white;
-    color: var(--color_primary);
+    background-color: var(--color_beige);
+    color: var(--color_black);
     border: 5px solid var(--color_primary);
     border-radius: 10px;
     width: 33%;
 }
+
+.cellContainer {
+    box-sizing: border-box;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: var(--color_beige);
+    border: 2px solid var(--color_primary);
+    border-radius: 15px;
+    padding: 20px;
+    width: 90%;
+    max-width: 400px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    padding-top: 0px;
+    display: none;
+}
+
+.cellDateTime, .cellDescription, .cellName{
+    text-align: left;
+}
+
+.cellDescriptionText {
+    height: 80px;
+    resize: none;
+}
+
+.cellLabel {
+    display: block;
+    font-size: 0.9em;
+    margin-bottom: 5px;
+    font-weight: bold;
+}
+
+.cellContainer[type="text"], .cellContainer textarea {
+    width: 95%;
+    padding: 10px;
+    font-size: 1em;
+    border: 1px solid var(--color_primary);
+    border-radius: 5px;
+}
+
+.cellTimeInputs {
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+    padding-top: 5px;
+}
+
+.cellTimeInputs div {
+    flex: 1;
+}
+
+.cellAddButton {
+    background-color: var(--color_primary);
+    color: var(--color_black);
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    font-size: 1em;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.cellDate, .cellTime {
+    width: 95%;
+    padding: 10px;
+    font-size: 1em;
+    border: 1px solid var(--color_primary);
+    border-radius: 5px;
+}
+
+.cellTime {
+    width: 90%;
+}
+
+.cellContainerDelete {
+    box-sizing: border-box;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: var(--color_beige);
+    border: 2px solid var(--color_primary);
+    border-radius: 15px;
+    padding: 20px;
+    width: 90%;
+    max-width: 400px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    padding-top: 0px;
+    display: none;
+}
+
+.cellTile, .cellTileEdit {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: var(--color_border_gray);
+    padding: 10px 15px;
+    margin-bottom: 10px;
+    border-radius: 10px;
+    box-shadow: 0 2px 4px var(--color_primary);
+}
+
+.tileDelete {
+    background-color: transparent;
+    border: none;
+    cursor: pointer;
+}
+
+.cellContainerEdit {
+    box-sizing: border-box;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: var(--color_beige);
+    border: 2px solid var(--color_primary);
+    border-radius: 15px;
+    padding: 20px;
+    width: 90%;
+    max-width: 400px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    padding-top: 0px;
+    display: none;
+}
+
+#cellEdit {
+    background-color: transparent;
+    border: none;
+    cursor: pointer;
+}
+
+.cellContainerEditEdit {
+    box-sizing: border-box;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: var(--color_beige);
+    border: 2px solid var(--color_primary);
+    border-radius: 15px;
+    padding: 20px;
+    width: 90%;
+    max-width: 400px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    padding-top: 0px;
+    display: none;
+}
+
+.cellContainerEditEdit[type="text"], .cellContainerEditEdit textarea {
+    width: 95%;
+    padding: 10px;
+    font-size: 1em;
+    border: 1px solid var(--color_primary);
+    border-radius: 5px;
+}
+
+.cellContainer input, textarea {
+    background-color: var(--color_border_gray);
+}
+
+.cellContainerEditEdit input, textarea {
+    background-color: var(--color_border_gray);
+}
+
 
 /*Zmiana motywu respektując ustawiony motyw systemowy/przeglądarkowy użytkownika*/
 /*@media (prefers-color-scheme: dark) {*/
