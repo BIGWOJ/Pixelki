@@ -39,6 +39,7 @@ body {
     display: flex;
     flex-direction: column;
     min-height: 100vh;
+    font-size: 16px;
 }
 
 .navigation {
@@ -58,9 +59,121 @@ header {
     padding: 10px 20px;
 }
 
+header, nav, main, footer, button, .icon-and-text, i {
+    font-size: inherit;
+}
+
 header .logo img {
     max-height: 40px;
 }
+
+.hidden {
+    display: none;
+}
+
+.modal-content {
+    width: 400px;
+    height: 20%;
+    position: fixed;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    z-index: 1000;
+    top: 50%;
+    background-color: #cdd8c3;
+    border: 1px solid rgba(144, 172, 117, 0.76);
+}
+#filter-title{
+    width: 100%;
+    height: 40%;
+    border: 1px solid rgba(144, 172, 117, 0.76);
+    background-color: rgba(144, 172, 117, 0.52);
+    border-radius: 10px;
+
+}
+.button-container{
+    display: flex;
+    justify-content: center;
+    margin-top: 20px;
+    gap: 10px;
+}
+
+#save-filter, #cancel-filter{
+    background-color: rgba(144, 172, 117, 0.52);
+    border: 1px solid rgba(144, 172, 117, 0.76);
+    border-radius: 10px;
+    color: #325019;
+    width: 25%;
+    height: 25px;
+}
+
+.favorites {
+    position: absolute;
+    top: 48px;
+    right: 20px;
+    padding: 20px;
+    width: 250px;
+    z-index: 1000;
+    background-color: #cdd8c3;
+    border: 2px solid rgba(144, 172, 117, 0.76);
+    border-radius: 10px;
+    color: #325019;
+    display: none;
+}
+
+#favorites-list button{
+    width: 100%;
+    background-color: rgba(144, 172, 117, 0.52);
+    border: 1px solid rgba(144, 172, 117, 0.76);
+    border-radius: 10px;
+    color: #325019;
+}
+
+.favorite-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 5px;
+}
+
+button {
+    padding: 5px 10px;
+    font-size: 14px;
+    cursor: pointer;
+}
+
+.delete {
+    font-size: 16px;
+    color: #333;
+    cursor: pointer;
+}
+
+.delete:hover {
+    color: red;
+}
+
+h2{
+    text-align: center;
+}
+
+.fas.fa-heart {
+    color: white;
+}
+
+i {
+    font-size: 24px;
+    color: #325019;
+}
+
+
+.icon-and-text {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
 
 header .theme-buttons button {
     background-color: var(--color_beige);
@@ -431,6 +544,197 @@ footer {
     background-color: transparent;
     border: none;
     cursor: pointer;
+    .fas.fa-heart{
+        font-size: 2em;
+        text-align: center;
+    }
+
+    .favorites{
+        left: 17%;
+        top: 12%;
+    }
+    .modal-content{
+        width: 300px;
+    }
+
+}
+
+.cells-buttons {
+    display: none;
+    gap: 10px;
+    width: 100%;
+}
+
+.cells-buttons button {
+    padding: 20px 20px;
+    font-size: 14px;
+    cursor: pointer;
+    background-color: var(--color_beige);
+    color: var(--color_black);
+    border: 5px solid var(--color_primary);
+    border-radius: 10px;
+    width: 33%;
+}
+
+.cellContainer {
+    box-sizing: border-box;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: var(--color_beige);
+    border: 2px solid var(--color_primary);
+    border-radius: 15px;
+    padding: 20px;
+    width: 90%;
+    max-width: 400px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    padding-top: 0px;
+    display: none;
+}
+
+.cellDateTime, .cellDescription, .cellName{
+    text-align: left;
+}
+
+.cellDescriptionText {
+    height: 80px;
+    resize: none;
+}
+
+.cellLabel {
+    display: block;
+    font-size: 0.9em;
+    margin-bottom: 5px;
+    font-weight: bold;
+}
+
+.cellContainer[type="text"], .cellContainer textarea {
+    width: 95%;
+    padding: 10px;
+    font-size: 1em;
+    border: 1px solid var(--color_primary);
+    border-radius: 5px;
+}
+
+.cellTimeInputs {
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+    padding-top: 5px;
+}
+
+.cellTimeInputs div {
+    flex: 1;
+}
+
+.cellAddButton {
+    background-color: var(--color_primary);
+    color: var(--color_black);
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    font-size: 1em;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.cellDate, .cellTime {
+    width: 95%;
+    padding: 10px;
+    font-size: 1em;
+    border: 1px solid var(--color_primary);
+    border-radius: 5px;
+}
+
+.cellTime {
+    width: 90%;
+}
+
+.cellContainerDelete {
+    box-sizing: border-box;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: var(--color_beige);
+    border: 2px solid var(--color_primary);
+    border-radius: 15px;
+    padding: 20px;
+    width: 90%;
+    max-width: 400px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    padding-top: 0px;
+    display: none;
+}
+
+.cellTile, .cellTileEdit {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: var(--color_border_gray);
+    padding: 10px 15px;
+    margin-bottom: 10px;
+    border-radius: 10px;
+    box-shadow: 0 2px 4px var(--color_primary);
+}
+
+.tileDelete {
+    background-color: transparent;
+    border: none;
+    cursor: pointer;
+}
+
+.cellContainerEdit {
+    box-sizing: border-box;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: var(--color_beige);
+    border: 2px solid var(--color_primary);
+    border-radius: 15px;
+    padding: 20px;
+    width: 90%;
+    max-width: 400px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    padding-top: 0px;
+    display: none;
+}
+
+#cellEdit {
+    background-color: transparent;
+    border: none;
+    cursor: pointer;
+}
+
+.cellContainerEditEdit {
+    box-sizing: border-box;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: var(--color_beige);
+    border: 2px solid var(--color_primary);
+    border-radius: 15px;
+    padding: 20px;
+    width: 90%;
+    max-width: 400px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    padding-top: 0px;
+    display: none;
+}
+
+.cellContainerEditEdit[type="text"], .cellContainerEditEdit textarea {
+    width: 95%;
+    padding: 10px;
+    font-size: 1em;
+    border: 1px solid var(--color_primary);
+    border-radius: 5px;
 }
 
 .cellContainerEditEdit {
