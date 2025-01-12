@@ -1,90 +1,74 @@
-const favoritesModal = document.getElementById('favorites-modal');
-const titleModal = document.getElementById('title-modal');
-const saveFilterBtn = document.getElementById('save-filter');
-const cancelFilterBtn = document.getElementById('cancel-filter');
-const favoritesList = document.getElementById('favorites-list');
-const heartIcon = document.querySelector('.fa-heart');
-const addToFavoritesBtn = document.getElementById('add-to-favorites');
-let currentFilter = {};
-let favorites = [];
+//Zmienne odnoszczące się do zmiany motywu strony
+let theme = localStorage.getItem("theme");
 
-
-//Ulubione ikona serduszka
-heartIcon.addEventListener('click', () => {
-    if (favoritesModal.style.display === 'none' || !favoritesModal.style.display) {
-        favoritesModal.style.display = 'block';
-    } else {
-        favoritesModal.style.display = 'none';
-    }
-});
-
-
-//Dodaj do ulubioncyh przycisk
-addToFavoritesBtn.addEventListener('click', () => {
-    currentFilter = getCurrentFilterValues();
-    titleModal.classList.remove('hidden');
-});
-
-//Wyśweitlanie z nadawaniem tytułu
-saveFilterBtn.addEventListener('click', () => {
-    const title = document.getElementById('filter-title').value;
-    if (title) {
-        favorites.push({ title, filter: currentFilter });
-        updateFavoritesList();
-        titleModal.classList.add('hidden');
-        document.getElementById('filter-title').value = '';
-    }
-});
-
-cancelFilterBtn.addEventListener('click', () => {
-    titleModal.classList.add('hidden');
-});
-
-
-function getCurrentFilterValues() {
-    return {
-        lecturer: document.getElementById('lecturer').value,
-        room: document.getElementById('room').value,
-        subject: document.getElementById('subject').value,
-        group: document.getElementById('group').value,
-        albumNumber: document.getElementById('album-number').value,
-        classType: document.getElementById('class-type').value,
-    };
-}
-
-//Lista z ulubionymi filtrami
-function updateFavoritesList() {
-    favoritesList.innerHTML = '';
-    favorites.forEach((fav, index) => {
-        const favoriteItem = document.createElement('div');
-        favoriteItem.classList.add('favorite-item');
-
-        const favButton = document.createElement('button');
-        favButton.textContent = fav.title;
-        favButton.addEventListener('click', () => {
-            loadFilterValues(fav.filter);
-        });
-
-        const deleteIcon = document.createElement('i');
-        deleteIcon.classList.add('fas', 'fa-trash-alt', 'delete');
-        deleteIcon.dataset.index = index;
-        deleteIcon.addEventListener('click', (event) => {
-            event.stopPropagation();
-            favorites.splice(index, 1);
-            updateFavoritesList();
-        });
-
-        favoriteItem.appendChild(favButton);
-        favoriteItem.appendChild(deleteIcon);
-        favoritesList.appendChild(favoriteItem);
+//Czynności wykonywane po załadowaniu strony
+document.addEventListener("DOMContentLoaded", () => {
+    //Czyszczenie inputów po odświeżeniu strony
+    let filter_inputs = document.querySelectorAll("input");
+    filter_inputs.forEach(input => {
+        input.value = "";
     });
+
+    //Inicjalizacja motywu na podstawie preferencji systemowych / przeglądarkowych
+    if (!theme) {
+        theme = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? "dark" : "light";
+        document.querySelector("body").classList.add(theme);
+    }
+
+    localStorage.setItem("theme", theme);
+});
+
+//Zmiana motywu strony
+document.querySelector(".theme-buttons button:nth-child(1)").addEventListener("click", () => {
+    console.log("Zmiana motywu\nJeszcze nie zrobione do końca");
+
+    if (theme === "dark") {
+        document.querySelector("body").classList.remove("dark");
+        document.querySelector("body").classList.add("light");
+        theme = "light";
+    }
+    else {
+        document.querySelector("body").classList.remove("light");
+        document.querySelector("body").classList.add("dark");
+        theme = "dark";
+    }
+
+    localStorage.setItem("theme", theme);
+});
+
+//Zmiana wielkości czcionki
+document.querySelector(".theme-buttons button:nth-child(2)").addEventListener("click", () => {
+    console.log("Zmiana czcionki\nJeszcze nie zrobione");
+});
+
+//Kopiowanie filtrów
+document.querySelector(".filter-share").addEventListener("click", () => {
+    console.log("Kopiowanie filtrów\nJeszcze nie zrobione");
+});
+
+//Kalendarz zakresowy
+document.querySelector(".range-calendar").addEventListener("click", () => {
+    console.log("Kalendarz zakresowy\nJeszcze nie zrobione");
+});
+
+//Zastosowanie filtrów po kliknięciu w przycisk "Filtruj"
+document.querySelector(".filter-buttons button:nth-child(1)").addEventListener("click", () => {
+    console.log("Filtrowanie\nJeszcze nie zrobione");
+});
+
+//Czyszczenie inputów filtrów po kliknięciu w przycisk "Wyczyść"
+document.querySelector(".filter-buttons button:nth-child(2)").addEventListener("click", () => {
+    let filter_inputs = document.querySelectorAll(".filters input");
+    filter_inputs.forEach(input => {
+        input.value = "";
+    });
+});
+
+
+if (theme === "dark") {
+    document.querySelector("body").classList.add("dark");
 }
 
-function loadFilterValues(filter) {
-    document.getElementById('lecturer').value = filter.lecturer || '';
-    document.getElementById('room').value = filter.room || '';
-    document.getElementById('subject').value = filter.subject || '';
-    document.getElementById('group').value = filter.group || '';
-    document.getElementById('album-number').value = filter.albumNumber || '';
-    document.getElementById('class-type').value = filter.classType || '';
+if (theme === "light") {
+    document.querySelector("body").classList.add("light");
 }
