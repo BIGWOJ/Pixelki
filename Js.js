@@ -18,32 +18,44 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     localStorage.setItem("theme", theme);
-
+});
 
 //Zmiana motywu strony
-document.querySelector(".theme-buttons button:nth-child(1)").addEventListener("click", () => {
+document.querySelector(".theme-buttons button:nth-child(2)").addEventListener("click", () => {
     console.log("Zmiana motywu\nJeszcze nie zrobione do końca");
+    if (theme === "dark") {
+        document.querySelector("body").classList.remove("dark");
+        document.querySelector("body").classList.add("light");
+        theme = "light";
+    }
+    else {
+        document.querySelector("body").classList.remove("light");
+        document.querySelector("body").classList.add("dark");
+        theme = "dark";
+    }
 
-//Dodaj do ulubioncyh przycisk
-addToFavoritesBtn.addEventListener('click', () => {
-    currentFilter = getCurrentFilterValues();
-    titleModal.classList.remove('hidden');
+    localStorage.setItem("theme", theme);
 });
+//Dodaj do ulubioncyh przycisk
+// addToFavoritesBtn.addEventListener('click', () => {
+//     currentFilter = getCurrentFilterValues();
+//     titleModal.classList.remove('hidden');
+// });
 
 //Wyśweitlanie z nadawaniem tytułu
-saveFilterBtn.addEventListener('click', () => {
-    const title = document.getElementById('filter-title').value;
-    if (title) {
-        favorites.push({ title, filter: currentFilter });
-        updateFavoritesList();
-        titleModal.classList.add('hidden');
-        document.getElementById('filter-title').value = '';
-    }
-});
+// saveFilterBtn.addEventListener('click', () => {
+//     const title = document.getElementById('filter-title').value;
+//     if (title) {
+//         favorites.push({ title, filter: currentFilter });
+//         updateFavoritesList();
+//         titleModal.classList.add('hidden');
+//         document.getElementById('filter-title').value = '';
+//     }
+// });
 
-cancelFilterBtn.addEventListener('click', () => {
-    titleModal.classList.add('hidden');
-});
+// cancelFilterBtn.addEventListener('click', () => {
+//     titleModal.classList.add('hidden');
+// });
 
 //Zmiana wielkości czcionki
 document.querySelector(".theme-buttons button:nth-child(2)").addEventListener("click", () => {
@@ -82,9 +94,6 @@ document.querySelector(".filter-buttons button:nth-child(2)").addEventListener("
     });
 });
 
-
-if (theme === "dark") {
-    document.querySelector("body").classList.add("dark");
 //Czyszczenie inputów filtrów po kliknięciu w przycisk "Wyczyść"
 document.querySelector(".filter-buttons button:nth-child(2)").addEventListener("click", () => {
     let filter_inputs = document.querySelectorAll(".filters input");

@@ -3,13 +3,14 @@ const titleModal = document.getElementById('title-modal');
 const saveFilterBtn = document.getElementById('save-filter');
 const cancelFilterBtn = document.getElementById('cancel-filter');
 const favoritesList = document.getElementById('favorites-list');
-const heartIcon = document.querySelector('.fa-heart');
+const heartIcon = document.querySelector('.theme-buttons .fa-heart');
 const addToFavoritesBtn = document.getElementById('add-to-favorites');
 let currentFilter = {};
 let favorites = loadFavorites();
 
 //Ulubione ikona serduszka
 heartIcon.addEventListener('click', () => {
+    console.log('Ulubione');
     if (favoritesModal.style.display === 'none' || !favoritesModal.style.display) {
         favoritesModal.style.display = 'block';
     } else {
@@ -107,7 +108,7 @@ let fontSizeLevel = 0;
 
 function changeFontSize() {
     const body = document.body;
-    const fontSizes = ['1em', '1.1em', '1.2em', '1.3em'];
+    const fontSizes = ['1em', '1.1em', '1.15em', '1.2em'];
 
 
     fontSizeLevel = (fontSizeLevel + 1) % fontSizes.length;
@@ -116,10 +117,21 @@ function changeFontSize() {
     body.style.fontSize = newFontSize;
 
     //Powiekszenie przycisków i nawigacji
-    const allElements = document.querySelectorAll('header, nav, button, .icon-and-text, footer, main, i');
+    const allElements = document.querySelectorAll('header, nav, button, .icon-and-text, footer, main, i, .calendar');
     allElements.forEach(element => {
         element.style.fontSize = newFontSize;
+        if (element.classList.contains('calendar')) {
+            element.style.height = `calc(${newFontSize} * 35)`;
+        }
+        if (element.classList.contains('calendar')) {
+            element.style.height = newFontSize === '1em' ? '70vh' : `calc(${newFontSize} * 35)`;
+        }
+        // if (element.classList.contains('fa-heart')) {
+        //     element.style.fontSize = newFontSize === '1em' ? '2em' : `calc(${newFontSize} * 35)`;
+        // }
     });
+
+
 }
 
 document.getElementById('font-size').addEventListener('click', changeFontSize);
