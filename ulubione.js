@@ -121,10 +121,10 @@ function changeFontSize() {
     allElements.forEach(element => {
         element.style.fontSize = newFontSize;
         if (element.classList.contains('calendar')) {
-            element.style.height = `calc(${newFontSize} * 35)`;
+            element.style.height = `calc(${newFontSize} * 40)`;
         }
         if (element.classList.contains('calendar')) {
-            element.style.height = newFontSize === '1em' ? '70vh' : `calc(${newFontSize} * 35)`;
+            element.style.height = newFontSize === '1em' ? '70vh' : `calc(${newFontSize} * 40)`;
         }
         // if (element.classList.contains('fa-heart')) {
         //     element.style.fontSize = newFontSize === '1em' ? '2em' : `calc(${newFontSize} * 35)`;
