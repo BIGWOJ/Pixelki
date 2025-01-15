@@ -1,5 +1,54 @@
 //Zmienne odnoszczące się do zmiany motywu strony
 let theme = localStorage.getItem("theme");
+let current_year_read = false;
+
+//Funkcja do zwracania tablicy dat w headzie kalendarza
+function get_dates(year_input=true) {
+    try {
+        let current_dates = (document.querySelector(".calendar_view thead").innerHTML)
+            .split("</th>")
+            .slice(1, -1);
+
+        if (year_input) {
+            return current_dates.map(item => {
+                let [day, month, year] = item.match(/\d{1,2}\.\d{1,2}\.\d{4}/)[0].split('.');
+                return `${day.padStart(2, '0')}.${month.padStart(2, '0')}.${year}`;
+            })
+        }
+        else {
+            return current_dates.map(item => {
+                let [day, month] = item.match(/\d{1,2}\.\d{1,2}/)[0].split('.');
+                return `${day.padStart(2, '0')}.${month.padStart(2, '0')}`;
+            })
+        }
+    }
+    catch (error) {
+        return [];
+    }
+}
+
+function initialize_date_range() {
+    let current_date = new Date();
+        let month = current_date.getMonth()+1;
+        let year = current_date.getFullYear();
+        let months_dict = {
+            '1': 'styczeń', '2': 'luty', '3': 'marzec', '4': 'kwiecień', '5': 'maj',
+            '6': 'czerwiec', '7': 'lipiec', '8': 'sierpień', '9': 'wrzesień',
+            '10': 'październik', '11': 'listopad', '12': 'grudzień'
+        };
+
+        // const current_year = document.querySelector(".calendar_range span").innerHTML.split(' ');
+        // current_dates = get_dates(year_input=false);
+        // [day, month] = current_dates[0].split(".");
+        //
+        // first_date = new Date(parseInt(current_year), month - 1, day);
+        document.querySelector(".calendar_range span").innerHTML = `${months_dict[month]} ${year}`;
+        if (!current_year_read) {
+            current_year = document.querySelector(".calendar_range span").innerHTML.split(' ')[1];
+            current_year_read = true;
+        }
+    // console.log(current_year);
+}
 
 //Czynności wykonywane po załadowaniu strony
 document.addEventListener("DOMContentLoaded", () => {
@@ -18,6 +67,9 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     localStorage.setItem("theme", theme);
+
+    //Ustawianie wyjściowej daty na górze planu zajęć
+    initialize_date_range();
 });
 
 //Zmiana motywu strony
@@ -104,6 +156,7 @@ document.querySelector(".filter-buttons button:nth-child(2)").addEventListener("
 
 //Dzisiejszy dzień widok kalendarza
 document.querySelector(".navigation button:nth-child(2)").addEventListener("click", () => {
+    initialize_date_range();
     const table = document.querySelector(".calendar_view");
 
     //Head dzisiejszego widoku
@@ -135,6 +188,7 @@ document.querySelector(".navigation button:nth-child(2)").addEventListener("clic
 
 //Dzienny widok kalendarza
 document.querySelector(".navigation button:nth-child(3)").addEventListener("click", () => {
+    initialize_date_range();
     const table = document.querySelector(".calendar_view");
     let connected_table = '';
     let lesson_hours = ['8:30 - 10:00', '10:15 - 12:00', '14:15 - 16:00', '16:15 - 18:00', '18:15 - 19:30']
@@ -148,7 +202,7 @@ document.querySelector(".navigation button:nth-child(3)").addEventListener("clic
         const daily_header = `
             <thead>
                 <tr>
-                    <th></th>
+                    <th>Trzeba ustalić poprawne godziny,<br> bo czasami 10:30 a czasami 10:15 np<br>według godzin w kafelkach</th>
                     <th>${date}</th>
                 </tr>
             </thead>`;
@@ -174,12 +228,13 @@ document.querySelector(".navigation button:nth-child(3)").addEventListener("clic
     table.innerHTML = connected_table;
 
     const calendar = document.querySelector('.calendar');
-calendar.style.height = `${table.scrollHeight +250}px`;
+    calendar.style.height = `${table.scrollHeight +250}px`;
 
 });
 
 //Tygodniowy widok kalendarza
 document.querySelector(".navigation button:nth-child(4)").addEventListener("click", () => {
+    initialize_date_range();
     const table = document.querySelector(".calendar_view");
     let current_date = new Date();
     let week_start = current_date.getDate() - current_date.getDay() + 1;
@@ -219,6 +274,7 @@ document.querySelector(".navigation button:nth-child(4)").addEventListener("clic
 
 //Miesięczny widok kalendarza
 document.querySelector(".navigation button:nth-child(5)").addEventListener("click", () => {
+    initialize_date_range();
     const table = document.querySelector(".calendar_view");
 
     //Head miesięcznego widoku
@@ -252,6 +308,7 @@ document.querySelector(".navigation button:nth-child(5)").addEventListener("clic
 
 //Semestralny widok kalendarza
 document.querySelector(".navigation button:nth-child(6)").addEventListener("click", () => {
+    initialize_date_range();
     const table = document.querySelector(".calendar_view");
 
     //Head semestralnego widoku
@@ -289,46 +346,79 @@ document.querySelector(".navigation button:nth-child(6)").addEventListener("clic
 
 //Strzałka w lewo
 document.querySelector(".calendar_range button:nth-child(1)").addEventListener("click", () => {
-
     const table = document.querySelector(".calendar_view");
     let row_count = table.rows.length;
-    console.log(row_count);
-    //Trzeba jakoś inaczej zmieniać dla semestru oraz miesiąca, bo tam nie ma dat, tylko dni
-    //Zmiana dziennego też inaczej, bo tam jest długa tabela
-    if (row_count !== 14) {
-        return;
-    }
+    let column_count = table.rows[0].cells.length;
 
-    let current_dates = (document.querySelector(".calendar_view thead").innerHTML)
-    .split("</th>")
-    .slice(1, -1)
-    .map(item => {
-        let [day, month] = item.match(/\d{1,2}\.\d{1,2}/)[0].split('.');
-        return `${day.padStart(2, '0')}-${month.padStart(2, '0')}-${new Date().getFullYear()}`;
-    });
-     console.log((current_dates));
+    let days_shortcut = ['pon.', 'wt.', 'śr.', 'czw.', 'pt.', 'sob.', 'ndz.'];
+    let months_dict = {
+        '01': 'styczeń', '02': 'luty', '03': 'marzec', '04': 'kwiecień', '05': 'maj',
+        '06': 'czerwiec', '07': 'lipiec', '08': 'sierpień', '09': 'wrzesień',
+        '10': 'październik', '11': 'listopad', '12': 'grudzień'
+    };
 
-     let days_shortcut = ['pon.', 'wt.', 'śr.', 'czw.', 'pt.', 'sob.', 'ndz.'];
-
-    let today_header = `
+    let table_header = `
     <thead>
         <tr>
             <th></th>`;
 
-    for (let i = 0; i < current_dates.length; i++) {
-        let [day, month] = current_dates[i].split("-");
-        let date = new Date(new Date().getFullYear(), month - 1, day);
-        date.setDate(date.getDate() - 7);
-        current_dates[i] = `${date.getDate()}.${(date.getMonth() + 1).toString().padStart(2, '0')}`;
-        today_header += `<th>${days_shortcut[i]} ${current_dates[i]}</th>`;
+    let current_dates, new_range, date;
+
+    // Widok dzisiaj
+    if (column_count === 2 && row_count === 14) {
+        current_dates = get_dates(year_input=true);
+        date = new Date(current_dates[0].split('.').reverse().join('-'));
+        date.setDate(date.getDate() - 1);
+        current_dates[0] = `${date.getDate().toString().padStart(2, '0')}.${(date.getMonth() + 1).toString().padStart(2, '0')}.${date.getFullYear()}`;
+        new_range = `${months_dict[current_dates[0].split('.')[1]]} ${current_dates[0].split('.')[2]}`;
+        table_header += `<th>${current_dates[0]}</th>`;
     }
 
-    today_header += `</tr></thead>`;
+    //Widok dzienny
+    if (column_count === 2 && row_count === 42) {
+        console.log(table.innerHTML);
+    }
 
-    table.tHead.innerHTML = today_header;
+    //Widok tydzień
+    if (column_count === 8 && row_count === 14) {
+        current_dates = get_dates(year_input=false);
+        let [day, month] = current_dates[0].split(".");
+
+        current_year = document.querySelector(".calendar_range span").innerHTML.split(' ')[1];
+        first_date = new Date(parseInt(current_year), month - 1, day);
+        console.log(first_date);
+        first_date.setDate(first_date.getDate() - 7);
+        console.log(current_year);
+        let year = first_date.getFullYear();
+
+        for (let i = 0; i < current_dates.length; i++) {
+            [day, month] = current_dates[i].split(".");
+            let date = new Date(year, month - 1, day);
+            date.setDate(date.getDate() - 7);
+            current_dates[i] = `${date.getDate().toString().padStart(2, '0')}.${(date.getMonth() + 1).toString().padStart(2, '0')}`;
+            table_header += `<th>${days_shortcut[i]} ${current_dates[i]}</th>`;
+        }
+        new_range = `${months_dict[current_dates[0].split('.')[1]]} ${year}`;
+    }
+
+    //Widok miesiąc
+    if (column_count === 7 && row_count === 6) {
+        date.setMonth(date.getMonth() - 1);
+        current_dates[i] = `${date.getDate()}.${(date.getMonth() + 1).toString().padStart(2, '0')}`;
+        table_header += `<th>${current_dates[i]}</th>`;
+    }
+
+    //Widok semestr
+    if (column_count === 7 && row_count === 16) {
+        console.log('widok semestr');
+    }
+
+    table_header += `</tr></thead>`;
+    table.tHead.innerHTML = table_header;
+
+    document.querySelector(".calendar_range span").innerHTML = new_range;
 
 });
-
 
 //Strzałka w prawo
 document.querySelector(".calendar_range button:nth-child(3)").addEventListener("click", () => {
