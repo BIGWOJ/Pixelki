@@ -388,33 +388,45 @@ document.querySelector("#semester_button").addEventListener("click", () => {
     calendar.style.height = `80vh`;
 });
 
-//Strzałka w lewo
-document.querySelector(".calendar_range button:nth-child(1)").addEventListener("click", () => {
-    const table = document.querySelector(".calendar_view");
-    let row_count = table.rows.length;
-    let column_count = table.rows[0].cells.length;
+//Funkcja do ustawiania poprawnego semestru w zakresie kalendarza
+//output: nazwa semestru
+function set_semester_range() {
+    let current_semester = document.querySelector(".calendar_range span").innerHTML.split(' ')[1];
+    let new_range;
+    if (current_semester === 'zimowy') {
+        new_range = 'Semestr letni';
+    }
+    else {
+        new_range = 'Semestr zimowy';
+    }
+    return new_range;
+}
 
-    let days_shortcut = ['pon.', 'wt.', 'śr.', 'czw.', 'pt.', 'sob.', 'ndz.'];
+//Funkcja do ustawiania poprawnego heada w kalendarzu dla dzisiaj, dziennego, tygodniowego
+//output: nowy zakres, nowy head
+function set_calendar_head(column_count, row_count, table, next_range=false) {
+    let current_dates, new_range, date, table_header;
     let months_dict = {
         '01': 'styczeń', '02': 'luty', '03': 'marzec', '04': 'kwiecień', '05': 'maj',
         '06': 'czerwiec', '07': 'lipiec', '08': 'sierpień', '09': 'wrzesień',
         '10': 'październik', '11': 'listopad', '12': 'grudzień'
     };
+    let days_shortcut = ['pon.', 'wt.', 'śr.', 'czw.', 'pt.', 'sob.', 'ndz.'];
 
-    let table_header = `
-    <thead>
-        <tr>`;
-
-    let current_dates, new_range, date;
-
-    // Widok dzisiaj
+    //Widok dzisiaj
     if (column_count === 2 && row_count === 14) {
-        current_dates = get_dates(year_input=true);
+        current_dates = get_dates(true);
         date = new Date(current_dates[0].split('.').reverse().join('-'));
-        date.setDate(date.getDate() - 1);
+        if (next_range) {
+            date.setDate(date.getDate() + 1);
+        }
+        else {
+            date.setDate(date.getDate() - 1);
+        }
+
         current_dates[0] = `${date.getDate().toString().padStart(2, '0')}.${(date.getMonth() + 1).toString().padStart(2, '0')}.${date.getFullYear()}`;
         new_range = `${months_dict[current_dates[0].split('.')[1]]} ${current_dates[0].split('.')[2]}`;
-        table_header += `<th></th><th>${current_dates[0]}</th>`;
+        table_header = `<th></th><th>${current_dates[0]}</th>`;
     }
 
     //Widok dzienny
@@ -423,16 +435,28 @@ document.querySelector(".calendar_range button:nth-child(1)").addEventListener("
         let current_year = document.querySelector(".calendar_range span").innerHTML.split(' ')[1];
         first_date = new Date(parseInt(current_year), first_date[0].split('.')[1] - 1, first_date[0].split('.')[0]);
 
-        table_header += `<th>Trzeba ustalić poprawne godziny,<br> bo czasami 10:30 a czasami 10:15 np<br>według godzin w kafelkach</th>
+        if (next_range) {
+            table_header = `<th>Trzeba ustalić poprawne godziny,<br> bo czasami 10:30 a czasami 10:15 np<br>według godzin w kafelkach</th>
+                        <th>${(new Date(first_date.setDate(first_date.getDate() + 7)).toLocaleDateString()).split('.').slice(0, 2).join('.')}</th>`;
+        }
+
+        else {
+            table_header = `<th>Trzeba ustalić poprawne godziny,<br> bo czasami 10:30 a czasami 10:15 np<br>według godzin w kafelkach</th>
                         <th>${(new Date(first_date.setDate(first_date.getDate() - 7)).toLocaleDateString()).split('.').slice(0, 2).join('.')}</th>`;
+        }
 
         for (let i = 0; i < table.rows.length; i++) {
             let row = table.rows[i];
             let date = row.cells[1].innerText;
-
+            let new_date;
             if (date) {
-                let new_date = (new Date(new Date(first_date).setDate(new Date(first_date).getDate() + i)).toLocaleDateString()).split('.').slice(0, 2).join('.');
-                row.cells[1].innerText = new_date;
+                if (next_range) {
+                   new_date = (new Date(new Date(first_date).setDate(new Date(first_date).getDate() + i)).toLocaleDateString()).split('.').slice(0, 2).join('.');
+                }
+                else {
+                    new_date = (new Date(new Date(first_date).setDate(new Date(first_date).getDate() - i)).toLocaleDateString()).split('.').slice(0, 2).join('.');
+                }
+                 row.cells[1].innerText = new_date;
             }
         }
         let new_month = ((first_date.getMonth() + 1).toString().padStart(2, '0'));
@@ -445,77 +469,131 @@ document.querySelector(".calendar_range button:nth-child(1)").addEventListener("
         current_dates = get_dates(year_input = false);
         let [day, month] = current_dates[0].split(".");
 
-        current_year = document.querySelector(".calendar_range span").innerHTML.split(' ')[1];
-        first_date = new Date(parseInt(current_year), month - 1, day);
-        first_date.setDate(first_date.getDate() - 7);
+        let current_year = document.querySelector(".calendar_range span").innerHTML.split(' ')[1];
+        let first_date = new Date(parseInt(current_year), month - 1, day);
+        if (next_range) {
+            first_date.setDate(first_date.getDate() + 7);
+        }
+        else {
+            first_date.setDate(first_date.getDate() - 7);
+        }
 
         let year = first_date.getFullYear();
 
-        table_header += `<th></th>`;
+        table_header = `<th></th>`;
 
         for (let i = 0; i < current_dates.length; i++) {
             [day, month] = current_dates[i].split(".");
             let date = new Date(year, month - 1, day);
-            date.setDate(date.getDate() - 7);
+            if (next_range) {
+                date.setDate(date.getDate() + 7);
+            }
+            else {
+                date.setDate(date.getDate() - 7);
+            }
+
             current_dates[i] = `${date.getDate().toString().padStart(2, '0')}.${(date.getMonth() + 1).toString().padStart(2, '0')}`;
             table_header += `<th>${days_shortcut[i]} ${current_dates[i]}</th>`;
         }
         new_range = `${months_dict[current_dates[0].split('.')[1]]} ${year}`;
     }
 
+    return [new_range, table_header];
+}
+
+//Funkcja do ustawiania poprawnego heada w kalendarzu dla semestru oraz miesiąca
+//output: nowy zakres, nowy head
+function render_head_range_semester_month(semester=false, next_range=false) {
+    let months_dict = {
+        '01': 'styczeń', '02': 'luty', '03': 'marzec', '04': 'kwiecień', '05': 'maj',
+        '06': 'czerwiec', '07': 'lipiec', '08': 'sierpień', '09': 'wrzesień',
+        '10': 'październik', '11': 'listopad', '12': 'grudzień'
+    };
+
+    let [month_string, year] = document.querySelector(".calendar_range span").innerHTML.split(' ');
+    let month_number = Object.keys(months_dict).find(key => months_dict[key] === month_string);
+    let current_date = new Date(parseInt(year), parseInt(month_number) - 1, 1);
+    current_date.setMonth(current_date.getMonth() - 1);
+    let month_before = current_date;
+    let month_before_string = months_dict[(month_before.getMonth() + 1).toString().padStart(2, '0')];
+
+    current_date = new Date(parseInt(year), parseInt(month_number) - 1, 1);
+    current_date.setMonth(current_date.getMonth() + 1);
+    let month_after = current_date;
+    let month_after_string = months_dict[(month_after.getMonth() + 1).toString().padStart(2, '0')];
+    let new_range, table_header='';
     let days = ['poniedziałek', 'wtorek', 'środa', 'czwartek', 'piątek', 'sobota', 'niedziela'];
 
-    function render_head_range_semester_month(semester=false, next_range=false) {
-        let [month_string, year] = document.querySelector(".calendar_range span").innerHTML.split(' ');
-        let month_number = Object.keys(months_dict).find(key => months_dict[key] === month_string);
-        let current_date = new Date(parseInt(year), parseInt(month_number) - 1, 1);
-        current_date.setMonth(current_date.getMonth() - 1);
-        let month_before = current_date;
-        let month_before_string = months_dict[(month_before.getMonth() + 1).toString().padStart(2, '0')];
-
-        if (semester) {
-            table_header += `<th></th>`;
-            let winter_semester = ['01', '02', '10', '11', '12']
-            if (winter_semester.hasOwnProperty(month_number)) {
-                new_range = "Semestr zimowy";
-            }
-
-            else {
-                new_range = "Semestr letni";
-            }
+    if (semester) {
+        table_header = `<th></th>`;
+        let winter_semester = ['01', '02', '10', '11', '12']
+        if (winter_semester.hasOwnProperty(month_number)) {
+            new_range = "Semestr zimowy";
         }
 
         else {
-            new_range = `${month_before_string} ${month_before.getFullYear()}`;
-        }
-
-        for (let i = 0; i < 7; i++) {
-            table_header += `<th>${days[i]}</th>`;
+            new_range = "Semestr letni";
         }
     }
 
-    //Widok miesiąc
+    else {
+        if (next_range) {
+            new_range = `${month_after_string} ${month_after.getFullYear()}`;
+        }
+        else {
+            new_range = `${month_before_string} ${month_before.getFullYear()}`;
+        }
+    }
+
+    for (let i = 0; i < 7; i++) {
+        table_header += `<th>${days[i]}</th>`;
+    }
+
+    return [new_range, table_header];
+}
+
+//Strzałka w lewo
+document.querySelector(".calendar_range button:nth-child(1)").addEventListener("click", () => {
+const table = document.querySelector(".calendar_view");
+    let row_count = table.rows.length;
+    let column_count = table.rows[0].cells.length;
+
+    let table_header = `
+    <thead>
+        <tr>`;
+
+    let new_range;
+
+    // Widok dzisiaj
+    if (column_count === 2 && row_count === 14) {
+        [new_range, table_header] = set_calendar_head(column_count, row_count, table);
+    }
+
+    // Widok dzienny
+    if (column_count === 2 && row_count === 42) {
+        [new_range, table_header] = set_calendar_head(column_count, row_count, table);
+    }
+
+    // Widok tydzień
+    if (column_count === 8 && row_count === 14) {
+        [new_range, table_header] = set_calendar_head(column_count, row_count, table);
+    }
+
+    // Widok miesiąc
     if (column_count === 7 && row_count === 6) {
-        render_head_range_semester_month();
+        [new_range, table_header] = render_head_range_semester_month(false);
     }
 
     //Widok semestr
     if (column_count === 8 && row_count === 16) {
-        render_head_range_semester_month(true);
-        let current_semester = document.querySelector(".calendar_range span").innerHTML.split(' ')[1];
-        if (current_semester === 'zimowy') {
-            new_range = 'Semestr letni';
-        }
-        else {
-            new_range = 'Semestr zimowy';
-        }
+        table_header = render_head_range_semester_month(true)[1];
+        new_range = set_semester_range();
     }
 
     table_header += `</tr></thead>`;
     table.tHead.innerHTML = table_header;
 
     document.querySelector(".calendar_range span").innerHTML = new_range;
-
 });
 
 //Strzałka w prawo
@@ -524,131 +602,36 @@ document.querySelector(".calendar_range button:nth-child(3)").addEventListener("
     let row_count = table.rows.length;
     let column_count = table.rows[0].cells.length;
 
-    let days_shortcut = ['pon.', 'wt.', 'śr.', 'czw.', 'pt.', 'sob.', 'ndz.'];
-    let months_dict = {
-        '01': 'styczeń', '02': 'luty', '03': 'marzec', '04': 'kwiecień', '05': 'maj',
-        '06': 'czerwiec', '07': 'lipiec', '08': 'sierpień', '09': 'wrzesień',
-        '10': 'październik', '11': 'listopad', '12': 'grudzień'
-    };
-
     let table_header = `
     <thead>
         <tr>`;
 
-    let current_dates, new_range, date;
+    let new_range;
 
     // Widok dzisiaj
     if (column_count === 2 && row_count === 14) {
-        current_dates = get_dates(year_input=true);
-        date = new Date(current_dates[0].split('.').reverse().join('-'));
-        date.setDate(date.getDate() + 1);
-        current_dates[0] = `${date.getDate().toString().padStart(2, '0')}.${(date.getMonth() + 1).toString().padStart(2, '0')}.${date.getFullYear()}`;
-        new_range = `${months_dict[current_dates[0].split('.')[1]]} ${current_dates[0].split('.')[2]}`;
-        table_header += `<th></th><th>${current_dates[0]}</th>`;
+        [new_range, table_header] = set_calendar_head(column_count, row_count, table, true);
     }
 
     // Widok dzienny
     if (column_count === 2 && row_count === 42) {
-        let first_date = get_dates(year_input=false);
-        let current_year = document.querySelector(".calendar_range span").innerHTML.split(' ')[1];
-        first_date = new Date(parseInt(current_year), first_date[0].split('.')[1] - 1, first_date[0].split('.')[0]);
-
-        table_header += `<th>Trzeba ustalić poprawne godziny,<br> bo czasami 10:30 a czasami 10:15 np<br>według godzin w kafelkach</th>
-                        <th>${(new Date(first_date.setDate(first_date.getDate() + 7)).toLocaleDateString()).split('.').slice(0, 2).join('.')}</th>`;
-
-        for (let i = 0; i < table.rows.length; i++) {
-            let row = table.rows[i];
-            let date = row.cells[1].innerText;
-
-            if (date) {
-                let new_date = (new Date(new Date(first_date).setDate(new Date(first_date).getDate() + i)).toLocaleDateString()).split('.').slice(0, 2).join('.');
-                row.cells[1].innerText = new_date;
-            }
-        }
-        let new_month = ((first_date.getMonth() + 1).toString().padStart(2, '0'));
-
-        new_range = `${months_dict[new_month]} ${first_date.getFullYear()}`;
+        [new_range, table_header] = set_calendar_head(column_count, row_count, table, true);
     }
 
     // Widok tydzień
-      if (column_count === 8 && row_count === 14) {
-        current_dates = get_dates(year_input = false);
-        let [day, month] = current_dates[0].split(".");
-
-        current_year = document.querySelector(".calendar_range span").innerHTML.split(' ')[1];
-        first_date = new Date(parseInt(current_year), month - 1, day);
-        first_date.setDate(first_date.getDate() + 7);
-
-        let year = first_date.getFullYear();
-
-        table_header += `<th></th>`;
-
-        for (let i = 0; i < current_dates.length; i++) {
-            [day, month] = current_dates[i].split(".");
-            let date = new Date(year, month - 1, day);
-            date.setDate(date.getDate() + 7);
-            current_dates[i] = `${date.getDate().toString().padStart(2, '0')}.${(date.getMonth() + 1).toString().padStart(2, '0')}`;
-            table_header += `<th>${days_shortcut[i]} ${current_dates[i]}</th>`;
-        }
-        new_range = `${months_dict[current_dates[0].split('.')[1]]} ${year}`;
-    }
-
-    let days = ['poniedziałek', 'wtorek', 'środa', 'czwartek', 'piątek', 'sobota', 'niedziela'];
-
-    function render_head_range_semester_month(semester=false, next_range=false) {
-        let [month_string, year] = document.querySelector(".calendar_range span").innerHTML.split(' ');
-        let month_number = Object.keys(months_dict).find(key => months_dict[key] === month_string);
-        let current_date = new Date(parseInt(year), parseInt(month_number) - 1, 1);
-        current_date.setMonth(current_date.getMonth() - 1);
-        let month_before = current_date;
-        let month_before_string = months_dict[(month_before.getMonth() + 1).toString().padStart(2, '0')];
-
-        current_date = new Date(parseInt(year), parseInt(month_number) - 1, 1);
-        current_date.setMonth(current_date.getMonth() + 1);
-        let month_after = current_date;
-        let month_after_string = months_dict[(month_after.getMonth() + 1).toString().padStart(2, '0')];
-
-        if (semester) {
-            table_header += `<th></th>`;
-            let winter_semester = ['01', '02', '10', '11', '12']
-            if (winter_semester.hasOwnProperty(month_number)) {
-                new_range = "Semestr zimowy";
-            }
-
-            else {
-                new_range = "Semestr letni";
-            }
-        }
-
-        else {
-            if (next_range) {
-                new_range = `${month_after_string} ${month_after.getFullYear()}`;
-            }
-            else {
-                new_range = `${month_before_string} ${month_before.getFullYear()}`;
-            }
-        }
-
-        for (let i = 0; i < 7; i++) {
-            table_header += `<th>${days[i]}</th>`;
-        }
+    if (column_count === 8 && row_count === 14) {
+        [new_range, table_header] = set_calendar_head(column_count, row_count, table, true);
     }
 
     // Widok miesiąc
     if (column_count === 7 && row_count === 6) {
-        render_head_range_semester_month(false, true);
+        [new_range, table_header] = render_head_range_semester_month(false, true);
     }
 
     //Widok semestr
     if (column_count === 8 && row_count === 16) {
-        render_head_range_semester_month(true);
-        let current_semester = document.querySelector(".calendar_range span").innerHTML.split(' ')[1];
-        if (current_semester === 'zimowy') {
-            new_range = 'Semestr letni';
-        }
-        else {
-            new_range = 'Semestr zimowy';
-        }
+        table_header = render_head_range_semester_month(true)[1];
+        new_range = set_semester_range();
     }
 
     table_header += `</tr></thead>`;
@@ -657,11 +640,12 @@ document.querySelector(".calendar_range button:nth-child(3)").addEventListener("
     document.querySelector(".calendar_range span").innerHTML = new_range;
 });
 
-//Kalendarz ikona
+//Kalendarz zakresowy ikona
 document.getElementById("calendar-button").addEventListener("click", () => {
     document.getElementById("date-container").style.display = "block";
 });
 
+//Zamykanie kalendarza zakresowego
 document.getElementById("close-modal").addEventListener("click", () => {
     document.getElementById("date-container").style.display = "none";
 });
