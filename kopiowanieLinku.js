@@ -53,7 +53,7 @@ function paramsEnter() {
     const albumNumber = params.get("album-number");
     const classType = params.get("class-type");
 
-    console.log(params.get("lecturer"));
+    // console.log(params.get("lecturer"));
 
     document.getElementById("lecturer").value = params.get("lecturer");
     document.getElementById("room").value = params.get("room");
