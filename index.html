@@ -49,7 +49,23 @@
     <nav class="navigation">
         <div class="icons">
             <i class="fas fa-share-square filter-share" title="Udostępnij" id="copyLink"></i>
-            <i class="fas fa-calendar range-calendar"></i>
+
+            <button id="calendar-button">
+                <i class="fas fa-calendar range-calendar"></i>
+            </button>
+            <div id="date-container">
+                <div class="modal-date">
+                    <label for="start-date">Data od:</label>
+                    <input type="date" id="start-date" />
+                    <br />
+                    <label for="end-date">Data do:</label>
+                    <input type="date" id="end-date" />
+                    <br />
+                    <button id="confirm-dates">Zatwierdź</button>
+                    <button id="close-modal">Anuluj</button>
+                </div>
+            </div>
+
         </div>
         <button>Dzisiaj</button>
         <button>Dzienny</button>

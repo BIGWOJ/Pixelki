@@ -51,6 +51,33 @@ body {
     padding: 10px 0;
 }
 
+#date-container {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+
+    background-color: var(--color_primary);
+    border: 1px solid #ccc;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    padding: 20px;
+    z-index: 1000;
+    display: none;
+}
+
+.modal-date {
+    text-align: center;
+}
+
+#date-container button {
+    margin: 5px;
+}
+
+#date-container input {
+    margin: 10px 0;
+}
+
+
 header {
     display: flex;
     justify-content: space-between;

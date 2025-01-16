@@ -420,15 +420,78 @@ document.querySelector(".calendar_range button:nth-child(1)").addEventListener("
 
 });
 
-//Strzałka w prawo
+// Strzałka w prawo
 document.querySelector(".calendar_range button:nth-child(3)").addEventListener("click", () => {
-    console.log("Strzałka w prawo\nJeszcze nie zrobione");
+    const table = document.querySelector(".calendar_view");
+    let row_count = table.rows.length;
+    let column_count = table.rows[0].cells.length;
+
+    let days_shortcut = ['pon.', 'wt.', 'śr.', 'czw.', 'pt.', 'sob.', 'ndz.'];
+    let months_dict = {
+        '01': 'styczeń', '02': 'luty', '03': 'marzec', '04': 'kwiecień', '05': 'maj',
+        '06': 'czerwiec', '07': 'lipiec', '08': 'sierpień', '09': 'wrzesień',
+        '10': 'październik', '11': 'listopad', '12': 'grudzień'
+    };
+
+    let table_header = `
+    <thead>
+        <tr>
+            <th></th>`;
+
+    let current_dates, new_range, date;
+
+    // Widok dzisiaj
+    if (column_count === 2 && row_count === 14) {
+        current_dates = get_dates(year_input=true);
+        date = new Date(current_dates[0].split('.').reverse().join('-'));
+        date.setDate(date.getDate() + 1);
+        current_dates[0] = `${date.getDate().toString().padStart(2, '0')}.${(date.getMonth() + 1).toString().padStart(2, '0')}.${date.getFullYear()}`;
+        new_range = `${months_dict[current_dates[0].split('.')[1]]} ${current_dates[0].split('.')[2]}`;
+        table_header += `<th>${current_dates[0]}</th>`;
+    }
+
+    // Widok dzienny
+
+
+    // Widok tydzień
+    if (column_count === 8 && row_count === 14) {
+        current_dates = get_dates(year_input=false);
+        let [day, month] = current_dates[0].split(".");
+
+        current_year = document.querySelector(".calendar_range span").innerHTML.split(' ')[1];
+        first_date = new Date(parseInt(current_year), month - 1, day);
+        first_date.setDate(first_date.getDate() + 7);
+        let year = first_date.getFullYear();
+
+        for (let i = 0; i < current_dates.length; i++) {
+            [day, month] = current_dates[i].split(".");
+            let date = new Date(year, month - 1, day);
+            date.setDate(date.getDate() + 7);
+            current_dates[i] = `${date.getDate().toString().padStart(2, '0')}.${(date.getMonth() + 1).toString().padStart(2, '0')}`;
+            table_header += `<th>${days_shortcut[i]} ${current_dates[i]}</th>`;
+        }
+        new_range = `${months_dict[current_dates[0].split('.')[1]]} ${year}`;
+    }
+
+    // Widok miesiąc
+
+
+    // Widok semestr
+
+
+    table_header += `</tr></thead>`;
+    table.tHead.innerHTML = table_header;
+
+    document.querySelector(".calendar_range span").innerHTML = new_range;
 });
 
-if (theme === "dark") {
-    document.querySelector("body").classList.add("dark");
-}
 
-if (theme === "light") {
-    document.querySelector("body").classList.add("light");
-}
+//Kalendarz ikona
+document.getElementById("calendar-button").addEventListener("click", () => {
+    document.getElementById("date-container").style.display = "block";
+});
+
+document.getElementById("close-modal").addEventListener("click", () => {
+    document.getElementById("date-container").style.display = "none";
+});
+
