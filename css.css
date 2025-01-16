@@ -276,10 +276,6 @@ main {
     color: var(--color_black);
 }
 
-.calendar .highlight {
-    background-color: #ffeeba;
-}
-
 .filters {
     flex: 1;
     background-color: var(--color_beige);
@@ -297,6 +293,7 @@ main {
 }
 
 .filters input {
+    color: var(--color_black);
     width: 100%;
     border: 1px solid var(--color_border_gray);
     border-radius: 4px;
