@@ -60,7 +60,7 @@ function paramsEnter() {
     document.getElementById("subject").value = params.get("subject");
     document.getElementById("group").value = params.get("group");
     document.getElementById("album-number").value = params.get("album-number");
-    document.getElementById("class-type").value = params.get("class-type");
+    // document.getElementById("class-type").value = params.get("class-type");
 
     // pozniej dodac wyswietlanie od razu planu jak sie wejdzie na strone
 }
