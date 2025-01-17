@@ -404,7 +404,7 @@ function set_semester_range() {
 
 //Funkcja do ustawiania poprawnego heada w kalendarzu dla dzisiaj, dziennego, tygodniowego
 //output: nowy zakres, nowy head
-function set_calendar_head(column_count, row_count, table, next_range=false) {
+function set_calendar_head(row_count, column_count, table, next_range=false) {
     let current_dates, new_range, date, table_header;
     let months_dict = {
         '01': 'styczeń', '02': 'luty', '03': 'marzec', '04': 'kwiecień', '05': 'maj',
@@ -552,6 +552,76 @@ function render_head_range_semester_month(semester=false, next_range=false) {
     return [new_range, table_header];
 }
 
+//Funkcja do obliczania współrzędnych dla podanego kafelka
+//output: Object(współrzędne x, y) kafelka
+function get_table_tile_coordinates(row, column) {
+    const table = document.querySelector(".calendar_view");
+    if (table) {
+        const cell = table.rows[row].cells[column];
+        if (cell) {
+            const rect = cell.getBoundingClientRect();
+            return { x: rect.left, y: rect.top };
+        }
+    }
+    return null;
+}
+
+//Funkcja do obliczania wymiarów dla podanego kafelka
+//output: Object(wymiary width, height) kafelka
+function get_table_tile_dimensions(row, column) {
+    const table = document.querySelector(".calendar_view");
+    if (table) {
+        const cell = table.rows[row].cells[column];
+        if (cell) {
+            const rect = cell.getBoundingClientRect();
+            return { width: rect.width, height: rect.height };
+        }
+    }
+    return null;
+}
+
+//Funkcja do dodawania kafelka do kalendarza
+function add_tile_calendar(row, column, text) {
+    const dims = get_table_tile_dimensions(row, column);
+    const coordinates = get_table_tile_coordinates(row, column);
+
+    if (coordinates) {
+        const tile = document.createElement('div');
+        tile.classList.add('calendar_tile');
+        tile.style.position = 'absolute';
+        tile.style.left = `${coordinates.x}px`;
+        tile.style.top = `${coordinates.y}px`;
+        tile.style.width = `${dims.width}px`;
+        tile.style.height = `${dims.height}px`;
+        tile.style.backgroundColor = 'blue';
+        tile.style.boxSizing = 'border-box';
+        tile.style.border = '1px solid black';
+        tile.innerText = text;
+        tile.style.fontSize = '10px';
+
+        document.body.appendChild(tile);
+
+        window.addEventListener('resize', () => {
+            const new_dims = get_table_tile_dimensions(row, column);
+            const new_coordinates = get_table_tile_coordinates(row, column);
+            if (new_dims && new_coordinates) {
+                tile.style.left = `${new_coordinates.x}px`;
+                tile.style.top = `${new_coordinates.y}px`;
+                tile.style.width = `${new_dims.width}px`;
+                tile.style.height = `${new_dims.height}px`;
+            }
+        });
+    }
+}
+
+//Funkcja do usuwania wszystkich kafelków z kalendarza
+function clear_tiles_calendar() {
+    const tiles = document.querySelectorAll('.calendar_tile');
+    tiles.forEach(tile => {
+        tile.remove();
+    });
+}
+
 //Strzałka w lewo
 document.querySelector(".calendar_range button:nth-child(1)").addEventListener("click", () => {
 const table = document.querySelector(".calendar_view");
@@ -565,27 +635,27 @@ const table = document.querySelector(".calendar_view");
     let new_range;
 
     // Widok dzisiaj
-    if (column_count === 2 && row_count === 14) {
-        [new_range, table_header] = set_calendar_head(column_count, row_count, table);
+    if (row_count === 14 && column_count === 2) {
+        [new_range, table_header] = set_calendar_head(row_count, column_count, table);
     }
 
     // Widok dzienny
-    if (column_count === 2 && row_count === 42) {
-        [new_range, table_header] = set_calendar_head(column_count, row_count, table);
+    if (row_count === 42 && column_count === 2) {
+        [new_range, table_header] = set_calendar_head(row_count, column_count, table);
     }
 
     // Widok tydzień
-    if (column_count === 8 && row_count === 14) {
-        [new_range, table_header] = set_calendar_head(column_count, row_count, table);
+    if (row_count === 14 && column_count === 8) {
+        [new_range, table_header] = set_calendar_head(row_count, column_count, table);
     }
 
     // Widok miesiąc
-    if (column_count === 7 && row_count === 6) {
+    if (row_count === 6 && column_count === 7) {
         [new_range, table_header] = render_head_range_semester_month(false);
     }
 
     //Widok semestr
-    if (column_count === 8 && row_count === 16) {
+    if (row_count === 16 && column_count === 8) {
         table_header = render_head_range_semester_month(true)[1];
         new_range = set_semester_range();
     }
@@ -609,27 +679,27 @@ document.querySelector(".calendar_range button:nth-child(3)").addEventListener("
     let new_range;
 
     // Widok dzisiaj
-    if (column_count === 2 && row_count === 14) {
-        [new_range, table_header] = set_calendar_head(column_count, row_count, table, true);
+    if ( row_count === 14 && column_count === 2) {
+        [new_range, table_header] = set_calendar_head(row_count, column_count, table, true);
     }
 
     // Widok dzienny
-    if (column_count === 2 && row_count === 42) {
-        [new_range, table_header] = set_calendar_head(column_count, row_count, table, true);
+    if (row_count === 42 && column_count === 2) {
+        [new_range, table_header] = set_calendar_head(row_count, column_count, table, true);
     }
 
     // Widok tydzień
-    if (column_count === 8 && row_count === 14) {
-        [new_range, table_header] = set_calendar_head(column_count, row_count, table, true);
+    if (row_count === 14 && column_count === 8) {
+        [new_range, table_header] = set_calendar_head(row_count, column_count, table, true);
     }
 
     // Widok miesiąc
-    if (column_count === 7 && row_count === 6) {
+    if (row_count === 6 && column_count === 7) {
         [new_range, table_header] = render_head_range_semester_month(false, true);
     }
 
     //Widok semestr
-    if (column_count === 8 && row_count === 16) {
+    if (row_count === 16 && column_count === 8) {
         table_header = render_head_range_semester_month(true)[1];
         new_range = set_semester_range();
     }
