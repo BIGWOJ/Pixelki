@@ -827,6 +827,14 @@ footer {
     background-color: var(--color_border_gray);
 }
 
+.calendar_tile {
+    background-color: var(--color_primary);
+    font-size: 10px;
+    position: absolute;
+    border: 1px solid var(--color_border_gray);
+    border-radius: 4px;
+    box-sizing: border-box;
+}
 
 /*Zmiana motywu respektując ustawiony motyw systemowy/przeglądarkowy użytkownika*/
 /*@media (prefers-color-scheme: dark) {*/

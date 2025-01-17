@@ -581,23 +581,24 @@ function get_table_tile_dimensions(row, column) {
 }
 
 //Funkcja do dodawania kafelka do kalendarza
-function add_tile_calendar(row, column, text) {
+//input: godzina startu, minuty startu, minuty trwania, nr_kolumny (od 1), tekst
+function add_tile_calendar(hour_start, minutes_start, minutes_duration, column, text) {
+    const row = hour_start - 6;
     const dims = get_table_tile_dimensions(row, column);
+    let tile_upper_line = minutes_start / 60;
+    tile_upper_line *= dims.height;
+
     const coordinates = get_table_tile_coordinates(row, column);
+    const tile_duration_hour = minutes_duration / 60;
 
     if (coordinates) {
         const tile = document.createElement('div');
         tile.classList.add('calendar_tile');
-        tile.style.position = 'absolute';
         tile.style.left = `${coordinates.x}px`;
-        tile.style.top = `${coordinates.y}px`;
+        tile.style.top = `${coordinates.y + tile_upper_line}px`;
         tile.style.width = `${dims.width}px`;
-        tile.style.height = `${dims.height}px`;
-        tile.style.backgroundColor = 'blue';
-        tile.style.boxSizing = 'border-box';
-        tile.style.border = '1px solid black';
+        tile.style.height = `${dims.height * tile_duration_hour}px`;
         tile.innerText = text;
-        tile.style.fontSize = '10px';
 
         document.body.appendChild(tile);
 
