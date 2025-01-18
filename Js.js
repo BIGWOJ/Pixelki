@@ -201,10 +201,25 @@ function show_tiles(){
         let dateAdd = new Date(dataEnd);
         dateAdd.setDate(dateAdd.getDate() + 1);
         dataEnd = dateAdd.toISOString().split('T')[0];
+        //console.log(data);
     }
-    else if (calendar.id === "dzienny"){
 
+    else if (calendar.id === "dzienny"){
+        const data = document.querySelector(".calendar_range span").textContent;
+        let parts = data.split(" ");
+        let year = parts[1];
+        dataStart = year + "-";
+        let str = document.querySelector(".calendar_view thead th:nth-child(2)").textContent;
+        parts = str.split(".");
+        dataStart += parts[1] + "-" + parts[0];
+        dataEnd = new Date(new Date(dataStart).setDate(new Date(dataStart).getDate() + 5));
+        let dateAdd = new Date(dataEnd);
+        dateAdd.setDate(dateAdd.getDate() + 1);
+        dataEnd = dateAdd.toISOString().split('T')[0];
+        // console.log(dataStart);
+        // console.log(dataEnd);
     }
+
     else if (calendar.id === "tygodniowy"){
         const data = document.querySelectorAll(".calendar_view thead th");
         let str = data[1].textContent;
@@ -224,6 +239,7 @@ function show_tiles(){
         dataEnd = year + "-" + dataEnd;
         //console.log(dataStart);
     }
+
     else if (calendar.id === "miesieczny"){
 
     }
@@ -241,8 +257,62 @@ function show_tiles(){
     })
         .then(response => response.json())
         .then(data => {
-            console.log(data);
-            if (calendar.id === "tygodniowy"){
+            //Posortowanie zajęć według godziny zaczęcia
+            data.sort((a, b) => new Date(a.start) - new Date(b.start));
+            //console.log(data);
+
+            if (calendar.id === "dzisiejszy") {
+                    data.forEach(function(index){
+                        let timeStart = new Date(index["start"]);
+                        let hour = timeStart.getHours();
+                        let minute = timeStart.getMinutes();
+
+                        let timeEnd = new Date(index["koniec"]);
+
+                        let roznica = timeEnd - timeStart;
+                        roznica = roznica / 1000 / 60;
+
+                        let text = timeStart.getHours() + ":" + timeStart.getMinutes() + " - " + timeEnd.getHours() + ":" + timeEnd.getMinutes()
+                            + "\n" + index["tytul"];
+
+                        const dataTD = document.querySelectorAll(".calendar_view tbody tr td:nth-child(2)");
+                        dataTD.forEach(function(indexTH, indexNum){
+                            add_tile_calendar(hour, minute, roznica, 1, text, index["formaZajec"]);
+                        })
+
+                    });
+                }
+
+            else if (calendar.id === "dzienny") {
+                let current_lesson_day, next_lesson_day;
+                let jump_hour = 0;
+                for (let i = 0; i < data.length; i++) {
+                    let index = data[i];
+                    let timeStart = new Date(index["start"]);
+                    let hour = timeStart.getHours();
+                    let minute = timeStart.getMinutes();
+                    let timeEnd = new Date(index["koniec"]);
+                    let roznica = (timeEnd - timeStart) / 1000 / 60;
+                    let text = timeStart.getHours() + ":" + timeStart.getMinutes() + " - " + timeEnd.getHours() + ":" + timeEnd.getMinutes() + "\n" + index["tytul"];
+
+                    //const dataTD = document.querySelectorAll(".calendar_view tbody tr td:nth-child(2)");
+                    current_lesson_day = index["start"].split("T")[0].split("-")[2];
+                    next_lesson_day = data[i+1] ? data[i+1]["start"].split("T")[0].split("-")[2] : null;
+                    // console.log(current_lesson_day, next_lesson_day);
+                    //console.log(document.querySelector(".calendar_view").innerHTML);
+                    if (current_lesson_day !== next_lesson_day) {
+                        // console.log("Jestem w ifie");
+                    }
+                    else {
+
+                    }
+                    // console.log(timeStart);
+                    // console.log(`Dodanie kafelka ${hour}:${minute} ${roznica} 1 ${text} ${index["formaZajec"]}`);
+                    add_tile_calendar(6, (hour-6)*60+minute, 90, 1, text, index["formaZajec"]);
+                }
+            }
+
+            else if (calendar.id === "tygodniowy"){
                 data.forEach(function(index){
 
                     let timeStart = new Date(index["start"]);
@@ -274,31 +344,10 @@ function show_tiles(){
 
                 });
             }
-            else if (calendar.id === "dzisiejszy") {
-                data.forEach(function(index){
-                    let timeStart = new Date(index["start"]);
-                    let hour = timeStart.getHours();
-                    let minute = timeStart.getMinutes();
-
-
-                    let timeEnd = new Date(index["koniec"]);
-
-                    let roznica = timeEnd - timeStart;
-                    roznica = roznica / 1000 / 60;
-
-                    let text = timeStart.getHours() + ":" + timeStart.getMinutes() + " - " + timeEnd.getHours() + ":" + timeEnd.getMinutes()
-                        + "\n" + index["tytul"];
-
-                    const dataTD = document.querySelectorAll(".calendar_view tbody tr td:nth-child(2)");
-
-                    dataTD.forEach(function(indexTH, indexNum){
-                        add_tile_calendar(hour, minute, roznica, 1, text, index["formaZajec"]);
-                    })
-
-                });
-            }
 
         })
+
+
 
     if (forma.length === 0 || forma === "własnyKafelek"){
         ulubione.forEach(function(indexUlub){
@@ -400,7 +449,7 @@ document.querySelector("#daily_button").addEventListener("click", () => {
     initialize_date_range();
     const table = document.querySelector(".calendar_view");
     let connected_table = '';
-    let lesson_hours = ['8:30 - 10:00', '10:15 - 12:00', '14:15 - 16:00', '16:15 - 18:00', '18:15 - 19:30']
+    //let lesson_hours = ['8:30 - 10:00', '10:15 - 12:00', '14:15 - 16:00', '16:15 - 18:00', '18:15 - 19:30']
     let current_date = new Date();
     let week_start = current_date.getDate() - current_date.getDay() + 1;
 
@@ -411,18 +460,18 @@ document.querySelector("#daily_button").addEventListener("click", () => {
         const daily_header = `
             <thead>
                 <tr>
-                    <th>Trzeba ustalić poprawne godziny,<br> bo czasami 10:30 a czasami 10:15 np<br>według godzin w kafelkach</th>
+                    <th></th>
                     <th>${date.split('.').slice(0,2).join('.')}</th>
                 </tr>
             </thead>`;
 
         //Body dziennego widoku
         let daily_body = `<tbody>`;
-        for (let j = 0; j < 5; j++) {
+        for (let j = 0; j < 13; j++) {
             daily_body += `<tr>`;
             for (let k = 0; k < 2; k++) {
                 if (k === 0) {
-                    daily_body += `<td>${lesson_hours[j]}</td>`;
+                    daily_body += `<td>${7+j}</td>`;
                     continue;
                 }
                 daily_body += `<td></td>`;
@@ -439,7 +488,7 @@ document.querySelector("#daily_button").addEventListener("click", () => {
     const calendar = document.querySelector('.calendar');
     calendar.style.height = `${table.scrollHeight+250}px`;
     calendar.id = "dzienny";
-    show_tiles()
+    show_tiles();
 });
 
 //Tygodniowy widok kalendarza
@@ -652,18 +701,18 @@ function set_calendar_head(row_count, column_count, table, next_range=false) {
     }
 
     //Widok dzienny
-    if (column_count === 2 && row_count === 42) {
+    if (column_count === 2 && row_count === 98) {
         let first_date = get_dates(year_input=false);
         let current_year = document.querySelector(".calendar_range span").innerHTML.split(' ')[1];
         first_date = new Date(parseInt(current_year), first_date[0].split('.')[1] - 1, first_date[0].split('.')[0]);
 
         if (next_range) {
-            table_header = `<th>Trzeba ustalić poprawne godziny,<br> bo czasami 10:30 a czasami 10:15 np<br>według godzin w kafelkach</th>
+            table_header = `<th></th>
                         <th>${(new Date(first_date.setDate(first_date.getDate() + 7)).toLocaleDateString()).split('.').slice(0, 2).join('.')}</th>`;
         }
 
         else {
-            table_header = `<th>Trzeba ustalić poprawne godziny,<br> bo czasami 10:30 a czasami 10:15 np<br>według godzin w kafelkach</th>
+            table_header = `<th></th>
                         <th>${(new Date(first_date.setDate(first_date.getDate() - 7)).toLocaleDateString()).split('.').slice(0, 2).join('.')}</th>`;
         }
 
@@ -673,12 +722,12 @@ function set_calendar_head(row_count, column_count, table, next_range=false) {
             let new_date;
             if (date) {
                 if (next_range) {
-                   new_date = (new Date(new Date(first_date).setDate(new Date(first_date).getDate() + i)).toLocaleDateString()).split('.').slice(0, 2).join('.');
+                    new_date = (new Date(new Date(first_date).setDate(new Date(first_date).getDate() + i)).toLocaleDateString()).split('.').slice(0, 2).join('.');
                 }
                 else {
                     new_date = (new Date(new Date(first_date).setDate(new Date(first_date).getDate() - i)).toLocaleDateString()).split('.').slice(0, 2).join('.');
                 }
-                 row.cells[1].innerText = new_date;
+                row.cells[1].innerText = new_date;
             }
         }
         let new_month = ((first_date.getMonth() + 1).toString().padStart(2, '0'));
@@ -812,6 +861,7 @@ function get_table_tile_dimensions(row, column) {
 function add_tile_calendar(hour_start, minutes_start, minutes_duration, column, text, form) {
     const row = hour_start - 6;
     const dims = get_table_tile_dimensions(row, column);
+    console.log(dims);
     let tile_upper_line = minutes_start / 60;
     tile_upper_line *= dims.height;
 
@@ -877,7 +927,7 @@ document.querySelector(".calendar_range button:nth-child(1)").addEventListener("
 const table = document.querySelector(".calendar_view");
     let row_count = table.rows.length;
     let column_count = table.rows[0].cells.length;
-
+    console.log(row_count, column_count);
     let table_header = `
     <thead>
         <tr>`;
@@ -890,7 +940,7 @@ const table = document.querySelector(".calendar_view");
     }
 
     // Widok dzienny
-    if (row_count === 42 && column_count === 2) {
+    if (row_count === 98 && column_count === 2) {
         [new_range, table_header] = set_calendar_head(row_count, column_count, table);
     }
 
@@ -935,7 +985,7 @@ document.querySelector(".calendar_range button:nth-child(3)").addEventListener("
     }
 
     // Widok dzienny
-    if (row_count === 42 && column_count === 2) {
+    if (row_count === 98 && column_count === 2) {
         [new_range, table_header] = set_calendar_head(row_count, column_count, table, true);
     }
 
@@ -971,13 +1021,11 @@ document.getElementById("close-modal").addEventListener("click", () => {
     document.getElementById("date-container").style.display = "none";
 });
 
-
 const startDateInput = document.getElementById('start-date');
 const endDateInput = document.getElementById('end-date');
 const confirmButton = document.getElementById('confirm-dates');
 const calendarRange = document.querySelector('.calendar_range span');
 const calendarView = document.querySelector('.calendar_view tbody');
-
 
 confirmButton.addEventListener('click', function() {
     const startDate = new Date(startDateInput.value);
@@ -1005,7 +1053,7 @@ function updateCalendarView(startDate, endDate) {
 
     let startDay = startDate.getDay();
     if (startDay === 0) startDay = 7;
-
+    console.log(startDay, endDate);
     const headerDays = ['Pon', 'Wt', 'Śr', 'Czw', 'Pt', 'So', 'Nd'];
     let updatedHeader = headerDays.slice(startDay - 1).concat(headerDays.slice(0, startDay - 1));
 
