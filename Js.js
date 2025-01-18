@@ -186,11 +186,21 @@ function show_tiles(){
     const numerAlbumu = document.getElementById("album-number").value;
     const forma = document.getElementById("forma-zajec").value;
 
+    if (wykladowca.length === 0 && sala.length === 0 && przedmiot.length === 0 && grupa.length === 0 && numerAlbumu.length === 0 && forma.length === 0) {
+        return;
+    }
+
     const calendar = document.querySelector(".calendar");
 
 
     if (calendar.id === "dzisiejszy"){
-
+        let data = document.querySelector(".calendar_view thead th:nth-child(2)").textContent;
+        let parts = data.split(".");
+        var dataStart = `${parts[2]}-${parts[1]}-${parts[0]}`;
+        var dataEnd = dataStart;
+        let dateAdd = new Date(dataEnd);
+        dateAdd.setDate(dateAdd.getDate() + 1);
+        dataEnd = dateAdd.toISOString().split('T')[0];
     }
     else if (calendar.id === "dzienny"){
 
@@ -212,6 +222,7 @@ function show_tiles(){
         var dataEnd = parts[1].split(".");
         dataEnd = dataEnd.reverse().join("-");
         dataEnd = year + "-" + dataEnd;
+        //console.log(dataStart);
     }
     else if (calendar.id === "miesieczny"){
 
@@ -231,38 +242,73 @@ function show_tiles(){
         .then(response => response.json())
         .then(data => {
             console.log(data);
-            data.forEach(function(index){
+            if (calendar.id === "tygodniowy"){
+                data.forEach(function(index){
 
-                let timeStart = new Date(index["start"]);
-                let hour = timeStart.getHours();
-                let minute = timeStart.getMinutes();
+                    let timeStart = new Date(index["start"]);
+                    let hour = timeStart.getHours();
+                    let minute = timeStart.getMinutes();
 
-                let timeEnd = new Date(index["koniec"]);
+                    let timeEnd = new Date(index["koniec"]);
 
-                let roznica = timeEnd - timeStart;
-                roznica = roznica / 1000 / 60;
+                    let roznica = timeEnd - timeStart;
+                    roznica = roznica / 1000 / 60;
 
-                let text = timeStart.getHours() + ":" + timeStart.getMinutes() + " - " + timeEnd.getHours() + ":" + timeEnd.getMinutes()
-                    + "\n" + index["tytul"];
+                    let text = timeStart.getHours() + ":" + timeStart.getMinutes() + " - " + timeEnd.getHours() + ":" + timeEnd.getMinutes()
+                        + "\n" + index["tytul"];
 
-                const dataTH = document.querySelectorAll(".calendar_view thead th");
+                    const dataTH = document.querySelectorAll(".calendar_view thead th");
 
-                dataTH.forEach(function(indexTH, indexNum){
-                    if (indexNum > 0) {
-                        let str = indexTH.textContent;
-                        let part = str.split(' ')[1].split('.')[0];
+                    dataTH.forEach(function(indexTH, indexNum){
+                        if (indexNum > 0) {
+                            let str = indexTH.textContent;
+                            let part = str.split(' ')[1].split('.')[0];
 
-                        if (timeStart.getDate() === Number(part)){
-                            add_tile_calendar(hour, minute, roznica, indexNum, text, index["formaZajec"]);
+                            if (timeStart.getDate() === Number(part)){
+                                add_tile_calendar(hour, minute, roznica, indexNum, text, index["formaZajec"]);
+                            }
                         }
-                    }
 
 
-                })
+                    })
 
-            });
+                });
+            }
+            else if (calendar.id === "dzisiejszy") {
+                data.forEach(function(index){
+
+                    let timeStart = new Date(index["start"]);
+                    let hour = timeStart.getHours();
+                    let minute = timeStart.getMinutes();
+
+                    let timeEnd = new Date(index["koniec"]);
+
+                    let roznica = timeEnd - timeStart;
+                    roznica = roznica / 1000 / 60;
+
+                    let text = timeStart.getHours() + ":" + timeStart.getMinutes() + " - " + timeEnd.getHours() + ":" + timeEnd.getMinutes()
+                        + "\n" + index["tytul"];
+
+                    const dataTH = document.querySelectorAll(".calendar_view thead tr");
+
+                    dataTH.forEach(function(indexTH, indexNum){
+                        if (indexNum > 0) {
+                            let str = indexTH.textContent;
+                            let part = str.split(' ')[1].split('.')[0];
+
+                            if (timeStart.getDate() === Number(part)){
+                                add_tile_calendar(hour, minute, roznica, indexNum, text, index["formaZajec"]);
+                            }
+                        }
+
+
+                    })
+
+                });
+            }
+
         })
-    if (forma.length === 0 || forma === "własnyKafelek"){
+    /*if (forma.length === 0 || forma === "własnyKafelek"){
         ulubione.forEach(function(indexUlub){
 
             let str = indexUlub["timeFrom"];
@@ -300,7 +346,7 @@ function show_tiles(){
                 }
             })
         });
-    }
+    }*/
 
 }
 
@@ -790,7 +836,7 @@ function add_tile_calendar(hour_start, minutes_start, minutes_duration, column, 
         else if (form === "własnyKafelek") {
             tile.style.backgroundColor = 'var(--color_kafelek)';
         }
-        else if (form === "audytorium") {
+        else if (form === "audytoryjne") {
             tile.style.backgroundColor = 'var(--color_audytorium)';
         }
         else {
@@ -811,8 +857,6 @@ function add_tile_calendar(hour_start, minutes_start, minutes_duration, column, 
         });
     }
 }
-
-
 
 //Funkcja do usuwania wszystkich kafelków z kalendarza
 function clear_tiles_calendar() {
