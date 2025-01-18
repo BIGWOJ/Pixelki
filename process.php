@@ -86,9 +86,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $query = $queryNumerAlbumu;
         $query = $query . " AND n.numer = :numerAlbumu";
         $numerAlbumuTrue = true;
-        //scrapGrupyNumberAlbumu($pdo, $numerAlbumu);
-        //scrapNumerAlbumuGrupa($pdo, $numerAlbumu);
-        //scrapLekcjaNumberAlbumu($pdo, $numerAlbumu);
+//        scrapGrupyNumberAlbumu($pdo, $numerAlbumu);
+//        scrapNumerAlbumuGrupa($pdo, $numerAlbumu);
+//        scrapLekcjaNumberAlbumu($pdo, $numerAlbumu);
     }
 
     if (!empty($wykladowca)){

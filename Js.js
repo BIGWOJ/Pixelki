@@ -192,11 +192,11 @@ function show_tiles(){
 
     const calendar = document.querySelector(".calendar");
 
-
+    var dataStart;
     if (calendar.id === "dzisiejszy"){
         let data = document.querySelector(".calendar_view thead th:nth-child(2)").textContent;
         let parts = data.split(".");
-        var dataStart = `${parts[2]}-${parts[1]}-${parts[0]}`;
+        dataStart = `${parts[2]}-${parts[1]}-${parts[0]}`;
         var dataEnd = dataStart;
         let dateAdd = new Date(dataEnd);
         dateAdd.setDate(dateAdd.getDate() + 1);
@@ -209,7 +209,7 @@ function show_tiles(){
         const data = document.querySelectorAll(".calendar_view thead th");
         let str = data[1].textContent;
         let parts = str.split(" ");
-        var dataStart = parts[1].split(".");
+        dataStart = parts[1].split(".");
         dataStart = dataStart.reverse().join("-");
 
         let year = document.querySelector(".calendar_range span").textContent;
@@ -276,10 +276,10 @@ function show_tiles(){
             }
             else if (calendar.id === "dzisiejszy") {
                 data.forEach(function(index){
-
                     let timeStart = new Date(index["start"]);
                     let hour = timeStart.getHours();
                     let minute = timeStart.getMinutes();
+
 
                     let timeEnd = new Date(index["koniec"]);
 
@@ -289,26 +289,18 @@ function show_tiles(){
                     let text = timeStart.getHours() + ":" + timeStart.getMinutes() + " - " + timeEnd.getHours() + ":" + timeEnd.getMinutes()
                         + "\n" + index["tytul"];
 
-                    const dataTH = document.querySelectorAll(".calendar_view thead tr");
+                    const dataTD = document.querySelectorAll(".calendar_view tbody tr td:nth-child(2)");
 
-                    dataTH.forEach(function(indexTH, indexNum){
-                        if (indexNum > 0) {
-                            let str = indexTH.textContent;
-                            let part = str.split(' ')[1].split('.')[0];
-
-                            if (timeStart.getDate() === Number(part)){
-                                add_tile_calendar(hour, minute, roznica, indexNum, text, index["formaZajec"]);
-                            }
-                        }
-
-
+                    dataTD.forEach(function(indexTH, indexNum){
+                        add_tile_calendar(hour, minute, roznica, 1, text, index["formaZajec"]);
                     })
 
                 });
             }
 
         })
-    /*if (forma.length === 0 || forma === "własnyKafelek"){
+
+    if (forma.length === 0 || forma === "własnyKafelek"){
         ulubione.forEach(function(indexUlub){
 
             let str = indexUlub["timeFrom"];
@@ -334,19 +326,28 @@ function show_tiles(){
                 + "\n" + indexUlub["name"];
 
             const dataTH = document.querySelectorAll(".calendar_view thead th");
+            const dataTD = document.querySelectorAll(".calendar_view tbody tr td:nth-child(2)")
 
-            dataTH.forEach(function(indexTH, indexNum){
-                if (indexNum > 0) {
-                    let str = indexTH.textContent;
-                    let part = str.split(' ')[1].split('.')[0];
+            if (calendar.id === "tygodniowy"){
+                dataTH.forEach(function(indexTH, indexNum){
+                    if (indexNum > 0) {
+                        let str = indexTH.textContent;
+                        let part = str.split(' ')[1].split('.')[0];
 
-                    if (Number(dataKafelek) === Number(part)){
-                        add_tile_calendar(hour, minute, roznica, indexNum, text, "własnyKafelek");
+                        if (Number(dataKafelek) === Number(part)){
+                            add_tile_calendar(hour, minute, roznica, indexNum, text, "własnyKafelek");
+                        }
                     }
-                }
-            })
+                })
+            }
+            else if (calendar.id === "dzisiejszy" && indexUlub["date"] === dataStart) {
+                dataTD.forEach(function(indexTH){
+                    add_tile_calendar(hour, minute, roznica, 1, text, "własnyKafelek");
+                })
+            }
+
         });
-    }*/
+    }
 
 }
 
@@ -391,6 +392,7 @@ document.querySelector("#today_button").addEventListener("click", () => {
     const calendar = document.querySelector('.calendar');
     calendar.style.height = `70vh`;
     calendar.id = "dzisiejszy";
+    show_tiles()
 });
 
 //Dzienny widok kalendarza
@@ -437,7 +439,7 @@ document.querySelector("#daily_button").addEventListener("click", () => {
     const calendar = document.querySelector('.calendar');
     calendar.style.height = `${table.scrollHeight+250}px`;
     calendar.id = "dzienny";
-
+    show_tiles()
 });
 
 //Tygodniowy widok kalendarza
@@ -481,6 +483,7 @@ document.querySelector("#week_button").addEventListener("click", () => {
     const calendar = document.querySelector('.calendar');
     calendar.style.height = `70vh`;
     calendar.id = "tygodniowy";
+    show_tiles();
 });
 
 //Tygodniowy widok kalendarza
@@ -524,6 +527,7 @@ function calendarStart(){
     const calendar = document.querySelector('.calendar');
     calendar.style.height = `70vh`;
     calendar.id = "tygodniowy";
+    show_tiles();
 }
 
 //Miesięczny widok kalendarza
@@ -560,6 +564,7 @@ document.querySelector("#month_button").addEventListener("click", () => {
     table.innerHTML = monthly_header + monthly_body;
     const calendar = document.querySelector('.calendar');
     calendar.id = "miesieczny";
+    show_tiles();
 });
 
 //Semestralny widok kalendarza
@@ -601,6 +606,7 @@ document.querySelector("#semester_button").addEventListener("click", () => {
     const calendar = document.querySelector('.calendar');
     calendar.style.height = `80vh`;
     calendar.id = "semestralny";
+    show_tiles();
 });
 
 //Funkcja do ustawiania poprawnego semestru w zakresie kalendarza
