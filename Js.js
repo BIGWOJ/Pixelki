@@ -178,12 +178,13 @@ document.querySelector(".filter-buttons button:nth-child(1)").addEventListener("
 });
 
 function show_tiles(){
+    clear_tiles_calendar();
     const wykladowca = document.getElementById("lecturer").value;
     const sala = document.getElementById("room").value;
     const przedmiot = document.getElementById("subject").value;
     const grupa = document.getElementById("group").value;
     const numerAlbumu = document.getElementById("album-number").value;
-    const forma = document.getElementById("class-type").value;
+    const forma = document.getElementById("forma-zajec").value;
 
     const calendar = document.querySelector(".calendar");
 
@@ -261,6 +262,46 @@ function show_tiles(){
 
             });
         })
+    if (forma.length === 0 || forma === "własnyKafelek"){
+        ulubione.forEach(function(indexUlub){
+
+            let str = indexUlub["timeFrom"];
+            let hour = str.split(':')[0];
+            let minute = str.split(':')[1];
+
+            str = indexUlub["timeTo"];
+            let hourEnd = str.split(':')[0];
+
+            let startTime = '2025-01-01T' + hour + ":00";
+            startTime = new Date(startTime);
+
+            let endTime = '2025-01-01T' + hourEnd + ":00";
+            endTime = new Date(endTime);
+
+            let roznica = endTime - startTime;
+            roznica = roznica / 1000 / 60;
+
+            let dataKafelek = new Date(indexUlub["date"]);
+            dataKafelek = dataKafelek.getDate();
+
+            let text = indexUlub["timeFrom"] + " - " + indexUlub["timeTo"]
+                + "\n" + indexUlub["name"];
+
+            const dataTH = document.querySelectorAll(".calendar_view thead th");
+
+            dataTH.forEach(function(indexTH, indexNum){
+                if (indexNum > 0) {
+                    let str = indexTH.textContent;
+                    let part = str.split(' ')[1].split('.')[0];
+
+                    if (Number(dataKafelek) === Number(part)){
+                        add_tile_calendar(hour, minute, roznica, indexNum, text, "własnyKafelek");
+                    }
+                }
+            })
+        });
+    }
+
 }
 
 //Czyszczenie inputów filtrów po kliknięciu w przycisk "Wyczyść"
@@ -746,11 +787,15 @@ function add_tile_calendar(hour_start, minutes_start, minutes_duration, column, 
         else if (form === "projekt") {
             tile.style.backgroundColor = 'var(--color_projekt)';
         }
-        else {
+        else if (form === "własnyKafelek") {
+            tile.style.backgroundColor = 'var(--color_kafelek)';
+        }
+        else if (form === "audytorium") {
             tile.style.backgroundColor = 'var(--color_audytorium)';
         }
-
-
+        else {
+            tile.style.backgroundColor = 'var(--color_konsultacje)';
+        }
 
         document.body.appendChild(tile);
 
@@ -819,7 +864,6 @@ const table = document.querySelector(".calendar_view");
     table.tHead.innerHTML = table_header;
 
     document.querySelector(".calendar_range span").innerHTML = new_range;
-    clear_tiles_calendar();
     show_tiles();
 });
 
@@ -865,7 +909,6 @@ document.querySelector(".calendar_range button:nth-child(3)").addEventListener("
     table.tHead.innerHTML = table_header;
 
     document.querySelector(".calendar_range span").innerHTML = new_range;
-    clear_tiles_calendar();
     show_tiles();
 });
 

@@ -139,7 +139,13 @@
                 </tbody>
             </table>
             <div class="legend">
-                <span> Miejsce na legendę </span>
+                <div class="legend-item" id="legend-laboratorium">Laboratorium</div>
+                <div class="legend-item" id="legend-wyklad">Wykład</div>
+                <div class="legend-item" id="legend-lektorat">Lektorat</div>
+                <div class="legend-item" id="legend-audytorium">Audytorium</div>
+                <div class="legend-item" id="legend-projekt">Projekt</div>
+                <div class="legend-item" id="legend-konsultacje">Konsultacje</div>
+                <div class="legend-item" id="legend-wlasny-kafelek">Własny Kafelek</div>
             </div>
 
             <div class="statistics">
@@ -163,8 +169,17 @@
             <label for="album-number">Numer Albumu:</label>
             <input type="text" id="album-number" name="album-number">
 
-            <label for="class-type">Forma Zajęć:</label>
-            <input type="text" id="class-type" name="class-type">
+            <label for="forma-zajec">Forma Zajęć:</label>
+            <select type="text" id="forma-zajec" name="class-type">
+                <option value=""></option>
+                <option value="laboratorium">Laboratorium</option>
+                <option value="wykład">Wykład</option>
+                <option value="lektorat">Lektorat</option>
+                <option value="projekt">Projekt</option>
+                <option value="audytoryjne">Audytoryjne</option>
+                <option value="konsultacje">Konsultacje</option>
+                <option value="własnyKafelek">Własne kafelki</option>
+            </select>
 
             <div class="filter-buttons">
                 <button>Filtruj</button>

@@ -1,5 +1,8 @@
 //Zarządzanie kafelkami
 
+let ulubione = [];
+ulubione = JSON.parse(localStorage.getItem("ulubione")) || [];
+
 const cellsButtonContainer = document.querySelector(".cells-buttons");
 document.querySelector(".manage-button").addEventListener("click", (e) => {
     e.stopPropagation();
@@ -39,9 +42,8 @@ cellContainer.querySelector(".cellAddButton").addEventListener("click", (e) => {
     addToStorage();
 });
 
-let ulubione = [];
 
-ulubione = JSON.parse(localStorage.getItem("ulubione")) || [];
+
 
 function addToStorage() {
     const cellName = document.getElementById("cellName").value;

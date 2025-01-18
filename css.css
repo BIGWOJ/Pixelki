@@ -35,6 +35,8 @@
     --color_lektorat: #c44f00;
     --color_projekt: #555500;
     --color_audytorium: #243184;
+    --color_kafelek: #420114;
+    --color_konsultacje: #9cc914;
 }
 
 .dark {
@@ -49,6 +51,8 @@
     --color_lektorat: #c44f00;
     --color_projekt: #555500;
     --color_audytorium: #243184;
+    --color_kafelek: #420114;
+    --color_konsultacje: #9cc914;
 }
 
 .light {
@@ -63,6 +67,8 @@
     --color_lektorat: #c44f00;
     --color_projekt: #555500;
     --color_audytorium: #243184;
+    --color_kafelek: #420114;
+    --color_konsultacje: #9cc914;
 }
 
 body, h1, h2, h3, p, ul, ol, li, table, th, td {
@@ -373,6 +379,16 @@ main {
     font-weight: bold;
 }
 
+.filters select {
+
+    color: var(--color_black);
+    width: 101%;
+    border: 1px solid var(--color_border_gray);
+    border-radius: 4px;
+    height: 35px;
+    background-color: var(--color_white);
+}
+
 .filters input {
     color: var(--color_black);
     width: 100%;
@@ -419,6 +435,50 @@ main {
     border: 1px solid var(--color_border_gray);
     border-radius: 4px;
     text-align: right;
+
+    display: flex;
+    justify-content: space-between;
+}
+
+.legend-item {
+    padding: 0 5px;
+    border-radius: 10px;
+    color: white;
+}
+
+#legend-audytorium {
+    background-color: var(--color_audytorium);
+    border: 1px solid var(--color_audytorium);
+}
+
+#legend-konsultacje {
+    background-color: var(--color_konsultacje);
+    border: 1px solid var(--color_konsultacje);
+}
+
+#legend-laboratorium {
+    background-color: var(--color_laby);
+    border: 1px solid var(--color_laby);
+}
+
+#legend-lektorat {
+    background-color: var(--color_lektorat);
+    border: 1px solid var(--color_lektorat);
+}
+
+#legend-wyklad {
+    background-color: var(--color_wyklad);
+    border: 1px solid var(--color_wyklad);
+}
+
+#legend-projekt {
+    background-color: var(--color_projekt);
+    border: 1px solid var(--color_projekt);
+}
+
+#legend-wlasny-kafelek {
+    background-color: var(--color_kafelek);
+    border: 1px solid var(--color_kafelek);
 }
 
 .statistics {
@@ -863,6 +923,7 @@ footer {
     border: 1px solid var(--color_border_gray);
     border-radius: 4px;
     box-sizing: border-box;
+    color: white;
 }
 
 /*Zmiana motywu respektując ustawiony motyw systemowy/przeglądarkowy użytkownika*/

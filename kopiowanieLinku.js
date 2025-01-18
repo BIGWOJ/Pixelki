@@ -4,7 +4,7 @@ function generateLink() {
     const przedmiot = document.getElementById("subject").value;
     const grupa = document.getElementById("group").value;
     const numerAlbumu = document.getElementById("album-number").value;
-    const forma = document.getElementById("class-type").value;
+    const forma = document.getElementById("forma-zajec").value;
 
     const baseUrl = window.location.href.split("?")[0];
 
