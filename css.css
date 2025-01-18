@@ -438,12 +438,23 @@ main {
 
     display: flex;
     justify-content: space-between;
+    flex-wrap: wrap;
 }
 
 .legend-item {
     padding: 0 5px;
     border-radius: 10px;
     color: white;
+}
+
+@media (max-width: 400px) {
+    .legend {
+        flex-direction: column;
+    }
+
+    .legend-item {
+        max-width: 100%;
+    }
 }
 
 #legend-audytorium {
@@ -917,7 +928,6 @@ footer {
 }
 
 .calendar_tile {
-    //background-color: var(--color_primary);
     font-size: 10px;
     position: absolute;
     border: 1px solid var(--color_border_gray);
