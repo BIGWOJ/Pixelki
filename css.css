@@ -81,25 +81,38 @@ body {
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-
+    border-radius: 40px;
     background-color: var(--color_primary);
     border: 1px solid #ccc;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-    padding: 20px;
+    padding: 40px;
     z-index: 1000;
     display: none;
+    width: 500px;
+    height: auto;
 }
 
 .modal-date {
     text-align: center;
+    font-size: 1.2rem;
 }
 
 #date-container button {
-    margin: 5px;
+    margin: 10px;
+    font-size: 1.1rem;
+    font-family: 'Open Sans', sans-serif;
+    border-radius: 10px;
+
 }
 
 #date-container input {
-    margin: 10px 0;
+    margin: 15px 0;
+    padding: 10px;
+    font-size: 1.1rem;
+    font-family: 'Open Sans', sans-serif;
+    border-radius: 10px;
+
+
 }
 
 
@@ -246,6 +259,7 @@ header .theme-buttons button:hover {
     background-color: var(--color_secondary);
     color: var(--color_beige);
 }
+
 
 i {
     font-size: 24px;

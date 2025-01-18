@@ -711,15 +711,79 @@ document.querySelector(".calendar_range button:nth-child(3)").addEventListener("
     document.querySelector(".calendar_range span").innerHTML = new_range;
 });
 
-//Kalendarz zakresowy ikona
+//Ikona kalendarza
 document.getElementById("calendar-button").addEventListener("click", () => {
     document.getElementById("date-container").style.display = "block";
 });
 
-//Zamykanie kalendarza zakresowego
 document.getElementById("close-modal").addEventListener("click", () => {
     document.getElementById("date-container").style.display = "none";
 });
+
+
+const startDateInput = document.getElementById('start-date');
+const endDateInput = document.getElementById('end-date');
+const confirmButton = document.getElementById('confirm-dates');
+const calendarRange = document.querySelector('.calendar_range span');
+const calendarView = document.querySelector('.calendar_view tbody');
+
+
+confirmButton.addEventListener('click', function() {
+    const startDate = new Date(startDateInput.value);
+    const endDate = new Date(endDateInput.value);
+
+    if (startDate && endDate) {
+        calendarRange.textContent = `${startDateInput.value} - ${endDateInput.value}`;
+        updateCalendarView(startDate, endDate);
+    }
+
+});
+
+function updateCalendarView(startDate, endDate) {
+    calendarView.innerHTML = '';
+
+    let currentDate = new Date(startDate);
+    let daysInRange = [];
+
+
+    while (currentDate <= endDate) {
+        daysInRange.push(new Date(currentDate));
+        currentDate.setDate(currentDate.getDate() + 1);
+    }
+
+
+    let startDay = startDate.getDay();
+    if (startDay === 0) startDay = 7;
+
+    const headerDays = ['Pon', 'Wt', 'Śr', 'Czw', 'Pt', 'So', 'Nd'];
+    let updatedHeader = headerDays.slice(startDay - 1).concat(headerDays.slice(0, startDay - 1));
+
+    //Nagłowki
+    const tableHeader = document.querySelector('.calendar_view thead tr');
+    tableHeader.innerHTML = updatedHeader.map(day => `<th>${day}</th>`).join('');
+
+    //Grupowanie dni w tygodnie
+    let weeks = [];
+    let currentWeek = [];
+    daysInRange.forEach(function(date, index) {
+        currentWeek.push(date.getDate());
+        if (currentWeek.length === 7 || index === daysInRange.length - 1) {
+            weeks.push(currentWeek);
+            currentWeek = [];
+        }
+    });
+
+    //Dodawanie dni do tabeli
+    weeks.forEach(function(week) {
+        let row = document.createElement('tr');
+        week.forEach(function(day) {
+            let cell = document.createElement('td');
+            cell.textContent = day || '';
+            row.appendChild(cell);
+        });
+        calendarView.appendChild(row);
+    });
+}
 
 if (theme === "dark") {
     document.querySelector("body").classList.add("dark");
