@@ -63,6 +63,18 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 JOIN przedmiot p ON l.przedmiotID = p.przedmiotID
                 WHERE l.start BETWEEN :dataStart AND :dataEnd";
 
+    $queryKonsultacje = "SELECT
+    w.imie,
+    w.nazwisko,
+    l.tytul,
+    l.opis,
+    l.start,
+    l.koniec
+    FROM lekcja l
+    JOIN wykladowca w ON l.wykladowcaID = w.wykladowcaID
+    WHERE l.start BETWEEN :dataStart AND :dataEnd
+    AND l.opis LIKE '%Konsultacje%'";
+
     $wykladowcaTrue = false;
     $salaTrue = false;
     $przedmiotTrue = false;
@@ -84,8 +96,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
         $query = $query . " AND w.nazwisko = :nazwisko AND w.imie = :imie";
         $wykladowcaTrue = true;
-        scrapGrupyWykladowca($pdo, $wykladowca);
-        scrapLekcjaWykladowca($pdo, $wykladowca);
+        //scrapGrupyWykladowca($pdo, $wykladowca);
+        //scrapLekcjaWykladowca($pdo, $wykladowca);
     }
     if (!empty($sala)){
         list($wydzial, $pokoj) = explode(" ", $sala, 2);
@@ -110,6 +122,24 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     if (!empty($forma)){
         $query = $query . " AND l.formaZajec = :forma";
         $formaTrue = true;
+    }
+
+    if (!empty($forma) && $forma == "konsultacje") {
+        $query = $queryKonsultacje;
+        $salaTrue = false;
+        $przedmiotTrue = false;
+        $grupaTrue = false;
+        $numerAlbumuTrue = false;
+        $formaTrue = false;
+    }
+
+    if (!empty($wykladowca)){
+        list($nazwisko, $imie) = explode(" ", $wykladowca, 2);
+
+        $query = $query . " AND w.nazwisko = :nazwisko AND w.imie = :imie";
+        $wykladowcaTrue = true;
+        //scrapGrupyWykladowca($pdo, $wykladowca);
+        //scrapLekcjaWykladowca($pdo, $wykladowca);
     }
 
 
