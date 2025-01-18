@@ -108,6 +108,12 @@ document.addEventListener("DOMContentLoaded", () => {
 
     //Ustawienie wyjsciowych dat w headzie kalendarza
     initialize_calendar_head_week();
+
+    // Kalendarz jako tydzien na wejsciu
+    calendarStart();
+
+    // testowanie
+    //add_tile_calendar(9, 0, 90, 1, "test");
 });
 
 //Zmiana motywu strony
@@ -168,21 +174,94 @@ document.querySelector(".range-calendar").addEventListener("click", () => {
 
 //Zastosowanie filtrów po kliknięciu w przycisk "Filtruj"
 document.querySelector(".filter-buttons button:nth-child(1)").addEventListener("click", () => {
-    console.log("Filtrowanie\nJeszcze nie zrobione");
+    show_tiles();
 });
 
-//Zastosowanie filtrów po kliknięciu w przycisk "Filtruj"
-document.querySelector(".filter-buttons button:nth-child(1)").addEventListener("click", () => {
-    console.log("Filtrowanie\nJeszcze nie zrobione");
-});
+function show_tiles(){
+    const wykladowca = document.getElementById("lecturer").value;
+    const sala = document.getElementById("room").value;
+    const przedmiot = document.getElementById("subject").value;
+    const grupa = document.getElementById("group").value;
+    const numerAlbumu = document.getElementById("album-number").value;
+    const forma = document.getElementById("class-type").value;
 
-//Czyszczenie inputów filtrów po kliknięciu w przycisk "Wyczyść"
-document.querySelector(".filter-buttons button:nth-child(2)").addEventListener("click", () => {
-    let filter_inputs = document.querySelectorAll(".filters input");
-    filter_inputs.forEach(input => {
-        input.value = "";
-    });
-});
+    const calendar = document.querySelector(".calendar");
+
+
+    if (calendar.id === "dzisiejszy"){
+
+    }
+    else if (calendar.id === "dzienny"){
+
+    }
+    else if (calendar.id === "tygodniowy"){
+        const data = document.querySelectorAll(".calendar_view thead th");
+        let str = data[1].textContent;
+        let parts = str.split(" ");
+        var dataStart = parts[1].split(".");
+        dataStart = dataStart.reverse().join("-");
+
+        let year = document.querySelector(".calendar_range span").textContent;
+        const part = year.split(" ");
+        year = part[1];
+        dataStart = year + "-" + dataStart;
+
+        str = data[7].textContent;
+        parts = str.split(" ");
+        var dataEnd = parts[1].split(".");
+        dataEnd = dataEnd.reverse().join("-");
+        dataEnd = year + "-" + dataEnd;
+    }
+    else if (calendar.id === "miesieczny"){
+
+    }
+    else if (calendar.id === "semestralny"){
+
+    }
+
+
+    fetch("process.php", {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({wykladowca, sala, przedmiot, grupa, numerAlbumu, forma, dataStart, dataEnd})
+    })
+        .then(response => response.json())
+        .then(data => {
+            console.log(data);
+            data.forEach(function(index){
+
+                let timeStart = new Date(index["start"]);
+                let hour = timeStart.getHours();
+                let minute = timeStart.getMinutes();
+
+                let timeEnd = new Date(index["koniec"]);
+
+                let roznica = timeEnd - timeStart;
+                roznica = roznica / 1000 / 60;
+
+                let text = timeStart.getHours() + ":" + timeStart.getMinutes() + " - " + timeEnd.getHours() + ":" + timeEnd.getMinutes()
+                    + "\n" + index["tytul"];
+
+                const dataTH = document.querySelectorAll(".calendar_view thead th");
+
+                dataTH.forEach(function(indexTH, indexNum){
+                    if (indexNum > 0) {
+                        let str = indexTH.textContent;
+                        let part = str.split(' ')[1].split('.')[0];
+
+                        if (timeStart.getDate() === Number(part)){
+                            add_tile_calendar(hour, minute, roznica, indexNum, text, index["formaZajec"]);
+                        }
+                    }
+
+
+                })
+
+            });
+        })
+}
 
 //Czyszczenie inputów filtrów po kliknięciu w przycisk "Wyczyść"
 document.querySelector(".filter-buttons button:nth-child(2)").addEventListener("click", () => {
@@ -224,6 +303,7 @@ document.querySelector("#today_button").addEventListener("click", () => {
     table.innerHTML = today_header + today_body;
     const calendar = document.querySelector('.calendar');
     calendar.style.height = `70vh`;
+    calendar.id = "dzisiejszy";
 });
 
 //Dzienny widok kalendarza
@@ -269,6 +349,7 @@ document.querySelector("#daily_button").addEventListener("click", () => {
 
     const calendar = document.querySelector('.calendar');
     calendar.style.height = `${table.scrollHeight+250}px`;
+    calendar.id = "dzienny";
 
 });
 
@@ -312,7 +393,51 @@ document.querySelector("#week_button").addEventListener("click", () => {
     table.innerHTML = weekly_header + weekly_body;
     const calendar = document.querySelector('.calendar');
     calendar.style.height = `70vh`;
+    calendar.id = "tygodniowy";
 });
+
+//Tygodniowy widok kalendarza
+function calendarStart(){
+    initialize_date_range();
+    const table = document.querySelector(".calendar_view");
+    let current_date = new Date();
+    let week_start = current_date.getDate() - current_date.getDay() + 1;
+    let days_shortcut = ['pon.', 'wt.', 'śr.', 'czw.', 'pt.', 'sob.', 'ndz.'];
+
+    //Head tygodniowego widoku
+    let weekly_header = `
+        <thead>
+            <tr>
+                <th></th>`;
+
+    for (let i = 0; i < 7; i++) {
+        //Data bez roku
+        let date = new Date(current_date.setDate(week_start + i)).toLocaleDateString(undefined, { month: '2-digit', day: '2-digit' });
+        weekly_header += `<th>${days_shortcut[i]} ${date}</th>`;
+    }
+
+    weekly_header += `</tr></thead>`;
+
+    //Body tygodniowego widoku
+    let weekly_body = `<tbody>`;
+    for (let i = 0; i < 13; i++) {
+        weekly_body += `<tr>`;
+        for (let j = 0; j <= 7; j++) {
+            if (j === 0) {
+                weekly_body += `<td>${7 + i}</td>`;
+                continue;
+            }
+            weekly_body += `<td></td>`;
+        }
+        weekly_body += `</tr>`;
+    }
+    weekly_body += `</tbody>`;
+
+    table.innerHTML = weekly_header + weekly_body;
+    const calendar = document.querySelector('.calendar');
+    calendar.style.height = `70vh`;
+    calendar.id = "tygodniowy";
+}
 
 //Miesięczny widok kalendarza
 document.querySelector("#month_button").addEventListener("click", () => {
@@ -346,6 +471,8 @@ document.querySelector("#month_button").addEventListener("click", () => {
     monthly_body += `</tbody>`;
 
     table.innerHTML = monthly_header + monthly_body;
+    const calendar = document.querySelector('.calendar');
+    calendar.id = "miesieczny";
 });
 
 //Semestralny widok kalendarza
@@ -386,6 +513,7 @@ document.querySelector("#semester_button").addEventListener("click", () => {
     table.innerHTML = semester_header + semester_body;
     const calendar = document.querySelector('.calendar');
     calendar.style.height = `80vh`;
+    calendar.id = "semestralny";
 });
 
 //Funkcja do ustawiania poprawnego semestru w zakresie kalendarza
@@ -427,6 +555,7 @@ function set_calendar_head(row_count, column_count, table, next_range=false) {
         current_dates[0] = `${date.getDate().toString().padStart(2, '0')}.${(date.getMonth() + 1).toString().padStart(2, '0')}.${date.getFullYear()}`;
         new_range = `${months_dict[current_dates[0].split('.')[1]]} ${current_dates[0].split('.')[2]}`;
         table_header = `<th></th><th>${current_dates[0]}</th>`;
+       // console.log(current_dates);   //zmienna przechowujaca date danego dnia
     }
 
     //Widok dzienny
@@ -498,6 +627,9 @@ function set_calendar_head(row_count, column_count, table, next_range=false) {
         new_range = `${months_dict[current_dates[0].split('.')[1]]} ${year}`;
     }
 
+    //console.log(table_header);  // przechowuje daty calego tygodnia
+    //console.log(new_range)  // przechowuje dany miesiac i rok
+
     return [new_range, table_header];
 }
 
@@ -549,6 +681,8 @@ function render_head_range_semester_month(semester=false, next_range=false) {
         table_header += `<th>${days[i]}</th>`;
     }
 
+    //console.log(new_range)  // wyswietla miesiac i rok
+
     return [new_range, table_header];
 }
 
@@ -581,8 +715,8 @@ function get_table_tile_dimensions(row, column) {
 }
 
 //Funkcja do dodawania kafelka do kalendarza
-//input: godzina startu, minuty startu, minuty trwania, nr_kolumny (od 1), tekst
-function add_tile_calendar(hour_start, minutes_start, minutes_duration, column, text) {
+//input: godzina startu, minuty startu, minuty trwania, nr_kolumny (od 1), tekst, forma zajec
+function add_tile_calendar(hour_start, minutes_start, minutes_duration, column, text, form) {
     const row = hour_start - 6;
     const dims = get_table_tile_dimensions(row, column);
     let tile_upper_line = minutes_start / 60;
@@ -600,6 +734,24 @@ function add_tile_calendar(hour_start, minutes_start, minutes_duration, column, 
         tile.style.height = `${dims.height * tile_duration_hour}px`;
         tile.innerText = text;
 
+        if (form === "laboratorium") {
+            tile.style.backgroundColor = 'var(--color_laby)';
+        }
+        else if (form === "wykład") {
+            tile.style.backgroundColor = 'var(--color_wyklad)';
+        }
+        else if (form === "lektorat") {
+            tile.style.backgroundColor = 'var(--color_lektorat)';
+        }
+        else if (form === "projekt") {
+            tile.style.backgroundColor = 'var(--color_projekt)';
+        }
+        else {
+            tile.style.backgroundColor = 'var(--color_audytorium)';
+        }
+
+
+
         document.body.appendChild(tile);
 
         window.addEventListener('resize', () => {
@@ -614,6 +766,8 @@ function add_tile_calendar(hour_start, minutes_start, minutes_duration, column, 
         });
     }
 }
+
+
 
 //Funkcja do usuwania wszystkich kafelków z kalendarza
 function clear_tiles_calendar() {
@@ -665,6 +819,8 @@ const table = document.querySelector(".calendar_view");
     table.tHead.innerHTML = table_header;
 
     document.querySelector(".calendar_range span").innerHTML = new_range;
+    clear_tiles_calendar();
+    show_tiles();
 });
 
 //Strzałka w prawo
@@ -709,6 +865,8 @@ document.querySelector(".calendar_range button:nth-child(3)").addEventListener("
     table.tHead.innerHTML = table_header;
 
     document.querySelector(".calendar_range span").innerHTML = new_range;
+    clear_tiles_calendar();
+    show_tiles();
 });
 
 //Kalendarz zakresowy ikona

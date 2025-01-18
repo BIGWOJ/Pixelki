@@ -1,17 +1,10 @@
 <?php
 
-function dbConnection($path){       // funkcja laczenia z baza, zwraca zmienna polaczenia z baza
-    try {
-        $pdo = new PDO($path);
-        echo "Pomyslnie polaczono z baza danych \n";
+/*require "bootstrap.php";
 
-    } catch (PDOException $e) {
-        echo "Blad polaczenia: " . $e -> getMessage();
-        exit();
-    }
+$dbPath = 'sqlite:./data.db';   // link do bazy danych
 
-    return $pdo;
-}
+$pdo = dbConnection($dbPath);   // polaczenie z baza danych*/
 
 function scrapWykladowca($pdo, $ssl_error=False, $clearTableCondition=True, $addToBase=True) {       // funkcja scrapowania danych do tabeli wykladowca, argument = zmienna laczenia z baza
     try {
@@ -32,7 +25,7 @@ function scrapWykladowca($pdo, $ssl_error=False, $clearTableCondition=True, $add
             $response = file_get_contents($url);
         }
 
-        echo "Pomyslnie otrzymano zwrot z API \n";
+        // // echo "Pomyslnie otrzymano zwrot z API \n";
         $data = json_decode($response, true);                                                 // dekodowania zawartosci do JSON
 
 
@@ -44,7 +37,7 @@ function scrapWykladowca($pdo, $ssl_error=False, $clearTableCondition=True, $add
                 $clearIndexes = $pdo->prepare("DELETE FROM sqlite_sequence WHERE name = 'wykladowca'"); // czyszczenie indexow tablicy
                 $clearIndexes -> execute();
             } catch (PDOException $e) {
-                echo "Blad zapytania: " . $e -> getMessage();
+                // echo "Blad zapytania: " . $e -> getMessage();
                 exit();
             }
         }
@@ -66,7 +59,7 @@ function scrapWykladowca($pdo, $ssl_error=False, $clearTableCondition=True, $add
                     try {
                         $statement -> execute();
                     } catch (PDOException $e) {
-                        echo "Blad zapytania: " . $e -> getMessage();
+                        // echo "Blad zapytania: " . $e -> getMessage();
                         exit();
                     }
 
@@ -75,7 +68,7 @@ function scrapWykladowca($pdo, $ssl_error=False, $clearTableCondition=True, $add
         }
 
     } catch (PDOException $e) {
-        echo "Blad polaczenia z API: " . $e -> getMessage();
+        // echo "Blad polaczenia z API: " . $e -> getMessage();
         exit();
     }
 }
@@ -98,7 +91,7 @@ function scrapWydzial($pdo, $ssl_error=False, $clearTableCondition=True, $addToB
         else {
             $response = file_get_contents($url);
         }                                                           // pobranie zawartosci ze zwrotki z API
-        echo "Pomyslnie otrzymano zwrot z API \n";
+        // echo "Pomyslnie otrzymano zwrot z API \n";
         $data = json_decode($response, true);                                                 // dekodowania zawartosci do JSON
 
 
@@ -110,7 +103,7 @@ function scrapWydzial($pdo, $ssl_error=False, $clearTableCondition=True, $addToB
                 $clearIndexes = $pdo->prepare("DELETE FROM sqlite_sequence WHERE name = 'wydzial'"); // czyszczenie indexow tablicy
                 $clearIndexes -> execute();
             } catch (PDOException $e) {
-                echo "Blad zapytania: " . $e -> getMessage();
+                // echo "Blad zapytania: " . $e -> getMessage();
                 exit();
             }
         }
@@ -141,7 +134,7 @@ function scrapWydzial($pdo, $ssl_error=False, $clearTableCondition=True, $addToB
                 try {
                     $statement -> execute();
                 } catch (PDOException $e) {
-                    echo "Blad zapytania: " . $e -> getMessage();
+                    // echo "Blad zapytania: " . $e -> getMessage();
                     exit();
                 }
             }
@@ -149,7 +142,7 @@ function scrapWydzial($pdo, $ssl_error=False, $clearTableCondition=True, $addToB
         }
 
     } catch (PDOException $e) {
-        echo "Blad polaczenia z API: " . $e -> getMessage();
+        // echo "Blad polaczenia z API: " . $e -> getMessage();
         exit();
     }
 }
@@ -173,7 +166,7 @@ function scrapSala($pdo, $ssl_error=False, $clearTableCondition=True, $addToBase
         else {
             $response = file_get_contents($url);
         }         // pobranie zawartosci ze zwrotki z API
-        echo "Pomyslnie otrzymano zwrot z API \n";
+        // echo "Pomyslnie otrzymano zwrot z API \n";
         $data = json_decode($response, true);                                                 // dekodowania zawartosci do JSON
 
 
@@ -185,7 +178,7 @@ function scrapSala($pdo, $ssl_error=False, $clearTableCondition=True, $addToBase
                 $clearIndexes = $pdo->prepare("DELETE FROM sqlite_sequence WHERE name = 'sala'"); // czyszczenie indexow tablicy
                 $clearIndexes -> execute();
             } catch (PDOException $e) {
-                echo "Blad zapytania: " . $e -> getMessage();
+                // echo "Blad zapytania: " . $e -> getMessage();
                 exit();
             }
         }
@@ -220,7 +213,7 @@ function scrapSala($pdo, $ssl_error=False, $clearTableCondition=True, $addToBase
                     try {
                         $statement -> execute();
                     } catch (PDOException $e) {
-                        echo "Blad zapytania: " . $e -> getMessage();
+                        // echo "Blad zapytania: " . $e -> getMessage();
                         exit();
                     }
 
@@ -232,7 +225,7 @@ function scrapSala($pdo, $ssl_error=False, $clearTableCondition=True, $addToBase
         }
 
     } catch (PDOException $e) {
-        echo "Blad polaczenia z API: " . $e -> getMessage();
+        // echo "Blad polaczenia z API: " . $e -> getMessage();
         exit();
     }
 }
@@ -248,7 +241,7 @@ function scrapNumerAlbumu($pdo, $ssl_error=False, $clearTableCondition=True, $ad
                 $clearIndexes = $pdo->prepare("DELETE FROM sqlite_sequence WHERE name = 'numerAlbumu'");
                 $clearIndexes -> execute();
             } catch (PDOException $e) {
-                echo "Blad zapytania: " . $e -> getMessage();
+                // echo "Blad zapytania: " . $e -> getMessage();
                 exit();
             }
         }
@@ -288,12 +281,12 @@ function scrapNumerAlbumu($pdo, $ssl_error=False, $clearTableCondition=True, $ad
             //Jeżeli zapytanie zwróciło więcej niż jeden element, to znaczy, że jest jakiś plan zajęć -> poprawny numer albumu
             if (count($data) > 1) {
                 if ($console_write) {
-                    echo "Koniec na albumie: " . $album_index . "\n";
+                    // echo "Koniec na albumie: " . $album_index . "\n";
                 }
                 break;
             }
             if ($console_write) {
-                echo $iteracja . "\n";
+                // echo $iteracja . "\n";
             }
         }
 
@@ -314,13 +307,13 @@ function scrapNumerAlbumu($pdo, $ssl_error=False, $clearTableCondition=True, $ad
 
             } catch (PDOException $e) {
                 $pdo->rollBack();
-                echo "Blad zapytania: " . $e -> getMessage();
+                // echo "Blad zapytania: " . $e -> getMessage();
                 exit();
             }
         }
 
     } catch (PDOException $e) {
-        echo "Blad polaczenia z API: " . $e -> getMessage();
+        // echo "Blad polaczenia z API: " . $e -> getMessage();
         exit();
     }
 }
@@ -362,7 +355,7 @@ function poprawaNumerAlbumu($pdo, $ssl_error=False, $console_write=False, $start
                 //Jeżeli zapytanie zwróciło tylko jeden element, to znaczy, że nie ma planu zajęć -> usuwamy numer
                 if (count($data) == 1) {
                     if ($console_write) {
-                        echo "Usuwany numer: " . $numerAlbumu[$i]['numer'] . "\n";
+                        // echo "Usuwany numer: " . $numerAlbumu[$i]['numer'] . "\n";
                     }
                     $deleteStatement->bindParam(':numer', $numerAlbumu[$i]['numer'], PDO::PARAM_INT);
                     $deleteStatement->execute();
@@ -370,18 +363,18 @@ function poprawaNumerAlbumu($pdo, $ssl_error=False, $console_write=False, $start
                 //W przeciwnym razie numer jest używany, więc nie usuwamy z bazy
                 else {
                     if ($console_write) {
-                        echo "\t\tUżywany numer: " . $numerAlbumu[$i]['numer'] . "\n";
+                        // echo "\t\tUżywany numer: " . $numerAlbumu[$i]['numer'] . "\n";
                     }
                 }
             }
 
         } catch (PDOException $e) {
-            echo "Blad zapytania: " . $e -> getMessage();
+            // echo "Blad zapytania: " . $e -> getMessage();
             exit();
         }
 
     } catch (PDOException $e) {
-        echo "Blad polaczenia z API: " . $e -> getMessage();
+        // echo "Blad polaczenia z API: " . $e -> getMessage();
         exit();
     }
 }
@@ -404,7 +397,7 @@ function scrapPrzedmiot($pdo, $ssl_error=False, $clearTableCondition=True, $addT
                 $clearIndexes = $pdo->prepare("DELETE FROM sqlite_sequence WHERE name = 'przedmiot'"); // czyszczenie indexow tablicy
                 $clearIndexes -> execute();
             } catch (PDOException $e) {
-                echo "Blad zapytania: " . $e -> getMessage();
+                // echo "Blad zapytania: " . $e -> getMessage();
                 exit();
             }
         }
@@ -427,6 +420,7 @@ function scrapPrzedmiot($pdo, $ssl_error=False, $clearTableCondition=True, $addT
 
             // ustawienie zeby pobieralo tylko lekcje do 1 miesiaca w przod
             $dateNow = new DateTime();
+            $dateNow= $dateNow->modify("-1 month");
             $dateNow = $dateNow->format("Y-m-d");
 
             $dateMonth = new DateTime();
@@ -435,7 +429,7 @@ function scrapPrzedmiot($pdo, $ssl_error=False, $clearTableCondition=True, $addT
 
 
             $url = $url . $link . "&start=" . $dateNow . "T00%3A00%3A00%2B01%3A00&end=" . $dateMonth . "T00%3A00%3A00%2B01%3A00";
-            #echo $url . "\n";
+            #// echo $url . "\n";
 
             if ($ssl_error) {
                 $options = [
@@ -452,7 +446,7 @@ function scrapPrzedmiot($pdo, $ssl_error=False, $clearTableCondition=True, $addT
             else {
                 $response = file_get_contents($url);
             }         // pobranie zawartosci ze zwrotki z API
-            echo "Pomyslnie otrzymano zwrot z API \n";
+            // echo "Pomyslnie otrzymano zwrot z API \n";
             $data = json_decode($response, true);                                                 // dekodowania zawartosci do JSON
 
 
@@ -479,14 +473,14 @@ function scrapPrzedmiot($pdo, $ssl_error=False, $clearTableCondition=True, $addT
                 try {
                     $statement -> execute();
                 } catch (PDOException $e) {
-                    echo "Blad zapytania: " . $e -> getMessage();
+                    // echo "Blad zapytania: " . $e -> getMessage();
                     exit();
                 }
             }
         }
 
     } catch (PDOException $e) {
-        echo "Blad polaczenia z API: " . $e -> getMessage();
+        // echo "Blad polaczenia z API: " . $e -> getMessage();
         exit();
     }
 }
@@ -516,7 +510,7 @@ function scrapGrupyNumberAlbumu($pdo, $albumNumber, $ssl_error=False, $clearTabl
                 $clearIndexes = $pdo->prepare("DELETE FROM sqlite_sequence WHERE name = 'grupa'"); // czyszczenie indexow tablicy
                 $clearIndexes -> execute();
             } catch (PDOException $e) {
-                echo "Blad zapytania: " . $e -> getMessage();
+                // echo "Blad zapytania: " . $e -> getMessage();
                 exit();
             }
         }
@@ -527,6 +521,7 @@ function scrapGrupyNumberAlbumu($pdo, $albumNumber, $ssl_error=False, $clearTabl
 
         // ustawienie zeby pobieralo tylko lekcje do 1 miesiaca w przod
         $dateNow = new DateTime();
+        $dateNow= $dateNow->modify("-1 month");
         $dateNow = $dateNow->format("Y-m-d");
 
         $dateMonth = new DateTime();
@@ -538,7 +533,7 @@ function scrapGrupyNumberAlbumu($pdo, $albumNumber, $ssl_error=False, $clearTabl
         // przygotowanie nazwy pokoju dla api
 
         $url = $url . $albumNumber . "&start=" . $dateNow . "T00%3A00%3A00%2B01%3A00&end=" . $dateMonth . "T00%3A00%3A00%2B01%3A00";
-        #echo $url . "\n";
+        #// echo $url . "\n";
 
         if ($ssl_error) {
                 $options = [
@@ -555,7 +550,7 @@ function scrapGrupyNumberAlbumu($pdo, $albumNumber, $ssl_error=False, $clearTabl
         else {
                 $response = file_get_contents($url);
             }         // pobranie zawartosci ze zwrotki z API
-        echo "Pomyslnie otrzymano zwrot z API \n";
+        // echo "Pomyslnie otrzymano zwrot z API \n";
         $data = json_decode($response, true);                                                 // dekodowania zawartosci do JSON
 
 
@@ -583,14 +578,14 @@ function scrapGrupyNumberAlbumu($pdo, $albumNumber, $ssl_error=False, $clearTabl
                 try {
                     $statement -> execute();
                 } catch (PDOException $e) {
-                    echo "Blad zapytania: " . $e -> getMessage();
+                    // echo "Blad zapytania: " . $e -> getMessage();
                     exit();
                 }
             }
         }
 
     } catch (PDOException $e) {
-        echo "Blad polaczenia z API: " . $e -> getMessage();
+        // echo "Blad polaczenia z API: " . $e -> getMessage();
         exit();
     }
 }
@@ -619,7 +614,7 @@ function scrapGrupyWykladowca($pdo, $teacherName, $ssl_error=False, $clearTableC
                 $clearIndexes = $pdo->prepare("DELETE FROM sqlite_sequence WHERE name = 'grupa'"); // czyszczenie indexow tablicy
                 $clearIndexes -> execute();
             } catch (PDOException $e) {
-                echo "Blad zapytania: " . $e -> getMessage();
+                // echo "Blad zapytania: " . $e -> getMessage();
                 exit();
             }
         }
@@ -630,6 +625,7 @@ function scrapGrupyWykladowca($pdo, $teacherName, $ssl_error=False, $clearTableC
 
         // ustawienie zeby pobieralo tylko lekcje do 1 miesiaca w przod
         $dateNow = new DateTime();
+        $dateNow= $dateNow->modify("-1 month");
         $dateNow = $dateNow->format("Y-m-d");
 
         $dateMonth = new DateTime();
@@ -643,7 +639,7 @@ function scrapGrupyWykladowca($pdo, $teacherName, $ssl_error=False, $clearTableC
         // przygotowanie nazwy pokoju dla api
 
         $url = $url . $lastName . "%20" . $name . "&start=" . $dateNow . "T00%3A00%3A00%2B01%3A00&end=" . $dateMonth . "T00%3A00%3A00%2B01%3A00";
-        #echo $url . "\n";
+        #// echo $url . "\n";
 
         if ($ssl_error) {
             $options = [
@@ -660,7 +656,7 @@ function scrapGrupyWykladowca($pdo, $teacherName, $ssl_error=False, $clearTableC
         else {
             $response = file_get_contents($url);
         }         // pobranie zawartosci ze zwrotki z API
-        echo "Pomyslnie otrzymano zwrot z API \n";
+        // echo "Pomyslnie otrzymano zwrot z API \n";
         $data = json_decode($response, true);                                                 // dekodowania zawartosci do JSON
 
 
@@ -688,14 +684,14 @@ function scrapGrupyWykladowca($pdo, $teacherName, $ssl_error=False, $clearTableC
                 try {
                     $statement -> execute();
                 } catch (PDOException $e) {
-                    echo "Blad zapytania: " . $e -> getMessage();
+                    // echo "Blad zapytania: " . $e -> getMessage();
                     exit();
                 }
             }
         }
 
     } catch (PDOException $e) {
-        echo "Blad polaczenia z API: " . $e -> getMessage();
+        // echo "Blad polaczenia z API: " . $e -> getMessage();
         exit();
     }
 }
@@ -724,7 +720,7 @@ function scrapGrupySala($pdo, $room, $ssl_error=False, $clearTableCondition=True
                 $clearIndexes = $pdo->prepare("DELETE FROM sqlite_sequence WHERE name = 'grupa'"); // czyszczenie indexow tablicy
                 $clearIndexes -> execute();
             } catch (PDOException $e) {
-                echo "Blad zapytania: " . $e -> getMessage();
+                // echo "Blad zapytania: " . $e -> getMessage();
                 exit();
             }
         }
@@ -735,6 +731,7 @@ function scrapGrupySala($pdo, $room, $ssl_error=False, $clearTableCondition=True
 
         // ustawienie zeby pobieralo tylko lekcje do 1 miesiaca w przod
         $dateNow = new DateTime();
+        $dateNow= $dateNow->modify("-1 month");
         $dateNow = $dateNow->format("Y-m-d");
 
         $dateMonth = new DateTime();
@@ -748,7 +745,7 @@ function scrapGrupySala($pdo, $room, $ssl_error=False, $clearTableCondition=True
         // przygotowanie nazwy pokoju dla api
 
         $url = $url . $room . "&start=" . $dateNow . "T00%3A00%3A00%2B01%3A00&end=" . $dateMonth . "T00%3A00%3A00%2B01%3A00";
-        #echo $url . "\n";
+        #// echo $url . "\n";
 
         if ($ssl_error) {
             $options = [
@@ -765,7 +762,7 @@ function scrapGrupySala($pdo, $room, $ssl_error=False, $clearTableCondition=True
         else {
             $response = file_get_contents($url);
         }         // pobranie zawartosci ze zwrotki z API
-        echo "Pomyslnie otrzymano zwrot z API \n";
+        // echo "Pomyslnie otrzymano zwrot z API \n";
         $data = json_decode($response, true);                                                 // dekodowania zawartosci do JSON
 
 
@@ -793,14 +790,14 @@ function scrapGrupySala($pdo, $room, $ssl_error=False, $clearTableCondition=True
                 try {
                     $statement -> execute();
                 } catch (PDOException $e) {
-                    echo "Blad zapytania: " . $e -> getMessage();
+                    // echo "Blad zapytania: " . $e -> getMessage();
                     exit();
                 }
             }
         }
 
     } catch (PDOException $e) {
-        echo "Blad polaczenia z API: " . $e -> getMessage();
+        // echo "Blad polaczenia z API: " . $e -> getMessage();
         exit();
     }
 }
@@ -829,7 +826,7 @@ function scrapGrupyPrzedmiot($pdo, $subject, $ssl_error=False, $clearTableCondit
                 $clearIndexes = $pdo->prepare("DELETE FROM sqlite_sequence WHERE name = 'grupa'"); // czyszczenie indexow tablicy
                 $clearIndexes -> execute();
             } catch (PDOException $e) {
-                echo "Blad zapytania: " . $e -> getMessage();
+                // echo "Blad zapytania: " . $e -> getMessage();
                 exit();
             }
         }
@@ -840,6 +837,7 @@ function scrapGrupyPrzedmiot($pdo, $subject, $ssl_error=False, $clearTableCondit
 
         // ustawienie zeby pobieralo tylko lekcje do 1 miesiaca w przod
         $dateNow = new DateTime();
+        $dateNow= $dateNow->modify("-1 month");
         $dateNow = $dateNow->format("Y-m-d");
 
         $dateMonth = new DateTime();
@@ -853,7 +851,7 @@ function scrapGrupyPrzedmiot($pdo, $subject, $ssl_error=False, $clearTableCondit
         // przygotowanie nazwy pokoju dla api
 
         $url = $url . $subject . "&start=" . $dateNow . "T00%3A00%3A00%2B01%3A00&end=" . $dateMonth . "T00%3A00%3A00%2B01%3A00";
-        echo $url . "\n";
+        // echo $url . "\n";
 
         if ($ssl_error) {
             $options = [
@@ -870,7 +868,7 @@ function scrapGrupyPrzedmiot($pdo, $subject, $ssl_error=False, $clearTableCondit
         else {
             $response = file_get_contents($url);
         }         // pobranie zawartosci ze zwrotki z API
-        echo "Pomyslnie otrzymano zwrot z API \n";
+        // echo "Pomyslnie otrzymano zwrot z API \n";
         $data = json_decode($response, true);                                                 // dekodowania zawartosci do JSON
 
 
@@ -898,14 +896,14 @@ function scrapGrupyPrzedmiot($pdo, $subject, $ssl_error=False, $clearTableCondit
                 try {
                     $statement -> execute();
                 } catch (PDOException $e) {
-                    echo "Blad zapytania: " . $e -> getMessage();
+                    // echo "Blad zapytania: " . $e -> getMessage();
                     exit();
                 }
             }
         }
 
     } catch (PDOException $e) {
-        echo "Blad polaczenia z API: " . $e -> getMessage();
+        // echo "Blad polaczenia z API: " . $e -> getMessage();
         exit();
     }
 }
@@ -934,7 +932,7 @@ function scrapGrupyGrupa($pdo, $group, $ssl_error=False, $clearTableCondition=Tr
                 $clearIndexes = $pdo->prepare("DELETE FROM sqlite_sequence WHERE name = 'grupa'"); // czyszczenie indexow tablicy
                 $clearIndexes -> execute();
             } catch (PDOException $e) {
-                echo "Blad zapytania: " . $e -> getMessage();
+                // echo "Blad zapytania: " . $e -> getMessage();
                 exit();
             }
         }
@@ -945,6 +943,7 @@ function scrapGrupyGrupa($pdo, $group, $ssl_error=False, $clearTableCondition=Tr
 
         // ustawienie zeby pobieralo tylko lekcje do 1 miesiaca w przod
         $dateNow = new DateTime();
+        $dateNow= $dateNow->modify("-1 month");
         $dateNow = $dateNow->format("Y-m-d");
 
         $dateMonth = new DateTime();
@@ -958,7 +957,7 @@ function scrapGrupyGrupa($pdo, $group, $ssl_error=False, $clearTableCondition=Tr
         // przygotowanie nazwy pokoju dla api
 
         $url = $url . $group . "&start=" . $dateNow . "T00%3A00%3A00%2B01%3A00&end=" . $dateMonth . "T00%3A00%3A00%2B01%3A00";
-        echo $url . "\n";
+        // echo $url . "\n";
 
         if ($ssl_error) {
             $options = [
@@ -975,7 +974,7 @@ function scrapGrupyGrupa($pdo, $group, $ssl_error=False, $clearTableCondition=Tr
         else {
             $response = file_get_contents($url);
         }         // pobranie zawartosci ze zwrotki z API
-        echo "Pomyslnie otrzymano zwrot z API \n";
+        // echo "Pomyslnie otrzymano zwrot z API \n";
         $data = json_decode($response, true);                                                 // dekodowania zawartosci do JSON
 
 
@@ -1003,14 +1002,14 @@ function scrapGrupyGrupa($pdo, $group, $ssl_error=False, $clearTableCondition=Tr
                 try {
                     $statement -> execute();
                 } catch (PDOException $e) {
-                    echo "Blad zapytania: " . $e -> getMessage();
+                    // echo "Blad zapytania: " . $e -> getMessage();
                     exit();
                 }
             }
         }
 
     } catch (PDOException $e) {
-        echo "Blad polaczenia z API: " . $e -> getMessage();
+        // echo "Blad polaczenia z API: " . $e -> getMessage();
         exit();
     }
 }
@@ -1040,7 +1039,7 @@ function scrapGrupyTest($pdo, $ssl_error=False, $clearTableCondition=True, $addT
                 $clearIndexes = $pdo->prepare("DELETE FROM sqlite_sequence WHERE name = 'grupa'"); // czyszczenie indexow tablicy
                 $clearIndexes -> execute();
             } catch (PDOException $e) {
-                echo "Blad zapytania: " . $e -> getMessage();
+                // echo "Blad zapytania: " . $e -> getMessage();
                 exit();
             }
         }
@@ -1051,6 +1050,7 @@ function scrapGrupyTest($pdo, $ssl_error=False, $clearTableCondition=True, $addT
 
         // ustawienie zeby pobieralo tylko lekcje do 1 miesiaca w przod
         $dateNow = new DateTime();
+        $dateNow= $dateNow->modify("-1 month");
         $dateNow = $dateNow->format("Y-m-d");
 
         $dateMonth = new DateTime();
@@ -1063,7 +1063,7 @@ function scrapGrupyTest($pdo, $ssl_error=False, $clearTableCondition=True, $addT
         // przygotowanie nazwy pokoju dla api
 
         $url = $url . "test" . "&start=" . $dateNow . "T00%3A00%3A00%2B01%3A00&end=" . $dateMonth . "T00%3A00%3A00%2B01%3A00";
-        echo $url . "\n";
+        // echo $url . "\n";
 
         if ($ssl_error) {
             $options = [
@@ -1080,7 +1080,7 @@ function scrapGrupyTest($pdo, $ssl_error=False, $clearTableCondition=True, $addT
         else {
             $response = file_get_contents($url);
         }         // pobranie zawartosci ze zwrotki z API
-        echo "Pomyslnie otrzymano zwrot z API \n";
+        // echo "Pomyslnie otrzymano zwrot z API \n";
         $data = json_decode($response, true);                                                 // dekodowania zawartosci do JSON
 
 
@@ -1108,14 +1108,14 @@ function scrapGrupyTest($pdo, $ssl_error=False, $clearTableCondition=True, $addT
                 try {
                     $statement -> execute();
                 } catch (PDOException $e) {
-                    echo "Blad zapytania: " . $e -> getMessage();
+                    // echo "Blad zapytania: " . $e -> getMessage();
                     exit();
                 }
             }
         }
 
     } catch (PDOException $e) {
-        echo "Blad polaczenia z API: " . $e -> getMessage();
+        // echo "Blad polaczenia z API: " . $e -> getMessage();
         exit();
     }
 }
@@ -1135,6 +1135,7 @@ function scrapLekcjaNumberAlbumu($pdo, $albumNumber, $ssl_error=False, $addToBas
 
         // ustawienie zeby pobieralo tylko lekcje do 1 miesiaca w przod
         $dateNow = new DateTime();
+        $dateNow= $dateNow->modify("-1 month");
         $dateNow = $dateNow->format("Y-m-d");
 
         $dateMonth = new DateTime();
@@ -1145,7 +1146,7 @@ function scrapLekcjaNumberAlbumu($pdo, $albumNumber, $ssl_error=False, $addToBas
         // przygotowanie nazwy pokoju dla api
 
         $url = $url . $albumNumber . "&start=" . $dateNow . "T00%3A00%3A00%2B01%3A00&end=" . $dateMonth . "T00%3A00%3A00%2B01%3A00";
-        echo $url . "\n";
+        // echo $url . "\n";
 
         if ($ssl_error) {
             $options = [
@@ -1162,7 +1163,7 @@ function scrapLekcjaNumberAlbumu($pdo, $albumNumber, $ssl_error=False, $addToBas
         else {
             $response = file_get_contents($url);
         }         // pobranie zawartosci ze zwrotki z API
-        echo "Pomyslnie otrzymano zwrot z API \n";
+        // echo "Pomyslnie otrzymano zwrot z API \n";
         $data = json_decode($response, true);                                                 // dekodowania zawartosci do JSON
 
 
@@ -1229,7 +1230,7 @@ function scrapLekcjaNumberAlbumu($pdo, $albumNumber, $ssl_error=False, $addToBas
 
                 // pobranie id wykladowcy
                 list($lastName, $name) = explode(" ", (string)$lesson["worker"], 2);             // rozbijanie stringa na imie i nazwisko
-                #echo "wykladowca: " . $lastName . " " . $name . "\n";
+                #// echo "wykladowca: " . $lastName . " " . $name . "\n";
                 $queryWykladowcaID = "SELECT wykladowcaID FROM wykladowca WHERE (Imie = :name AND Nazwisko = :lastName)";
                 $wykladowcaID = $pdo->prepare($queryWykladowcaID);
                 $wykladowcaID->bindParam(':name', $name, PDO::PARAM_STR);
@@ -1248,7 +1249,7 @@ function scrapLekcjaNumberAlbumu($pdo, $albumNumber, $ssl_error=False, $addToBas
                 $grupaIDresult = $grupaID->fetch(PDO::FETCH_ASSOC);
                 $grupaIDresult = (string)$grupaIDresult["grupaID"];
 
-                #echo $grupaIDresult . "\n";
+                #// echo $grupaIDresult . "\n";
 
                 // pobranie id sali
                 $room = $lesson["room"];
@@ -1266,7 +1267,7 @@ function scrapLekcjaNumberAlbumu($pdo, $albumNumber, $ssl_error=False, $addToBas
                 $salaIDresult = $salaID->fetch(PDO::FETCH_ASSOC);
                 $salaIDresult = (string)$salaIDresult["salaID"];
 
-                #echo $salaIDresult . "\n";
+                #// echo $salaIDresult . "\n";
 
                 // pobieranie id przedmiotu
                 $przedmiot = $lesson["subject"];
@@ -1278,7 +1279,7 @@ function scrapLekcjaNumberAlbumu($pdo, $albumNumber, $ssl_error=False, $addToBas
                 $przedmiotIDresult = $przedmiotID->fetch(PDO::FETCH_ASSOC);
                 $przedmiotIDresult = (string)$przedmiotIDresult["przedmiotID"];
 
-                #echo $przedmiotIDresult . "\n";
+                #// echo $przedmiotIDresult . "\n";
 
 
                 // wstawianie do tabeli
@@ -1297,7 +1298,7 @@ function scrapLekcjaNumberAlbumu($pdo, $albumNumber, $ssl_error=False, $addToBas
                 try {
                     $statement -> execute();
                 } catch (PDOException $e) {
-                    echo "Blad zapytania: " . $e -> getMessage();
+                    // echo "Blad zapytania: " . $e -> getMessage();
                     exit();
                 }
 
@@ -1306,7 +1307,7 @@ function scrapLekcjaNumberAlbumu($pdo, $albumNumber, $ssl_error=False, $addToBas
         }
 
     } catch (PDOException $e) {
-        echo "Blad polaczenia z API: " . $e -> getMessage();
+        // echo "Blad polaczenia z API: " . $e -> getMessage();
         exit();
     }
 }
@@ -1325,6 +1326,7 @@ function scrapLekcjaWykladowca($pdo, $teacherName, $ssl_error=False, $addToBase=
 
         // ustawienie zeby pobieralo tylko lekcje do 1 miesiaca w przod
         $dateNow = new DateTime();
+        $dateNow = $dateNow->modify("-1 month");
         $dateNow = $dateNow->format("Y-m-d");
 
         $dateMonth = new DateTime();
@@ -1339,7 +1341,7 @@ function scrapLekcjaWykladowca($pdo, $teacherName, $ssl_error=False, $addToBase=
         // przygotowanie nazwy pokoju dla api
 
         $url = $url . $lastName . "%20" . $name . "&start=" . $dateNow . "T00%3A00%3A00%2B01%3A00&end=" . $dateMonth . "T00%3A00%3A00%2B01%3A00";
-        echo $url . "\n";
+        // echo $url . "\n";
 
         if ($ssl_error) {
             $options = [
@@ -1356,7 +1358,7 @@ function scrapLekcjaWykladowca($pdo, $teacherName, $ssl_error=False, $addToBase=
         else {
             $response = file_get_contents($url);
         }         // pobranie zawartosci ze zwrotki z API
-        echo "Pomyslnie otrzymano zwrot z API \n";
+        // echo "Pomyslnie otrzymano zwrot z API \n";
         $data = json_decode($response, true);                                                 // dekodowania zawartosci do JSON
 
 
@@ -1423,7 +1425,7 @@ function scrapLekcjaWykladowca($pdo, $teacherName, $ssl_error=False, $addToBase=
 
                 // pobranie id wykladowcy
                 list($lastName, $name) = explode(" ", (string)$lesson["worker"], 2);             // rozbijanie stringa na imie i nazwisko
-                #echo "wykladowca: " . $lastName . " " . $name . "\n";
+                #// echo "wykladowca: " . $lastName . " " . $name . "\n";
                 $queryWykladowcaID = "SELECT wykladowcaID FROM wykladowca WHERE (Imie = :name AND Nazwisko = :lastName)";
                 $wykladowcaID = $pdo->prepare($queryWykladowcaID);
                 $wykladowcaID->bindParam(':name', $name, PDO::PARAM_STR);
@@ -1442,7 +1444,7 @@ function scrapLekcjaWykladowca($pdo, $teacherName, $ssl_error=False, $addToBase=
                 $grupaIDresult = $grupaID->fetch(PDO::FETCH_ASSOC);
                 $grupaIDresult = (string)$grupaIDresult["grupaID"];
 
-                #echo $grupaIDresult . "\n";
+                #// echo $grupaIDresult . "\n";
 
                 // pobranie id sali
                 $room = $lesson["room"];
@@ -1460,7 +1462,7 @@ function scrapLekcjaWykladowca($pdo, $teacherName, $ssl_error=False, $addToBase=
                 $salaIDresult = $salaID->fetch(PDO::FETCH_ASSOC);
                 $salaIDresult = (string)$salaIDresult["salaID"];
 
-                #echo $salaIDresult . "\n";
+                #// echo $salaIDresult . "\n";
 
                 // pobieranie id przedmiotu
                 $przedmiot = $lesson["subject"];
@@ -1472,7 +1474,7 @@ function scrapLekcjaWykladowca($pdo, $teacherName, $ssl_error=False, $addToBase=
                 $przedmiotIDresult = $przedmiotID->fetch(PDO::FETCH_ASSOC);
                 $przedmiotIDresult = (string)$przedmiotIDresult["przedmiotID"];
 
-                #echo $przedmiotIDresult . "\n";
+                #// echo $przedmiotIDresult . "\n";
 
 
                 // wstawianie do tabeli
@@ -1491,7 +1493,7 @@ function scrapLekcjaWykladowca($pdo, $teacherName, $ssl_error=False, $addToBase=
                 try {
                     $statement -> execute();
                 } catch (PDOException $e) {
-                    echo "Blad zapytania: " . $e -> getMessage();
+                    // echo "Blad zapytania: " . $e -> getMessage();
                     exit();
                 }
 
@@ -1500,7 +1502,7 @@ function scrapLekcjaWykladowca($pdo, $teacherName, $ssl_error=False, $addToBase=
         }
 
     } catch (PDOException $e) {
-        echo "Blad polaczenia z API: " . $e -> getMessage();
+        // echo "Blad polaczenia z API: " . $e -> getMessage();
         exit();
     }
 }
@@ -1519,6 +1521,7 @@ function scrapLekcjaSala($pdo, $room, $ssl_error=False, $addToBase=True) {
 
         // ustawienie zeby pobieralo tylko lekcje do 1 miesiaca w przod
         $dateNow = new DateTime();
+        $dateNow= $dateNow->modify("-1 month");
         $dateNow = $dateNow->format("Y-m-d");
 
         $dateMonth = new DateTime();
@@ -1533,7 +1536,7 @@ function scrapLekcjaSala($pdo, $room, $ssl_error=False, $addToBase=True) {
         // przygotowanie nazwy pokoju dla api
 
         $url = $url . $room . "&start=" . $dateNow . "T00%3A00%3A00%2B01%3A00&end=" . $dateMonth . "T00%3A00%3A00%2B01%3A00";
-        echo $url . "\n";
+        // echo $url . "\n";
 
         if ($ssl_error) {
             $options = [
@@ -1550,7 +1553,7 @@ function scrapLekcjaSala($pdo, $room, $ssl_error=False, $addToBase=True) {
         else {
             $response = file_get_contents($url);
         }         // pobranie zawartosci ze zwrotki z API
-        echo "Pomyslnie otrzymano zwrot z API \n";
+        // echo "Pomyslnie otrzymano zwrot z API \n";
         $data = json_decode($response, true);                                                 // dekodowania zawartosci do JSON
 
 
@@ -1617,7 +1620,7 @@ function scrapLekcjaSala($pdo, $room, $ssl_error=False, $addToBase=True) {
 
                 // pobranie id wykladowcy
                 list($lastName, $name) = explode(" ", (string)$lesson["worker"], 2);             // rozbijanie stringa na imie i nazwisko
-                #echo "wykladowca: " . $lastName . " " . $name . "\n";
+                #// echo "wykladowca: " . $lastName . " " . $name . "\n";
                 $queryWykladowcaID = "SELECT wykladowcaID FROM wykladowca WHERE (Imie = :name AND Nazwisko = :lastName)";
                 $wykladowcaID = $pdo->prepare($queryWykladowcaID);
                 $wykladowcaID->bindParam(':name', $name, PDO::PARAM_STR);
@@ -1636,7 +1639,7 @@ function scrapLekcjaSala($pdo, $room, $ssl_error=False, $addToBase=True) {
                 $grupaIDresult = $grupaID->fetch(PDO::FETCH_ASSOC);
                 $grupaIDresult = (string)$grupaIDresult["grupaID"];
 
-                #echo $grupaIDresult . "\n";
+                #// echo $grupaIDresult . "\n";
 
                 // pobranie id sali
                 $room = $lesson["room"];
@@ -1654,7 +1657,7 @@ function scrapLekcjaSala($pdo, $room, $ssl_error=False, $addToBase=True) {
                 $salaIDresult = $salaID->fetch(PDO::FETCH_ASSOC);
                 $salaIDresult = (string)$salaIDresult["salaID"];
 
-                #echo $salaIDresult . "\n";
+                #// echo $salaIDresult . "\n";
 
                 // pobieranie id przedmiotu
                 $przedmiot = $lesson["subject"];
@@ -1666,7 +1669,7 @@ function scrapLekcjaSala($pdo, $room, $ssl_error=False, $addToBase=True) {
                 $przedmiotIDresult = $przedmiotID->fetch(PDO::FETCH_ASSOC);
                 $przedmiotIDresult = (string)$przedmiotIDresult["przedmiotID"];
 
-                #echo $przedmiotIDresult . "\n";
+                #// echo $przedmiotIDresult . "\n";
 
 
                 // wstawianie do tabeli
@@ -1685,7 +1688,7 @@ function scrapLekcjaSala($pdo, $room, $ssl_error=False, $addToBase=True) {
                 try {
                     $statement -> execute();
                 } catch (PDOException $e) {
-                    echo "Blad zapytania: " . $e -> getMessage();
+                    // echo "Blad zapytania: " . $e -> getMessage();
                     exit();
                 }
 
@@ -1694,7 +1697,7 @@ function scrapLekcjaSala($pdo, $room, $ssl_error=False, $addToBase=True) {
         }
 
     } catch (PDOException $e) {
-        echo "Blad polaczenia z API: " . $e -> getMessage();
+        // echo "Blad polaczenia z API: " . $e -> getMessage();
         exit();
     }
 }
@@ -1713,6 +1716,7 @@ function scrapLekcjaPrzedmiot($pdo, $subject, $ssl_error=False, $addToBase=True)
 
         // ustawienie zeby pobieralo tylko lekcje do 1 miesiaca w przod
         $dateNow = new DateTime();
+        $dateNow= $dateNow->modify("-1 month");
         $dateNow = $dateNow->format("Y-m-d");
 
         $dateMonth = new DateTime();
@@ -1725,7 +1729,7 @@ function scrapLekcjaPrzedmiot($pdo, $subject, $ssl_error=False, $addToBase=True)
         // przygotowanie nazwy pokoju dla api
 
         $url = $url . $subject . "&start=" . $dateNow . "T00%3A00%3A00%2B01%3A00&end=" . $dateMonth . "T00%3A00%3A00%2B01%3A00";
-        echo $url . "\n";
+        // echo $url . "\n";
 
         if ($ssl_error) {
             $options = [
@@ -1742,7 +1746,7 @@ function scrapLekcjaPrzedmiot($pdo, $subject, $ssl_error=False, $addToBase=True)
         else {
             $response = file_get_contents($url);
         }         // pobranie zawartosci ze zwrotki z API
-        echo "Pomyslnie otrzymano zwrot z API \n";
+        // echo "Pomyslnie otrzymano zwrot z API \n";
         $data = json_decode($response, true);                                                 // dekodowania zawartosci do JSON
 
 
@@ -1809,7 +1813,7 @@ function scrapLekcjaPrzedmiot($pdo, $subject, $ssl_error=False, $addToBase=True)
 
                 // pobranie id wykladowcy
                 list($lastName, $name) = explode(" ", (string)$lesson["worker"], 2);             // rozbijanie stringa na imie i nazwisko
-                #echo "wykladowca: " . $lastName . " " . $name . "\n";
+                #// echo "wykladowca: " . $lastName . " " . $name . "\n";
                 $queryWykladowcaID = "SELECT wykladowcaID FROM wykladowca WHERE (Imie = :name AND Nazwisko = :lastName)";
                 $wykladowcaID = $pdo->prepare($queryWykladowcaID);
                 $wykladowcaID->bindParam(':name', $name, PDO::PARAM_STR);
@@ -1828,7 +1832,7 @@ function scrapLekcjaPrzedmiot($pdo, $subject, $ssl_error=False, $addToBase=True)
                 $grupaIDresult = $grupaID->fetch(PDO::FETCH_ASSOC);
                 $grupaIDresult = (string)$grupaIDresult["grupaID"];
 
-                #echo $grupaIDresult . "\n";
+                #// echo $grupaIDresult . "\n";
 
                 // pobranie id sali
                 $room = $lesson["room"];
@@ -1846,7 +1850,7 @@ function scrapLekcjaPrzedmiot($pdo, $subject, $ssl_error=False, $addToBase=True)
                 $salaIDresult = $salaID->fetch(PDO::FETCH_ASSOC);
                 $salaIDresult = (string)$salaIDresult["salaID"];
 
-                #echo $salaIDresult . "\n";
+                #// echo $salaIDresult . "\n";
 
                 // pobieranie id przedmiotu
                 $przedmiot = $lesson["subject"];
@@ -1858,7 +1862,7 @@ function scrapLekcjaPrzedmiot($pdo, $subject, $ssl_error=False, $addToBase=True)
                 $przedmiotIDresult = $przedmiotID->fetch(PDO::FETCH_ASSOC);
                 $przedmiotIDresult = (string)$przedmiotIDresult["przedmiotID"];
 
-                #echo $przedmiotIDresult . "\n";
+                #// echo $przedmiotIDresult . "\n";
 
 
                 // wstawianie do tabeli
@@ -1877,7 +1881,7 @@ function scrapLekcjaPrzedmiot($pdo, $subject, $ssl_error=False, $addToBase=True)
                 try {
                     $statement -> execute();
                 } catch (PDOException $e) {
-                    echo "Blad zapytania: " . $e -> getMessage();
+                    // echo "Blad zapytania: " . $e -> getMessage();
                     exit();
                 }
 
@@ -1886,7 +1890,7 @@ function scrapLekcjaPrzedmiot($pdo, $subject, $ssl_error=False, $addToBase=True)
         }
 
     } catch (PDOException $e) {
-        echo "Blad polaczenia z API: " . $e -> getMessage();
+        // echo "Blad polaczenia z API: " . $e -> getMessage();
         exit();
     }
 }
@@ -1905,6 +1909,7 @@ function scrapLekcjaGrupa($pdo, $group, $ssl_error=False, $addToBase=True) {
 
         // ustawienie zeby pobieralo tylko lekcje do 1 miesiaca w przod
         $dateNow = new DateTime();
+        $dateNow= $dateNow->modify("-1 month");
         $dateNow = $dateNow->format("Y-m-d");
 
         $dateMonth = new DateTime();
@@ -1918,7 +1923,7 @@ function scrapLekcjaGrupa($pdo, $group, $ssl_error=False, $addToBase=True) {
         // przygotowanie nazwy pokoju dla api
 
         $url = $url . $group . "&start=" . $dateNow . "T00%3A00%3A00%2B01%3A00&end=" . $dateMonth . "T00%3A00%3A00%2B01%3A00";
-        echo $url . "\n";
+        // echo $url . "\n";
 
         if ($ssl_error) {
             $options = [
@@ -1935,7 +1940,7 @@ function scrapLekcjaGrupa($pdo, $group, $ssl_error=False, $addToBase=True) {
         else {
             $response = file_get_contents($url);
         }         // pobranie zawartosci ze zwrotki z API
-        echo "Pomyslnie otrzymano zwrot z API \n";
+        // echo "Pomyslnie otrzymano zwrot z API \n";
         $data = json_decode($response, true);                                                 // dekodowania zawartosci do JSON
 
 
@@ -2002,7 +2007,7 @@ function scrapLekcjaGrupa($pdo, $group, $ssl_error=False, $addToBase=True) {
 
                 // pobranie id wykladowcy
                 list($lastName, $name) = explode(" ", (string)$lesson["worker"], 2);             // rozbijanie stringa na imie i nazwisko
-                #echo "wykladowca: " . $lastName . " " . $name . "\n";
+                #// echo "wykladowca: " . $lastName . " " . $name . "\n";
                 $queryWykladowcaID = "SELECT wykladowcaID FROM wykladowca WHERE (Imie = :name AND Nazwisko = :lastName)";
                 $wykladowcaID = $pdo->prepare($queryWykladowcaID);
                 $wykladowcaID->bindParam(':name', $name, PDO::PARAM_STR);
@@ -2021,7 +2026,7 @@ function scrapLekcjaGrupa($pdo, $group, $ssl_error=False, $addToBase=True) {
                 $grupaIDresult = $grupaID->fetch(PDO::FETCH_ASSOC);
                 $grupaIDresult = (string)$grupaIDresult["grupaID"];
 
-                #echo $grupaIDresult . "\n";
+                #// echo $grupaIDresult . "\n";
 
                 // pobranie id sali
                 $room = $lesson["room"];
@@ -2039,7 +2044,7 @@ function scrapLekcjaGrupa($pdo, $group, $ssl_error=False, $addToBase=True) {
                 $salaIDresult = $salaID->fetch(PDO::FETCH_ASSOC);
                 $salaIDresult = (string)$salaIDresult["salaID"];
 
-                #echo $salaIDresult . "\n";
+                #// echo $salaIDresult . "\n";
 
                 // pobieranie id przedmiotu
                 $przedmiot = $lesson["subject"];
@@ -2051,7 +2056,7 @@ function scrapLekcjaGrupa($pdo, $group, $ssl_error=False, $addToBase=True) {
                 $przedmiotIDresult = $przedmiotID->fetch(PDO::FETCH_ASSOC);
                 $przedmiotIDresult = (string)$przedmiotIDresult["przedmiotID"];
 
-                #echo $przedmiotIDresult . "\n";
+                #// echo $przedmiotIDresult . "\n";
 
 
                 // wstawianie do tabeli
@@ -2070,7 +2075,7 @@ function scrapLekcjaGrupa($pdo, $group, $ssl_error=False, $addToBase=True) {
                 try {
                     $statement -> execute();
                 } catch (PDOException $e) {
-                    echo "Blad zapytania: " . $e -> getMessage();
+                    // echo "Blad zapytania: " . $e -> getMessage();
                     exit();
                 }
 
@@ -2079,7 +2084,7 @@ function scrapLekcjaGrupa($pdo, $group, $ssl_error=False, $addToBase=True) {
         }
 
     } catch (PDOException $e) {
-        echo "Blad polaczenia z API: " . $e -> getMessage();
+        // echo "Blad polaczenia z API: " . $e -> getMessage();
         exit();
     }
 }
@@ -2103,6 +2108,7 @@ function scrapNumerAlbumuGrupa($pdo, $albumNumber, $ssl_error=False, $addToBase=
 
         // ustawienie zeby pobieralo tylko lekcje do 1 miesiaca w przod
         $dateNow = new DateTime();
+        $dateNow= $dateNow->modify("-1 month");
         $dateNow = $dateNow->format("Y-m-d");
 
         $dateMonth = new DateTime();
@@ -2114,7 +2120,7 @@ function scrapNumerAlbumuGrupa($pdo, $albumNumber, $ssl_error=False, $addToBase=
         // przygotowanie nazwy pokoju dla api
 
         $url = $url . $albumNumber . "&start=" . $dateNow . "T00%3A00%3A00%2B01%3A00&end=" . $dateMonth . "T00%3A00%3A00%2B01%3A00";
-        echo $url . "\n";
+        // echo $url . "\n";
 
         if ($ssl_error) {
             $options = [
@@ -2131,7 +2137,7 @@ function scrapNumerAlbumuGrupa($pdo, $albumNumber, $ssl_error=False, $addToBase=
         else {
             $response = file_get_contents($url);
         }         // pobranie zawartosci ze zwrotki z API
-        echo "Pomyslnie otrzymano zwrot z API \n";
+        // echo "Pomyslnie otrzymano zwrot z API \n";
         $data = json_decode($response, true);                                                 // dekodowania zawartosci do JSON
 
 
@@ -2191,14 +2197,14 @@ function scrapNumerAlbumuGrupa($pdo, $albumNumber, $ssl_error=False, $addToBase=
                 try {
                     $statement -> execute();
                 } catch (PDOException $e) {
-                    echo "Blad zapytania insert: " . $e -> getMessage();
+                    // echo "Blad zapytania insert: " . $e -> getMessage();
                     exit();
                 }
             }
         }
 
     } catch (PDOException $e) {
-        echo "Blad polaczenia z API: " . $e -> getMessage();
+        // echo "Blad polaczenia z API: " . $e -> getMessage();
         exit();
     }
 }
@@ -2217,9 +2223,9 @@ $addToBase = True;
 //Ustawić na True, jeżeli chcemy mieć podgląd do zmiannych testowych w konsoli podczas scrapNumerAlbumu
 $console_write = True;
 
-$dbPath = 'sqlite:./data.db';   // link do bazy danych
+//$dbPath = 'sqlite:./data.db';   // link do bazy danych
 
-$pdo = dbConnection($dbPath);   // polaczenie z baza danych
+//$pdo = dbConnection($dbPath);   // polaczenie z baza danych
 
 
 #scrapWykladowca($pdo, $ssl_error);
@@ -2246,7 +2252,7 @@ $pdo = dbConnection($dbPath);   // polaczenie z baza danych
 
 #scrapGrupyTest($pdo, $ssl_error, $clearTableCondition, $addToBase); // ta funkcja zbiera wszystkie grupy
 
-#scrapLekcjaNumberAlbumu($pdo, $albumNumber = "53873", $ssl_error=False, $addToBase=True);
+#scrapLekcjaNumberAlbumu($pdo, $albumNumber = "53731", $ssl_error=False, $addToBase=True);
 
 #scrapLekcjaWykladowca($pdo, $teacherName = "Kondyjowska-Dziechciarz Marzena", $ssl_error=False, $addToBase=True);
 
@@ -2259,6 +2265,9 @@ $pdo = dbConnection($dbPath);   // polaczenie z baza danych
 // dodawania rekordow do tabeli numerAlbumuGrupa
 #scrapNumerAlbumuGrupa($pdo, $albumNumber = "53731", $ssl_error=False, $addToBase=True);
 
+//scrapLekcjaNumberAlbumu($pdo, $albumNumber = "53828", $ssl_error=False, $addToBase=True);
+
+//scrapGrupyWykladowca($pdo, "Karczmarczyk Aleksandra", $ssl_error, $clearTableCondition = True, $addToBase = True);
 
 
 

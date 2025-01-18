@@ -30,6 +30,11 @@
     --color_black: #333;
     --color_beige: #faf9f6;
     --color_border_gray: #ddd;
+    --color_laby: #1a8238;
+    --color_wyklad: #247c84;
+    --color_lektorat: #c44f00;
+    --color_projekt: #555500;
+    --color_audytorium: #243184;
 }
 
 .dark {
@@ -39,6 +44,11 @@
     --color_black: #f8f9fa;
     --color_beige: #737373;
     --color_border_gray: #a6a6a6;
+    --color_laby: #1a8238;
+    --color_wyklad: #247c84;
+    --color_lektorat: #c44f00;
+    --color_projekt: #555500;
+    --color_audytorium: #243184;
 }
 
 .light {
@@ -48,6 +58,11 @@
     --color_black: #333;
     --color_beige: #faf9f6;
     --color_border_gray: #ddd;
+    --color_laby: #1a8238;
+    --color_wyklad: #247c84;
+    --color_lektorat: #c44f00;
+    --color_projekt: #555500;
+    --color_audytorium: #243184;
 }
 
 body, h1, h2, h3, p, ul, ol, li, table, th, td {
@@ -828,7 +843,7 @@ footer {
 }
 
 .calendar_tile {
-    background-color: var(--color_primary);
+    //background-color: var(--color_primary);
     font-size: 10px;
     position: absolute;
     border: 1px solid var(--color_border_gray);
