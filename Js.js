@@ -313,7 +313,7 @@ function show_tiles(){
                         let text = timeStart.getHours() + ":" + timeStart.getMinutes() + " - " + timeEnd.getHours() + ":" + timeEndMinutes
                             + "\n" + index["tytul"];
                         let info = index["tytul"] + "\n" + "Prowadzący: " + index["imie"] + " " + index["nazwisko"] + "\n" + "Sala: " + index["3"]
-                            + " " + index["pokoj"] + "\n" + "Grupa: " + index["grupa"] + "\n" + index["formaZajec"];
+                            + " " + index["pokoj"] + "\n" + "Grupa: " + index["2"] + "\n" + index["formaZajec"];
 
 
                         // zliczanie do statystyk
@@ -356,7 +356,7 @@ function show_tiles(){
                     let text = timeStart.getHours() + ":" + timeStart.getMinutes() + " - " + timeEnd.getHours() + ":" + timeEndMinutes
                         + "\n" + index["tytul"];
                     let info = index["tytul"] + "\n" + "Prowadzący: " + index["imie"] + " " + index["nazwisko"] + "\n" + "Sala: " + index["3"]
-                        + " " + index["pokoj"] + "\n" + "Grupa: " + index["grupa"] + "\n" + index["formaZajec"];
+                        + " " + index["pokoj"] + "\n" + "Grupa: " + index["2"] + "\n" + index["formaZajec"];
 
                     current_lesson_day = index["start"].split("T")[0].split("-")[2];
                     previous_lesson_day = data[i-1] ? data[i-1]["start"].split("T")[0].split("-")[2] : null;
