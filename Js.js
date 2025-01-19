@@ -199,9 +199,23 @@ function resetStatistics() {
     wlasnyKafelekNumber = 0;
 }
 
+function valid_inputs(lecturer, room, subject, group, index_number) {
+    const text_format = /^[a-zA-Z\s]+$/;
+    const number_format = /^[0-9]{1,5}$/;
+    const group_format = /^[a-zA-Z0-9\sąćęłńóśźżĄĆĘŁŃÓŚŹŻ_+.\-\/]+$/;
+    const sql_test = /\bdrop\b|\btable\b|\bselect\b|\bfrom\b/i;
+
+    if (lecturer && (!text_format.test(lecturer) || sql_test.test(lecturer))) return false;
+    if (room && (!text_format.test(room) || sql_test.test(room))) return false;
+    if (subject && (!text_format.test(subject) || sql_test.test(subject))) return false;
+    if (group && (!group_format.test(group) || sql_test.test(group))) return false;
+    if (index_number && (!number_format.test(index_number))) return false;
+
+    return true;
+}
+
 function show_tiles(){
     clear_tiles_calendar();
-
 
     const wykladowca = document.getElementById("lecturer").value;
     const sala = document.getElementById("room").value;
@@ -209,6 +223,12 @@ function show_tiles(){
     const grupa = document.getElementById("group").value;
     const numerAlbumu = document.getElementById("album-number").value;
     const forma = document.getElementById("forma-zajec").value;
+
+    //Walidacja danych wejściowych
+    if (!valid_inputs(wykladowca, sala, przedmiot, grupa, numerAlbumu, forma)) {
+        alert("Wprowadź poprawne dane");
+        return;
+    }
 
     if (wykladowca.length === 0 && sala.length === 0 && przedmiot.length === 0 && grupa.length === 0 && numerAlbumu.length === 0 && forma.length === 0) {
         resetStatistics();
