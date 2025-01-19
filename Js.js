@@ -152,20 +152,7 @@ document.querySelector(".theme-buttons button:nth-child(2)").addEventListener("c
 //     titleModal.classList.add('hidden');
 // });
 
-//Zmiana wielkości czcionki
-document.querySelector(".theme-buttons button:nth-child(2)").addEventListener("click", () => {
-    console.log("Zmiana czcionki\nJeszcze nie zrobione");
-});
 
-//Kalendarz zakresowy
-document.querySelector(".range-calendar").addEventListener("click", () => {
-    console.log("Kalendarz zakresowy\nJeszcze nie zrobione");
-});
-
-//Kopiowanie filtrów
-document.querySelector(".filter-share").addEventListener("click", () => {
-    console.log("Kopiowanie filtrów\nJeszcze nie zrobione");
-});
 
 //Kalendarz zakresowy
 document.querySelector(".range-calendar").addEventListener("click", () => {
@@ -288,14 +275,21 @@ function show_tiles(){
         var dataEnd = parts[1].split(".");
         dataEnd = dataEnd.reverse().join("-");
         dataEnd = year + "-" + dataEnd;
-        //console.log(dataStart);
+
     }
 
     else if (calendar.id === "miesieczny"){
 
     }
     else if (calendar.id === "semestralny"){
-
+        if (document.querySelector(".calendar_range span").textContent === "Semestr letni"){
+            dataStart = letniStart;
+            dataEnd = letniEnd;
+        }
+        else {
+            dataStart = zimowyStart;
+            dataEnd = zimowyEnd;
+        }
     }
 
     fetch("process.php", {
@@ -397,6 +391,7 @@ function show_tiles(){
                     }
                     add_tile_calendar(6, (hour-6)*60+minute+jump_day, 90, 1, text, index["formaZajec"], info);
                 }
+                showStatistics();
             }
 
             else if (calendar.id === "tygodniowy"){
@@ -407,7 +402,7 @@ function show_tiles(){
                     let minute = timeStart.getMinutes();
 
                     let timeEnd = new Date(index["koniec"]);
-                    console.log(timeEnd.getMinutes());
+                    //console.log(timeEnd.getMinutes());
 
                     let timeEndMinutes;
                     if (timeEnd.getMinutes() === Number(0)) {
@@ -424,6 +419,7 @@ function show_tiles(){
                         + "\n" + index["tytul"];
                     let info = index["tytul"] + "\n" + "Prowadzący: " + index["imie"] + " " + index["nazwisko"] + "\n" + "Sala: " + index["3"]
                         + " " + index["pokoj"] + "\n" + "Grupa: " + index["2"] + "\n" + index["formaZajec"];
+
 
                     // zliczanie do statystyk
                     if (index["formaZajec"] === "laboratorium") laboratoriumNumber++;
@@ -453,6 +449,83 @@ function show_tiles(){
                 });
             }
 
+            else if (calendar.id === "semestralny") {
+                let current_lesson_day, previous_lesson_day;
+                let jump_day = 0;
+                let jump_day_licznik = 0;
+                let indexLicznik = data[0];
+                let previousDay = new Date(indexLicznik["start"]);
+                previousDay = previousDay.toISOString().split('T')[0];
+                let dataLicznik = new Date(indexLicznik["start"]);
+                for (let i = 0; i < data.length; i++) {
+                    let index = data[i];
+                    let timeStart = new Date(index["start"]);
+                    let hour = timeStart.getHours();
+                    let minute = timeStart.getMinutes();
+                    let timeEnd = new Date(index["koniec"]);
+                    let timeEndMinutes;
+                    if (timeEnd.getMinutes() === Number(0)) {
+                        timeEndMinutes = "00";
+                    }
+                    else {
+                        timeEndMinutes = timeEnd.getMinutes();
+                    }
+
+                    const daysOfWeek = ["Pon", "Wto", "Śro", "Czw", "Pia", "Sob", "Nie"];
+                    const dayOfWeek = daysOfWeek[(dataLicznik.getDay() + 6) % 7];
+
+
+
+
+                    let roznica = timeEnd - timeStart;
+                    roznica = roznica / 1000 / 60;
+
+                    let text = timeStart.getHours() + ":" + timeStart.getMinutes() + " - " + timeEnd.getHours() + ":" + timeEndMinutes
+                        + "\n" + index["tytul"];
+                    let info = index["tytul"] + "\n" + "Prowadzący: " + index["imie"] + " " + index["nazwisko"] + "\n" + "Sala: " + index["3"]
+                        + " " + index["pokoj"] + "\n" + "Grupa: " + index["2"] + "\n" + index["formaZajec"];
+
+                    current_lesson_day = index["start"].split("T")[0].split("-")[2];
+                    previous_lesson_day = data[i-1] ? data[i-1]["start"].split("T")[0].split("-")[2] : null;
+
+                    // zliczanie do statystyk
+                    if (index["formaZajec"] === "laboratorium") laboratoriumNumber++;
+                    else if (index["formaZajec"] === "wykład") wykladNumber++;
+                    else if (index["formaZajec"] === "lektorat") lektoratNumber++;
+                    else if (index["formaZajec"] === "audytoryjne") audytoriumNumber++;
+                    else if (index["formaZajec"] === "projekt") projektNumber++;
+                    else if (index["formaZajec"] === "własnyKafelek") wlasnyKafelekNumber++;
+                    else if (index["opis"].includes("Konsultacje")) konsultacjeNumber++;
+                    //
+
+
+
+
+                    //Przesunięcie kafelka o dzień
+                    if (current_lesson_day !== previous_lesson_day && previous_lesson_day !== null) {
+                        console.log(dayOfWeek + " dodalo 1 warunek");
+                        jump_day += 840;
+                    }
+
+
+                    if (dataLicznik.toISOString().split('T')[0] != timeStart.toISOString().split('T')[0] && (dayOfWeek === "Pia")){
+                        console.log("timeStart " + timeStart);
+                        console.log(dayOfWeek + " dodalo 2 warunek");
+                        jump_day += 1680;
+                        dataLicznik.setDate(dataLicznik.getDate() + 2);
+                    }
+
+
+                    add_tile_calendar(6, (hour-6)*60+minute+jump_day+jump_day_licznik, roznica, 1, text, index["formaZajec"], info);
+
+
+                    if (previousDay != timeStart.toISOString().split('T')[0]) {
+                        dataLicznik.setDate(dataLicznik.getDate() + 1);
+                    }
+                    previousDay = new Date(timeStart);
+                    previousDay = previousDay.toISOString().split('T')[0];
+                }
+            }
             showStatistics();
         })
 
@@ -744,47 +817,110 @@ document.querySelector("#month_button").addEventListener("click", () => {
     show_tiles();
 });
 
+// Pobieranie dat z zakresu semestrow
+
+let letniStart;
+let letniEnd;
+let zimowyStart;
+let zimowyEnd;
+
+function getDatesSemestr() {
+    fetch("semestrShow.php", {
+        method: "GET",
+    })
+        .then(response => response.json())
+        .then(data => {
+            //console.log(data);
+            data.forEach(function (index) {
+                let text = index["start"] + " - " + index["end"];
+                if (index["name"] === "Semestr zimowy") {
+                    //document.getElementById("semestr-zimowy-date").textContent = text;
+                    zimowyStart = index["start"];
+                    zimowyEnd = index["end"];
+                }
+                else {
+                    //document.getElementById("semestr-letni-date").textContent = text;
+                    letniStart = index["start"];
+                    letniEnd = index["end"];
+                }
+            })
+        })
+}
+
+getDatesSemestr();
+
+
+
 //Semestralny widok kalendarza
 document.querySelector("#semester_button").addEventListener("click", () => {
-    initialize_date_range(semester=true);
+    document.querySelector(".calendar_range span").innerHTML = "Semestr letni";
+    calendarSemestr();
+});
+
+function calendarSemestr() {
+    //initialize_date_range(true);
     const table = document.querySelector(".calendar_view");
+    let connected_table = '';
+    let current_date = new Date();
 
-    //Head semestralnego widoku
-    const semester_header = `
-        <thead>
-            <tr>
-                <th></th>
-                <th>poniedziałek</th>
-                <th>wtorek</th>
-                <th>środa</th>
-                <th>czwartek</th>
-                <th>piątek</th>
-                <th>sobota</th>
-                <th>niedziela</th>
-            </tr>
-        </thead>`;
 
-    //Body semestralnego widoku
-    let semester_body = `<tbody>`;
-    for (let i = 0; i < 15; i++) {
-        semester_body += `<tr>`;
-        for (let j = 0; j < 8; j++) {
-            if (j === 0) {
-                semester_body += `<td>${i + 1}</td>`;
-                continue;
-            }
-            semester_body += `<td></td>`;
-        }
-        semester_body += `</tr>`;
+    let startDate;
+    let endDate;
+
+    const semestr = document.querySelector(".calendar_range span").textContent;
+
+    if (semestr === "Semestr letni") {
+        startDate = letniStart;
+        endDate = letniEnd;
     }
-    semester_body += `</tbody>`;
+    else {
+        startDate = zimowyStart;
+        endDate = zimowyEnd;
+    }
 
-    table.innerHTML = semester_header + semester_body;
+    const dateStart = new Date(startDate);
+    const dateEnd = new Date(endDate);
+    let roznica = (dateEnd - dateStart) / (24 * 60 * 60 * 1000);
+    roznica++;
+
+    for (let i = 0; i < roznica; i++) {
+        let date = new Date(dateStart);
+        date.setDate(dateStart.getDate() + i);
+
+        let formattedDate = date.toLocaleDateString();
+        const daily_header = `
+            <thead>
+                <tr>
+                    <th></th>
+                    <th>${formattedDate.split('.').slice(0,2).join('.')}</th>
+                </tr>
+            </thead>`;
+
+        //Body dziennego widoku
+        let daily_body = `<tbody>`;
+        for (let j = 0; j < 13; j++) {
+            daily_body += `<tr>`;
+            for (let k = 0; k < 2; k++) {
+                if (k === 0) {
+                    daily_body += `<td>${7+j}</td>`;
+                    continue;
+                }
+                daily_body += `<td></td>`;
+            }
+            daily_body += `</tr>`;
+        }
+        daily_body += `</tbody>`;
+
+        connected_table += daily_header + daily_body;
+    }
+
+    table.innerHTML = connected_table;
+
     const calendar = document.querySelector('.calendar');
-    calendar.style.height = `80vh`;
+    calendar.style.height = `${table.scrollHeight+250}px`;
     calendar.id = "semestralny";
     show_tiles();
-});
+}
 
 //Funkcja do ustawiania poprawnego semestru w zakresie kalendarza
 //output: nazwa semestru
@@ -1077,7 +1213,7 @@ document.querySelector(".calendar_range button:nth-child(1)").addEventListener("
 const table = document.querySelector(".calendar_view");
     let row_count = table.rows.length;
     let column_count = table.rows[0].cells.length;
-    console.log(row_count, column_count);
+    //console.log(row_count, column_count);
     let table_header = `
     <thead>
         <tr>`;
@@ -1104,16 +1240,23 @@ const table = document.querySelector(".calendar_view");
         [new_range, table_header] = render_head_range_semester_month(false);
     }
 
+    const calendar = document.querySelector(".calendar");
     //Widok semestr
-    if (row_count === 16 && column_count === 8) {
-        table_header = render_head_range_semester_month(true)[1];
-        new_range = set_semester_range();
+    if (calendar.id === "semestralny") {
+        if (document.querySelector(".calendar_range span").innerHTML === "Semestr zimowy") new_range = "Semestr letni";
+        else new_range = "Semestr zimowy";
     }
 
-    table_header += `</tr></thead>`;
-    table.tHead.innerHTML = table_header;
+    if (calendar.id != "semestralny"){
+        table_header += `</tr></thead>`;
+        table.tHead.innerHTML = table_header;
+    }
+
 
     document.querySelector(".calendar_range span").innerHTML = new_range;
+    if (calendar.id === "semestralny") {
+        calendarSemestr();
+    }
     show_tiles();
 });
 
@@ -1175,17 +1318,25 @@ document.querySelector(".calendar_range button:nth-child(3)").addEventListener("
         [new_range, table_header] = render_head_range_semester_month(false, true);
     }
 
+    const calendar = document.querySelector(".calendar");
     //Widok semestr
-    if (row_count === 16 && column_count === 8) {
-        table_header = render_head_range_semester_month(true)[1];
-        new_range = set_semester_range();
+    if (calendar.id === "semestralny") {
+        if (document.querySelector(".calendar_range span").innerHTML === "Semestr zimowy") new_range = "Semestr letni";
+        else new_range = "Semestr zimowy";
     }
 
-    table_header += `</tr></thead>`;
-    table.tHead.innerHTML = table_header;
+    if (calendar.id != "semestralny"){
+        table_header += `</tr></thead>`;
+        table.tHead.innerHTML = table_header;
+    }
 
     document.querySelector(".calendar_range span").innerHTML = new_range;
+    if (calendar.id === "semestralny") {
+        calendarSemestr();
+    }
     show_tiles();
+
+
 });
 
 //Ikona kalendarza

@@ -317,10 +317,24 @@ i {
     color: var(--color_beige);
 }
 
-/*.calendar, #semestralny {*/
-/*    max-height: 70vh;*/
-/*    overflow-y: auto;*/
-/*}*/
+/*#semestralny, #dzienny {
+    max-height: 70vh;
+    overflow-y: auto;
+}*/
+
+#semestralny::-webkit-scrollbar, #dzienny::-webkit-scrollbar {
+    width: 20px;
+}
+
+#semestralny::-webkit-scrollbar-track, #dzienny::-webkit-scrollbar-track {
+    background: var(--color_beige);
+    border: 1px solid var(--color_primary);
+}
+
+#semestralny::-webkit-scrollbar-thumb, #dzienny::-webkit-scrollbar-thumb {
+    background: var(--color_primary);
+}
+
 
 .calendar_range {
     display: flex;
@@ -340,6 +354,7 @@ i {
     cursor: pointer;
     width: 30px;
 }
+
 
 main {
     display: flex;

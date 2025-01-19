@@ -396,11 +396,11 @@ function scrapPrzedmiot($pdo, $ssl_error=False, $clearTableCondition=True, $addT
 
             // ustawienie zeby pobieralo tylko lekcje do 1 miesiaca w przod
             $dateNow = new DateTime();
-            $dateNow= $dateNow->modify("-1 month");
+            $dateNow= $dateNow->modify("-6 month");
             $dateNow = $dateNow->format("Y-m-d");
 
             $dateMonth = new DateTime();
-            $dateMonth = $dateMonth->modify("+1 month");
+            $dateMonth = $dateMonth->modify("+6 month");
             $dateMonth = $dateMonth->format("Y-m-d");
 
 
@@ -491,11 +491,11 @@ function scrapGrupyNumberAlbumu($pdo, $albumNumber, $ssl_error=False, $clearTabl
 
         // ustawienie zeby pobieralo tylko lekcje do 1 miesiaca w przod
         $dateNow = new DateTime();
-        $dateNow= $dateNow->modify("-1 month");
+        $dateNow= $dateNow->modify("-6 month");
         $dateNow = $dateNow->format("Y-m-d");
 
         $dateMonth = new DateTime();
-        $dateMonth = $dateMonth->modify("+1 month");
+        $dateMonth = $dateMonth->modify("+6 month");
         $dateMonth = $dateMonth->format("Y-m-d");
 
 
@@ -589,11 +589,11 @@ function scrapGrupyWykladowca($pdo, $teacherName, $ssl_error=False, $clearTableC
 
         // ustawienie zeby pobieralo tylko lekcje do 1 miesiaca w przod
         $dateNow = new DateTime();
-        $dateNow= $dateNow->modify("-1 month");
+        $dateNow= $dateNow->modify("-6 month");
         $dateNow = $dateNow->format("Y-m-d");
 
         $dateMonth = new DateTime();
-        $dateMonth = $dateMonth->modify("+1 month");
+        $dateMonth = $dateMonth->modify("+6 month");
         $dateMonth = $dateMonth->format("Y-m-d");
 
         list($lastName, $name) = explode(" ", $teacherName, 2);
@@ -690,11 +690,11 @@ function scrapGrupySala($pdo, $room, $ssl_error=False, $clearTableCondition=True
 
         // ustawienie zeby pobieralo tylko lekcje do 1 miesiaca w przod
         $dateNow = new DateTime();
-        $dateNow= $dateNow->modify("-1 month");
+        $dateNow= $dateNow->modify("-6 month");
         $dateNow = $dateNow->format("Y-m-d");
 
         $dateMonth = new DateTime();
-        $dateMonth = $dateMonth->modify("+1 month");
+        $dateMonth = $dateMonth->modify("+6 month");
         $dateMonth = $dateMonth->format("Y-m-d");
 
         $room = str_replace(" ", "%20", $room);
@@ -790,11 +790,11 @@ function scrapGrupyPrzedmiot($pdo, $subject, $ssl_error=False, $clearTableCondit
 
         // ustawienie zeby pobieralo tylko lekcje do 1 miesiaca w przod
         $dateNow = new DateTime();
-        $dateNow= $dateNow->modify("-1 month");
+        $dateNow= $dateNow->modify("-6 month");
         $dateNow = $dateNow->format("Y-m-d");
 
         $dateMonth = new DateTime();
-        $dateMonth = $dateMonth->modify("+1 month");
+        $dateMonth = $dateMonth->modify("+6 month");
         $dateMonth = $dateMonth->format("Y-m-d");
 
         $subject = str_replace(" ", "%20", $subject);
@@ -890,11 +890,11 @@ function scrapGrupyGrupa($pdo, $group, $ssl_error=False, $clearTableCondition=Tr
 
         // ustawienie zeby pobieralo tylko lekcje do 1 miesiaca w przod
         $dateNow = new DateTime();
-        $dateNow= $dateNow->modify("-1 month");
+        $dateNow= $dateNow->modify("-6 month");
         $dateNow = $dateNow->format("Y-m-d");
 
         $dateMonth = new DateTime();
-        $dateMonth = $dateMonth->modify("+1 month");
+        $dateMonth = $dateMonth->modify("+6 month");
         $dateMonth = $dateMonth->format("Y-m-d");
 
         $group = str_replace(" ", "%20", $group);
@@ -991,11 +991,11 @@ function scrapGrupyTest($pdo, $ssl_error=False, $clearTableCondition=True, $addT
 
         // ustawienie zeby pobieralo tylko lekcje do 1 miesiaca w przod
         $dateNow = new DateTime();
-        $dateNow= $dateNow->modify("-1 month");
+        $dateNow= $dateNow->modify("-6 month");
         $dateNow = $dateNow->format("Y-m-d");
 
         $dateMonth = new DateTime();
-        $dateMonth = $dateMonth->modify("+1 month");
+        $dateMonth = $dateMonth->modify("+6 month");
         $dateMonth = $dateMonth->format("Y-m-d");
 
 
@@ -1070,11 +1070,11 @@ function scrapLekcjaNumberAlbumu($pdo, $albumNumber, $ssl_error=False, $addToBas
 
         // ustawienie zeby pobieralo tylko lekcje do 1 miesiaca w przod
         $dateNow = new DateTime();
-        $dateNow= $dateNow->modify("-1 month");
+        $dateNow= $dateNow->modify("-6 month");
         $dateNow = $dateNow->format("Y-m-d");
 
         $dateMonth = new DateTime();
-        $dateMonth = $dateMonth->modify("+1 month");
+        $dateMonth = $dateMonth->modify("+6 month");
         $dateMonth = $dateMonth->format("Y-m-d");
 
         $url = 'https://plan.zut.edu.pl/schedule_student.php?number=';    // link do API
@@ -1255,11 +1255,11 @@ function scrapLekcjaWykladowca($pdo, $teacherName, $ssl_error=False, $addToBase=
 
         // ustawienie zeby pobieralo tylko lekcje do 1 miesiaca w przod
         $dateNow = new DateTime();
-        $dateNow = $dateNow->modify("-1 month");
+        $dateNow = $dateNow->modify("-6 month");
         $dateNow = $dateNow->format("Y-m-d");
 
         $dateMonth = new DateTime();
-        $dateMonth = $dateMonth->modify("+1 month");
+        $dateMonth = $dateMonth->modify("+6 month");
         $dateMonth = $dateMonth->format("Y-m-d");
 
 
@@ -1445,11 +1445,11 @@ function scrapLekcjaSala($pdo, $room, $ssl_error=False, $addToBase=True) {
 
         // ustawienie zeby pobieralo tylko lekcje do 1 miesiaca w przod
         $dateNow = new DateTime();
-        $dateNow= $dateNow->modify("-1 month");
+        $dateNow= $dateNow->modify("-6 month");
         $dateNow = $dateNow->format("Y-m-d");
 
         $dateMonth = new DateTime();
-        $dateMonth = $dateMonth->modify("+1 month");
+        $dateMonth = $dateMonth->modify("+6 month");
         $dateMonth = $dateMonth->format("Y-m-d");
 
 
@@ -1634,11 +1634,11 @@ function scrapLekcjaPrzedmiot($pdo, $subject, $ssl_error=False, $addToBase=True)
 
         // ustawienie zeby pobieralo tylko lekcje do 1 miesiaca w przod
         $dateNow = new DateTime();
-        $dateNow= $dateNow->modify("-1 month");
+        $dateNow= $dateNow->modify("-6 month");
         $dateNow = $dateNow->format("Y-m-d");
 
         $dateMonth = new DateTime();
-        $dateMonth = $dateMonth->modify("+1 month");
+        $dateMonth = $dateMonth->modify("+6 month");
         $dateMonth = $dateMonth->format("Y-m-d");
 
         $subject = str_replace(" ", "%20", $subject);
@@ -1821,11 +1821,11 @@ function scrapLekcjaGrupa($pdo, $group, $ssl_error=False, $addToBase=True) {
 
         // ustawienie zeby pobieralo tylko lekcje do 1 miesiaca w przod
         $dateNow = new DateTime();
-        $dateNow= $dateNow->modify("-1 month");
+        $dateNow= $dateNow->modify("-6 month");
         $dateNow = $dateNow->format("Y-m-d");
 
         $dateMonth = new DateTime();
-        $dateMonth = $dateMonth->modify("+1 month");
+        $dateMonth = $dateMonth->modify("+6 month");
         $dateMonth = $dateMonth->format("Y-m-d");
 
         $group = str_replace(" ", "%20", $group);
@@ -2014,11 +2014,11 @@ function scrapNumerAlbumuGrupa($pdo, $albumNumber, $ssl_error=False, $addToBase=
 
         // ustawienie zeby pobieralo tylko lekcje do 1 miesiaca w przod
         $dateNow = new DateTime();
-        $dateNow= $dateNow->modify("-1 month");
+        $dateNow= $dateNow->modify("-6 month");
         $dateNow = $dateNow->format("Y-m-d");
 
         $dateMonth = new DateTime();
-        $dateMonth = $dateMonth->modify("+1 month");
+        $dateMonth = $dateMonth->modify("+6 month");
         $dateMonth = $dateMonth->format("Y-m-d");
 
 
