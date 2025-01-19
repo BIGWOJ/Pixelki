@@ -86,9 +86,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $query = $queryNumerAlbumu;
         $query = $query . " AND n.numer = :numerAlbumu";
         $numerAlbumuTrue = true;
-//        scrapGrupyNumberAlbumu($pdo, $numerAlbumu);
-//        scrapNumerAlbumuGrupa($pdo, $numerAlbumu);
-//        scrapLekcjaNumberAlbumu($pdo, $numerAlbumu);
+        scrapGrupyNumberAlbumu($pdo, $numerAlbumu);
+        scrapNumerAlbumuGrupa($pdo, $numerAlbumu);
+        scrapLekcjaNumberAlbumu($pdo, $numerAlbumu);
     }
 
     if (!empty($wykladowca)){
@@ -96,8 +96,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
         $query = $query . " AND w.nazwisko = :nazwisko AND w.imie = :imie";
         $wykladowcaTrue = true;
-        //scrapGrupyWykladowca($pdo, $wykladowca);
-        //scrapLekcjaWykladowca($pdo, $wykladowca);
+        scrapGrupyWykladowca($pdo, $wykladowca);
+        scrapLekcjaWykladowca($pdo, $wykladowca);
     }
     if (!empty($sala)){
         list($wydzial, $pokoj) = explode(" ", $sala, 2);
@@ -110,8 +110,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     if (!empty($przedmiot)){
         $query = $query . " AND p.nazwa = :przedmiot";
         $przedmiotTrue = true;
-        //scrapGrupyPrzedmiot($pdo, $przedmiot);
-        //scrapLekcjaPrzedmiot($pdo, $przedmiot);
+        scrapGrupyPrzedmiot($pdo, $przedmiot);
+        scrapLekcjaPrzedmiot($pdo, $przedmiot);
     }
     if (!empty($grupa)){
         $query = $query . " AND g.nazwa = :grupa";

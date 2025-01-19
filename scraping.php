@@ -6,8 +6,12 @@ $dbPath = 'sqlite:./data.db';   // link do bazy danych
 
 $pdo = dbConnection($dbPath);   // polaczenie z baza danych*/
 
+
+ini_set('display_errors', '0');
+ini_set('log_errors', '1');
+error_reporting(E_ALL);
+
 function scrapWykladowca($pdo, $ssl_error=False, $clearTableCondition=True, $addToBase=True) {       // funkcja scrapowania danych do tabeli wykladowca, argument = zmienna laczenia z baza
-    try {
         $url = 'https://plan.zut.edu.pl/schedule.php?kind=teacher&query=';       // link do API
 
         if ($ssl_error) {
@@ -67,14 +71,10 @@ function scrapWykladowca($pdo, $ssl_error=False, $clearTableCondition=True, $add
             }
         }
 
-    } catch (PDOException $e) {
-        // echo "Blad polaczenia z API: " . $e -> getMessage();
-        exit();
-    }
 }
 
 function scrapWydzial($pdo, $ssl_error=False, $clearTableCondition=True, $addToBase=True) {       // funkcja scrapowania danych do tabeli wydzial, argument = zmienna laczenia z baza
-    try {
+
         $url = 'https://plan.zut.edu.pl/schedule.php?kind=room&query=';                              // link do API
 
         if ($ssl_error) {
@@ -141,14 +141,9 @@ function scrapWydzial($pdo, $ssl_error=False, $clearTableCondition=True, $addToB
 
         }
 
-    } catch (PDOException $e) {
-        // echo "Blad polaczenia z API: " . $e -> getMessage();
-        exit();
-    }
 }
 
 function scrapSala($pdo, $ssl_error=False, $clearTableCondition=True, $addToBase=True) {       // funkcja scrapowania danych do tabeli sala, argument = zmienna laczenia z baza
-    try {
         $url = 'https://plan.zut.edu.pl/schedule.php?kind=room&query=';                              // link do API
 
 
@@ -223,16 +218,9 @@ function scrapSala($pdo, $ssl_error=False, $clearTableCondition=True, $addToBase
 
 
         }
-
-    } catch (PDOException $e) {
-        // echo "Blad polaczenia z API: " . $e -> getMessage();
-        exit();
-    }
 }
 
 function scrapNumerAlbumu($pdo, $ssl_error=False, $clearTableCondition=True, $addToBase=True, $console_write=False) {
-    try {
-
         if ($clearTableCondition) {
             try {
                 $clearTable = $pdo->prepare("DELETE FROM numerAlbumu");
@@ -311,16 +299,10 @@ function scrapNumerAlbumu($pdo, $ssl_error=False, $clearTableCondition=True, $ad
                 exit();
             }
         }
-
-    } catch (PDOException $e) {
-        // echo "Blad polaczenia z API: " . $e -> getMessage();
-        exit();
-    }
 }
 
 //Funkcja poprawiająca numery albumu, usuwając te, które nie mają planu zajęć
 function poprawaNumerAlbumu($pdo, $ssl_error=False, $console_write=False, $start_index=1) {
-    try {
         //Pobranie wszystkich numerów albumów
         $sql = "SELECT numer FROM numerAlbumu";
         $statement = $pdo->prepare($sql);
@@ -372,15 +354,9 @@ function poprawaNumerAlbumu($pdo, $ssl_error=False, $console_write=False, $start
             // echo "Blad zapytania: " . $e -> getMessage();
             exit();
         }
-
-    } catch (PDOException $e) {
-        // echo "Blad polaczenia z API: " . $e -> getMessage();
-        exit();
-    }
 }
 
 function scrapPrzedmiot($pdo, $ssl_error=False, $clearTableCondition=True, $addToBase=True) {       // funkcja scrapowania danych do tabeli sala, argument = zmienna laczenia z baza
-    try {
         // przygotowywanie poprawnego linka do APi
 
         $sqlRoomsName = "SELECT w.nazwa, s.pokoj FROM sala s
@@ -478,16 +454,10 @@ function scrapPrzedmiot($pdo, $ssl_error=False, $clearTableCondition=True, $addT
                 }
             }
         }
-
-    } catch (PDOException $e) {
-        // echo "Blad polaczenia z API: " . $e -> getMessage();
-        exit();
-    }
 }
 
 // scrapGrupy bedzie tylko uzywana tylko w momencie wyszukania przez uzytkownika swojego numer albumu, wykladowcy, sali lub przedmiotu
 function scrapGrupyNumberAlbumu($pdo, $albumNumber, $ssl_error=False, $clearTableCondition=True, $addToBase=True) {
-    try {
         // przygotowywanie poprawnego linka do APi
 
         $sqlGroupsName = "SELECT nazwa from grupa";
@@ -583,11 +553,6 @@ function scrapGrupyNumberAlbumu($pdo, $albumNumber, $ssl_error=False, $clearTabl
                 }
             }
         }
-
-    } catch (PDOException $e) {
-        // echo "Blad polaczenia z API: " . $e -> getMessage();
-        exit();
-    }
 }
 
 function scrapGrupyWykladowca($pdo, $teacherName, $ssl_error=False, $clearTableCondition=True, $addToBase=True) {
@@ -692,7 +657,6 @@ function scrapGrupyWykladowca($pdo, $teacherName, $ssl_error=False, $clearTableC
 }
 
 function scrapGrupySala($pdo, $room, $ssl_error=False, $clearTableCondition=True, $addToBase=True) {
-    try {
         // przygotowywanie poprawnego linka do APi
 
         $sqlGroupsName = "SELECT nazwa from grupa";
@@ -790,15 +754,9 @@ function scrapGrupySala($pdo, $room, $ssl_error=False, $clearTableCondition=True
                 }
             }
         }
-
-    } catch (PDOException $e) {
-        // echo "Blad polaczenia z API: " . $e -> getMessage();
-        exit();
-    }
 }
 
 function scrapGrupyPrzedmiot($pdo, $subject, $ssl_error=False, $clearTableCondition=True, $addToBase=True) {
-    try {
         // przygotowywanie poprawnego linka do APi
 
         $sqlGroupsName = "SELECT nazwa from grupa";
@@ -896,15 +854,9 @@ function scrapGrupyPrzedmiot($pdo, $subject, $ssl_error=False, $clearTableCondit
                 }
             }
         }
-
-    } catch (PDOException $e) {
-        // echo "Blad polaczenia z API: " . $e -> getMessage();
-        exit();
-    }
 }
 
 function scrapGrupyGrupa($pdo, $group, $ssl_error=False, $clearTableCondition=True, $addToBase=True) {
-    try {
         // przygotowywanie poprawnego linka do APi
 
         $sqlGroupsName = "SELECT nazwa from grupa";
@@ -1002,16 +954,10 @@ function scrapGrupyGrupa($pdo, $group, $ssl_error=False, $clearTableCondition=Tr
                 }
             }
         }
-
-    } catch (PDOException $e) {
-        // echo "Blad polaczenia z API: " . $e -> getMessage();
-        exit();
-    }
 }
 
 // ta funkcja scrapuje wszystkie mozliwe grupy (nie wiem czy na pewno wszystkie)
 function scrapGrupyTest($pdo, $ssl_error=False, $clearTableCondition=True, $addToBase=True) {
-    try {
         // przygotowywanie poprawnego linka do APi
 
         $sqlGroupsName = "SELECT nazwa from grupa";
@@ -1108,15 +1054,9 @@ function scrapGrupyTest($pdo, $ssl_error=False, $clearTableCondition=True, $addT
                 }
             }
         }
-
-    } catch (PDOException $e) {
-        // echo "Blad polaczenia z API: " . $e -> getMessage();
-        exit();
-    }
 }
 
 function scrapLekcjaNumberAlbumu($pdo, $albumNumber, $ssl_error=False, $addToBase=True) {
-    try {
         // przygotowywanie poprawnego linka do APi
 
         $sqlLesson = "SELECT * from lekcja";
@@ -1300,11 +1240,6 @@ function scrapLekcjaNumberAlbumu($pdo, $albumNumber, $ssl_error=False, $addToBas
 
             }
         }
-
-    } catch (PDOException $e) {
-        // echo "Blad polaczenia z API: " . $e -> getMessage();
-        exit();
-    }
 }
 
 function scrapLekcjaWykladowca($pdo, $teacherName, $ssl_error=False, $addToBase=True) {
@@ -1498,7 +1433,6 @@ function scrapLekcjaWykladowca($pdo, $teacherName, $ssl_error=False, $addToBase=
 }
 
 function scrapLekcjaSala($pdo, $room, $ssl_error=False, $addToBase=True) {
-    try {
         // przygotowywanie poprawnego linka do APi
 
         $sqlLesson = "SELECT * from lekcja";
@@ -1685,15 +1619,9 @@ function scrapLekcjaSala($pdo, $room, $ssl_error=False, $addToBase=True) {
 
             }
         }
-
-    } catch (PDOException $e) {
-        // echo "Blad polaczenia z API: " . $e -> getMessage();
-        exit();
-    }
 }
 
 function scrapLekcjaPrzedmiot($pdo, $subject, $ssl_error=False, $addToBase=True) {
-    try {
         // przygotowywanie poprawnego linka do APi
 
         $sqlLesson = "SELECT * from lekcja";
@@ -1878,15 +1806,9 @@ function scrapLekcjaPrzedmiot($pdo, $subject, $ssl_error=False, $addToBase=True)
 
             }
         }
-
-    } catch (PDOException $e) {
-        // echo "Blad polaczenia z API: " . $e -> getMessage();
-        exit();
-    }
 }
 
 function scrapLekcjaGrupa($pdo, $group, $ssl_error=False, $addToBase=True) {
-    try {
         // przygotowywanie poprawnego linka do APi
 
         $sqlLesson = "SELECT * from lekcja";
@@ -2072,15 +1994,9 @@ function scrapLekcjaGrupa($pdo, $group, $ssl_error=False, $addToBase=True) {
 
             }
         }
-
-    } catch (PDOException $e) {
-        // echo "Blad polaczenia z API: " . $e -> getMessage();
-        exit();
-    }
 }
 
 function scrapNumerAlbumuGrupa($pdo, $albumNumber, $ssl_error=False, $addToBase=True) {
-    try {
         // przygotowywanie poprawnego linka do APi
 
         $sqlGroupsName = "SELECT g.nazwa, na.numer from NumerAlbumuGrupa n
@@ -2192,11 +2108,6 @@ function scrapNumerAlbumuGrupa($pdo, $albumNumber, $ssl_error=False, $addToBase=
                 }
             }
         }
-
-    } catch (PDOException $e) {
-        // echo "Blad polaczenia z API: " . $e -> getMessage();
-        exit();
-    }
 }
 
 
