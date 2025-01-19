@@ -26,7 +26,7 @@ document.querySelector(".cellAdd").addEventListener("click", (e)  => {
     cellContainerDelete.style.display = "none";
     cellContainerEdit.style.display = "none"
     cellContainerEditEdit.style.display = "none"
-    clear_tiles_calendar();
+    
 });
 
 document.addEventListener("click", () => {
@@ -93,7 +93,7 @@ document.querySelector(".cellDelete").addEventListener("click", (e)  => {
     cellContainer.style.display = "none";
     cellContainerEdit.style.display = "none"
     cellContainerEditEdit.style.display = "none"
-    clear_tiles_calendar();
+    
 });
 
 document.addEventListener("click", () => {
@@ -180,7 +180,7 @@ document.querySelector(".cellEdit").addEventListener("click", (e)  => {
     cellContainer.style.display = "none";
     cellContainerEdit.style.display = "block"
     cellContainerEditEdit.style.display = "none"
-    clear_tiles_calendar();
+    
 });
 
 document.addEventListener("click", () => {

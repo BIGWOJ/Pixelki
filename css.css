@@ -602,6 +602,7 @@ footer {
     text-align: center;
     padding-top: 0px;
     display: none;
+    z-index: 100;
 }
 
 .cellDateTime, .cellDescription, .cellName{
@@ -678,6 +679,7 @@ footer {
     text-align: center;
     padding-top: 0px;
     display: none;
+    z-index: 100;
 }
 
 .cellTile, .cellTileEdit {
@@ -713,6 +715,7 @@ footer {
     text-align: center;
     padding-top: 0px;
     display: none;
+    z-index: 100;
 }
 
 #cellEdit {
@@ -751,24 +754,6 @@ footer {
     width: 33%;
 }
 
-.cellContainer {
-    box-sizing: border-box;
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    background-color: var(--color_beige);
-    border: 2px solid var(--color_primary);
-    border-radius: 15px;
-    padding: 20px;
-    width: 90%;
-    max-width: 400px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    text-align: center;
-    padding-top: 0px;
-    display: none;
-}
-
 .cellDateTime, .cellDescription, .cellName{
     text-align: left;
 }
@@ -783,14 +768,6 @@ footer {
     font-size: 0.9em;
     margin-bottom: 5px;
     font-weight: bold;
-}
-
-.cellContainer[type="text"], .cellContainer textarea {
-    width: 95%;
-    padding: 10px;
-    font-size: 1em;
-    border: 1px solid var(--color_primary);
-    border-radius: 5px;
 }
 
 .cellTimeInputs {
@@ -827,23 +804,6 @@ footer {
     width: 90%;
 }
 
-.cellContainerDelete {
-    box-sizing: border-box;
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    background-color: var(--color_beige);
-    border: 2px solid var(--color_primary);
-    border-radius: 15px;
-    padding: 20px;
-    width: 90%;
-    max-width: 400px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    text-align: center;
-    padding-top: 0px;
-    display: none;
-}
 
 .cellTile, .cellTileEdit {
     display: flex;
@@ -860,24 +820,6 @@ footer {
     background-color: transparent;
     border: none;
     cursor: pointer;
-}
-
-.cellContainerEdit {
-    box-sizing: border-box;
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    background-color: var(--color_beige);
-    border: 2px solid var(--color_primary);
-    border-radius: 15px;
-    padding: 20px;
-    width: 90%;
-    max-width: 400px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    text-align: center;
-    padding-top: 0px;
-    display: none;
 }
 
 #cellEdit {
@@ -902,32 +844,7 @@ footer {
     text-align: center;
     padding-top: 0px;
     display: none;
-}
-
-.cellContainerEditEdit[type="text"], .cellContainerEditEdit textarea {
-    width: 95%;
-    padding: 10px;
-    font-size: 1em;
-    border: 1px solid var(--color_primary);
-    border-radius: 5px;
-}
-
-.cellContainerEditEdit {
-    box-sizing: border-box;
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    background-color: var(--color_beige);
-    border: 2px solid var(--color_primary);
-    border-radius: 15px;
-    padding: 20px;
-    width: 90%;
-    max-width: 400px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    text-align: center;
-    padding-top: 0px;
-    display: none;
+    z-index: 100;
 }
 
 .cellContainerEditEdit[type="text"], .cellContainerEditEdit textarea {
@@ -954,6 +871,32 @@ footer {
     box-sizing: border-box;
     color: white;
 }
+
+/*.tile-info {
+    position: absolute;
+    background-color: #333;
+    color: white;
+    padding: 8px 12px;
+    border-radius: 5px;
+    font-size: 14px;
+    visibility: hidden;
+    opacity: 0;
+    transition: opacity 0.2s;
+    z-index: 100;
+    max-width: 250px;
+}*/
+
+.tile-info {
+    background-color: var(--color_beige);
+    position: absolute;
+    padding: 10px;
+    border: 2px solid var(--color_primary);
+    border-radius: 15px;
+    text-align: center;
+}
+
+
+
 
 /*Zmiana motywu respektując ustawiony motyw systemowy/przeglądarkowy użytkownika*/
 /*@media (prefers-color-scheme: dark) {*/
