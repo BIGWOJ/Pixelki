@@ -292,26 +292,16 @@ function show_tiles(){
                     let hour = timeStart.getHours();
                     let minute = timeStart.getMinutes();
                     let timeEnd = new Date(index["koniec"]);
-                    let roznica = (timeEnd - timeStart) / 1000 / 60;
                     let text = timeStart.getHours() + ":" + timeStart.getMinutes() + " - " + timeEnd.getHours() + ":" + timeEnd.getMinutes() + "\n" + index["tytul"];
 
-                    //const dataTD = document.querySelectorAll(".calendar_view tbody tr td:nth-child(2)");
                     current_lesson_day = index["start"].split("T")[0].split("-")[2];
                     previous_lesson_day = data[i-1] ? data[i-1]["start"].split("T")[0].split("-")[2] : null;
-                    console.log(current_lesson_day, previous_lesson_day);
 
                     //Przesunięcie kafelka o dzień
                     if (current_lesson_day !== previous_lesson_day && previous_lesson_day !== null) {
                         jump_day += 840;
                     }
-                    else {
-
-                    }
-                    //start 6:60, przesunięcie o dzień +840 minut
-                    // console.log(timeStart);
-                    // console.log(`Dodanie kafelka ${hour}:${minute} ${roznica} 1 ${text} ${index["formaZajec"]}`);
                     add_tile_calendar(6, (hour-6)*60+minute+jump_day, 90, 1, text, index["formaZajec"]);
-                    //add_tile_calendar(6, 900, 90, 1, text, index["formaZajec"]);
                 }
             }
 
@@ -982,6 +972,32 @@ document.querySelector(".calendar_range button:nth-child(3)").addEventListener("
 
     let new_range;
 
+    document.querySelector(".calendar_view").addEventListener("click", (event) => {
+    const table = event.currentTarget;
+    const row = table.rows[4]; // 5th row (index 4)
+    const cell = row.cells[2]; // 3rd column (index 2)
+    if (event.target === cell) {
+        cell.classList.add("highlight");
+        const tooltip = document.createElement("div");
+        tooltip.style.position = "absolute";
+        tooltip.classList.add("tooltip");
+        tooltip.innerText = "Treść okna";
+        document.body.appendChild(tooltip);
+        const rect = cell.getBoundingClientRect();
+        tooltip.style.left = `${rect.left + window.scrollX}px`;
+        tooltip.style.top = `${rect.top + window.scrollY}px`;
+        tooltip.style.height = '100px';
+        tooltip.style.width = '100px';
+        tooltip.style.backgroundColor = 'red';
+
+    } else {
+        cell.classList.remove("highlight");
+        const tooltip = document.querySelector(".tooltip");
+        if (tooltip) {
+            tooltip.remove();
+        }
+    }
+});
     // Widok dzisiaj
     if ( row_count === 14 && column_count === 2) {
         [new_range, table_header] = set_calendar_head(row_count, column_count, table, true);

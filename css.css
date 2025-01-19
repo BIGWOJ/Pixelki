@@ -305,10 +305,22 @@ i {
     border-radius: 4px;
 }
 
+.highlight {
+    background-color: var(--color_primary);
+    color: var(--color_black);
+    border-style: solid;
+    border-color: var(--color_beige);
+    border-radius: 4px;
+}
 .navigation button:hover {
     background-color: var(--color_primary);
     color: var(--color_beige);
 }
+
+/*.calendar, #semestralny {*/
+/*    max-height: 70vh;*/
+/*    overflow-y: auto;*/
+/*}*/
 
 .calendar_range {
     display: flex;
@@ -513,6 +525,7 @@ footer {
 }
 
 @media (min-width: 768px) {
+    overflow-y: hidden;
     .body {
 
     }
@@ -533,9 +546,11 @@ footer {
     main {
         flex-direction: column;
     }
+    overflow-y: hidden;
 }
 
 @media (max-width: 450px) {
+    overflow-y: hidden;
     header {
         flex-direction: column;
         align-items: center;
