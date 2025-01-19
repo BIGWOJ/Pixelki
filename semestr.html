@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Kalendarz-Semestr</title>
+    <link rel="stylesheet" href="css.css">
+</head>
+<body>
+
+    <div class="semestr-now">
+      <label>Semestr Zimowy</label>
+      <span id="semestr-zimowy-date"></span>
+      </br>
+      <label>Semestr Letni</label>
+      <span id="semestr-letni-date"></span>
+    </div>
+
+
+
+    <div class="semestr-container">
+
+      <label>Wybierz semestr</label>
+
+      <select id="semestr-select">
+        <option value=""></option>
+        <option value="Semestr letni">Semestr letni</option>
+        <option value="Semestr zimowy">Semestr zimowy</option>
+      </select>
+
+      <label>Początek Semestru</label>
+      <input type="date" id="semestr-start">
+      <label>Koniec Semestru</label>
+      <input type="date" id="semestr-end">
+      <button id="semestr-submit">Zmień</button>
+    </div>
+
+    <script src="semestr.js"></script>
+</body>
+</html>
