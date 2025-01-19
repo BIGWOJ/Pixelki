@@ -8,12 +8,18 @@ const addToFavoritesBtn = document.getElementById('add-to-favorites');
 let currentFilter = {};
 let favorites = loadFavorites();
 
+
 //Ulubione ikona serduszka
 heartIcon.addEventListener('click', () => {
-    console.log('Ulubione');
+    //console.log('Ulubione');
     if (favoritesModal.style.display === 'none' || !favoritesModal.style.display) {
         favoritesModal.style.display = 'block';
-    } else {
+    }
+});
+
+//Zamykanie okna ulubionych po kliknięciu poza jego obszar
+document.addEventListener('click', (event) => {
+    if (!favoritesModal.contains(event.target) && event.target !== heartIcon) {
         favoritesModal.style.display = 'none';
     }
 });

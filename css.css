@@ -264,6 +264,10 @@ i {
     gap: 16px;
 }
 
+.theme-buttons {
+    display: flex;
+    align-items: center;
+}
 
 header .theme-buttons button {
     background-color: var(--color_beige);
@@ -463,16 +467,6 @@ main {
     color: white;
 }
 
-@media (max-width: 400px) {
-    .legend {
-        flex-direction: column;
-    }
-
-    .legend-item {
-        max-width: 100%;
-    }
-}
-
 #legend-audytorium, #statistics-audytorium {
     background-color: var(--color_audytorium);
     border: 1px solid var(--color_audytorium);
@@ -526,47 +520,6 @@ footer {
     background-color: var(--color_primary);
     position: fixed;
     bottom: 0;
-}
-
-@media (min-width: 768px) {
-    overflow-y: hidden;
-    .body {
-
-    }
-    .navigation {
-        gap: 30px;
-    }
-
-    main {
-        flex-direction: row;
-    }
-
-    .filters {
-        margin-top: 0;
-    }
-}
-
-@media (max-width: 767px) {
-    main {
-        flex-direction: column;
-    }
-    overflow-y: hidden;
-}
-
-@media (max-width: 450px) {
-    overflow-y: hidden;
-    header {
-        flex-direction: column;
-        align-items: center;
-        gap: 15px;
-    }
-
-    .theme-buttons {
-        display: flex;
-        gap: 10px;
-        flex-direction: column;
-        width: 100%;
-    }
 }
 
 .cells-buttons {
@@ -908,36 +861,61 @@ footer {
     align-items: center;
 }
 
+@media (min-width: 768px) {
+    overflow-y: hidden;
+    .body {
 
+    }
+    .navigation {
+        gap: 30px;
+    }
 
-/*Zmiana motywu respektując ustawiony motyw systemowy/przeglądarkowy użytkownika*/
-/*@media (prefers-color-scheme: dark) {*/
-/*    :root {*/
-/*        --color_primary: #7e9f60;*/
-/*        --color_secondary: #006fe6;*/
-/*        --color_white: #333;*/
-/*        --color_black: #f8f9fa;*/
-/*        --color_beige: #737373;*/
-/*        --color_border_gray: #a6a6a6;*/
-/*    }*/
+    main {
+        flex-direction: row;
+    }
 
-/*    .dark {*/
-/*        --color_primary: #7e9f60;*/
-/*        --color_secondary: #006fe6;*/
-/*        --color_white: #333;*/
-/*        --color_black: #f8f9fa;*/
-/*        --color_beige: #737373;*/
-/*        --color_border_gray: #a6a6a6;*/
-/*    }*/
+    .filters {
+        margin-top: 0;
+    }
+}
 
-/*    body {*/
-/*        --color_black: #f8f9fa;*/
-/*        --color_white: #333;*/
-/*        --color_beige: #737373;*/
-/*        --color_border_gray: #a6a6a6;*/
-/*    }*/
+@media (max-width: 767px) {
+    main {
+        flex-direction: column;
+    }
+    overflow-y: hidden;
+}
 
-/*    .filters button {*/
-/*        color: var(--color_black);*/
-/*    }*/
-/*}*/
+@media (max-width: 620px) {
+    header {
+        flex-direction: column;
+        align-items: center;
+        gap: 15px;
+    }
+}
+
+@media (max-width: 450px) {
+    overflow-y: hidden;
+    header {
+        flex-direction: column;
+        align-items: center;
+        gap: 15px;
+    }
+
+    .theme-buttons {
+        display: flex;
+        gap: 10px;
+        flex-direction: column;
+        width: 100%;
+    }
+}
+
+@media (max-width: 400px) {
+    .legend {
+        flex-direction: column;
+    }
+
+    .legend-item {
+        max-width: 100%;
+    }
+}
