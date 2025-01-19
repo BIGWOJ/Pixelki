@@ -259,7 +259,7 @@ function show_tiles(){
         .then(data => {
             //Posortowanie zajęć według godziny zaczęcia
             data.sort((a, b) => new Date(a.start) - new Date(b.start));
-            //console.log(data);
+            console.log(data);
 
             if (calendar.id === "dzisiejszy") {
                     data.forEach(function(index){
