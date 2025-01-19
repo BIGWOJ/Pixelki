@@ -284,8 +284,8 @@ function show_tiles(){
                 }
 
             else if (calendar.id === "dzienny") {
-                let current_lesson_day, next_lesson_day;
-                let jump_hour = 0;
+                let current_lesson_day, previous_lesson_day;
+                let jump_day = 0;
                 for (let i = 0; i < data.length; i++) {
                     let index = data[i];
                     let timeStart = new Date(index["start"]);
@@ -297,18 +297,21 @@ function show_tiles(){
 
                     //const dataTD = document.querySelectorAll(".calendar_view tbody tr td:nth-child(2)");
                     current_lesson_day = index["start"].split("T")[0].split("-")[2];
-                    next_lesson_day = data[i+1] ? data[i+1]["start"].split("T")[0].split("-")[2] : null;
-                    // console.log(current_lesson_day, next_lesson_day);
-                    //console.log(document.querySelector(".calendar_view").innerHTML);
-                    if (current_lesson_day !== next_lesson_day) {
-                        // console.log("Jestem w ifie");
+                    previous_lesson_day = data[i-1] ? data[i-1]["start"].split("T")[0].split("-")[2] : null;
+                    console.log(current_lesson_day, previous_lesson_day);
+
+                    //Przesunięcie kafelka o dzień
+                    if (current_lesson_day !== previous_lesson_day && previous_lesson_day !== null) {
+                        jump_day += 840;
                     }
                     else {
 
                     }
+                    //start 6:60, przesunięcie o dzień +840 minut
                     // console.log(timeStart);
                     // console.log(`Dodanie kafelka ${hour}:${minute} ${roznica} 1 ${text} ${index["formaZajec"]}`);
-                    add_tile_calendar(6, (hour-6)*60+minute, 90, 1, text, index["formaZajec"]);
+                    add_tile_calendar(6, (hour-6)*60+minute+jump_day, 90, 1, text, index["formaZajec"]);
+                    //add_tile_calendar(6, 900, 90, 1, text, index["formaZajec"]);
                 }
             }
 
@@ -861,7 +864,7 @@ function get_table_tile_dimensions(row, column) {
 function add_tile_calendar(hour_start, minutes_start, minutes_duration, column, text, form) {
     const row = hour_start - 6;
     const dims = get_table_tile_dimensions(row, column);
-    console.log(dims);
+    //console.log(dims);
     let tile_upper_line = minutes_start / 60;
     tile_upper_line *= dims.height;
 
