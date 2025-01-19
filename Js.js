@@ -177,8 +177,32 @@ document.querySelector(".filter-buttons button:nth-child(1)").addEventListener("
     show_tiles();
 });
 
+
+let laboratoriumNumber;
+let wykladNumber;
+let lektoratNumber;
+let audytoriumNumber;
+let projektNumber;
+let konsultacjeNumber;
+let wlasnyKafelekNumber;
+
+resetStatistics();
+
+
+function resetStatistics() {
+    laboratoriumNumber = 0;
+    wykladNumber = 0;
+    lektoratNumber = 0;
+    audytoriumNumber = 0;
+    projektNumber = 0;
+    konsultacjeNumber = 0;
+    wlasnyKafelekNumber = 0;
+}
+
 function show_tiles(){
     clear_tiles_calendar();
+
+
     const wykladowca = document.getElementById("lecturer").value;
     const sala = document.getElementById("room").value;
     const przedmiot = document.getElementById("subject").value;
@@ -187,6 +211,13 @@ function show_tiles(){
     const forma = document.getElementById("forma-zajec").value;
 
     if (wykladowca.length === 0 && sala.length === 0 && przedmiot.length === 0 && grupa.length === 0 && numerAlbumu.length === 0 && forma.length === 0) {
+        resetStatistics();
+        showStatistics();
+        return;
+    }
+    if (forma === "konsultacje" && (sala.length != 0 || przedmiot.length != 0 || grupa.length != 0 || numerAlbumu.length != 0)){
+        resetStatistics();
+        showStatistics();
         return;
     }
 
@@ -247,7 +278,6 @@ function show_tiles(){
 
     }
 
-
     fetch("process.php", {
         method: 'POST',
         headers: {
@@ -275,6 +305,17 @@ function show_tiles(){
                         let text = timeStart.getHours() + ":" + timeStart.getMinutes() + " - " + timeEnd.getHours() + ":" + timeEnd.getMinutes()
                             + "\n" + index["tytul"];
 
+                        // zliczanie do statystyk
+                        if (index["formaZajec"] === "laboratorium") laboratoriumNumber++;
+                        else if (index["formaZajec"] === "wykład") wykladNumber++;
+                        else if (index["formaZajec"] === "lektorat") lektoratNumber++;
+                        else if (index["formaZajec"] === "audytoryjne") audytoriumNumber++;
+                        else if (index["formaZajec"] === "projekt") projektNumber++;
+                        else if (index["formaZajec"] === "własnyKafelek") wlasnyKafelekNumber++;
+                        else if (index["opis"].includes("Konsultacje")) konsultacjeNumber++;
+                        //
+
+
                         const dataTD = document.querySelectorAll(".calendar_view tbody tr td:nth-child(2)");
                         dataTD.forEach(function(indexTH, indexNum){
                             add_tile_calendar(hour, minute, roznica, 1, text, index["formaZajec"]);
@@ -296,6 +337,16 @@ function show_tiles(){
 
                     current_lesson_day = index["start"].split("T")[0].split("-")[2];
                     previous_lesson_day = data[i-1] ? data[i-1]["start"].split("T")[0].split("-")[2] : null;
+
+                    // zliczanie do statystyk
+                    if (index["formaZajec"] === "laboratorium") laboratoriumNumber++;
+                    else if (index["formaZajec"] === "wykład") wykladNumber++;
+                    else if (index["formaZajec"] === "lektorat") lektoratNumber++;
+                    else if (index["formaZajec"] === "audytoryjne") audytoriumNumber++;
+                    else if (index["formaZajec"] === "projekt") projektNumber++;
+                    else if (index["formaZajec"] === "własnyKafelek") wlasnyKafelekNumber++;
+                    else if (index["opis"].includes("Konsultacje")) konsultacjeNumber++;
+                    //
 
                     //Przesunięcie kafelka o dzień
                     if (current_lesson_day !== previous_lesson_day && previous_lesson_day !== null) {
@@ -320,6 +371,16 @@ function show_tiles(){
                     let text = timeStart.getHours() + ":" + timeStart.getMinutes() + " - " + timeEnd.getHours() + ":" + timeEnd.getMinutes()
                         + "\n" + index["tytul"];
 
+                    // zliczanie do statystyk
+                    if (index["formaZajec"] === "laboratorium") laboratoriumNumber++;
+                    else if (index["formaZajec"] === "wykład") wykladNumber++;
+                    else if (index["formaZajec"] === "lektorat") lektoratNumber++;
+                    else if (index["formaZajec"] === "audytoryjne") audytoriumNumber++;
+                    else if (index["formaZajec"] === "projekt") projektNumber++;
+                    else if (index["formaZajec"] === "własnyKafelek") wlasnyKafelekNumber++;
+                    else if (index["opis"].includes("Konsultacje")) konsultacjeNumber++;
+                    //
+
                     const dataTH = document.querySelectorAll(".calendar_view thead th");
 
                     dataTH.forEach(function(indexTH, indexNum){
@@ -338,7 +399,9 @@ function show_tiles(){
                 });
             }
 
+            showStatistics();
         })
+
 
 
 
@@ -378,21 +441,39 @@ function show_tiles(){
 
                         if (Number(dataKafelek) === Number(part)){
                             add_tile_calendar(hour, minute, roznica, indexNum, text, "własnyKafelek");
+                            wlasnyKafelekNumber++;
                         }
                     }
                 })
             }
             else if (calendar.id === "dzisiejszy" && indexUlub["date"] === dataStart) {
                 dataTD.forEach(function(indexTH){
-                    add_tile_calendar(hour, minute, roznica, 1, text, "własnyKafelek");
+                    let hourCheck = indexTH.previousElementSibling;
+                    if (hourCheck.textContent === hour) {
+                        add_tile_calendar(hour, minute, roznica, 1, text, "własnyKafelek");
+                        wlasnyKafelekNumber++;
+                    }
                 })
             }
 
         });
     }
 
+
+    document.getElementById("statistics-wlasny-kafelek-number").textContent = wlasnyKafelekNumber.toString();
+    resetStatistics();
 }
 
+function showStatistics(){
+    const statistics = document.getElementById("statistics");
+    statistics.style.display = "flex";
+    document.getElementById("statistics-laboratorium-number").textContent = laboratoriumNumber.toString();
+    document.getElementById("statistics-wyklad-number").textContent = wykladNumber.toString();
+    document.getElementById("statistics-lektorat-number").textContent = lektoratNumber.toString();
+    document.getElementById("statistics-audytorium-number").textContent = audytoriumNumber.toString();
+    document.getElementById("statistics-projekt-number").textContent = projektNumber.toString();
+    document.getElementById("statistics-konsultacje-number").textContent = konsultacjeNumber.toString();
+}
 //Czyszczenie inputów filtrów po kliknięciu w przycisk "Wyczyść"
 document.querySelector(".filter-buttons button:nth-child(2)").addEventListener("click", () => {
     let filter_inputs = document.querySelectorAll(".filters input");
@@ -434,7 +515,7 @@ document.querySelector("#today_button").addEventListener("click", () => {
     const calendar = document.querySelector('.calendar');
     calendar.style.height = `70vh`;
     calendar.id = "dzisiejszy";
-    show_tiles()
+    show_tiles();
 });
 
 //Dzienny widok kalendarza
