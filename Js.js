@@ -299,11 +299,22 @@ function show_tiles(){
 
                         let timeEnd = new Date(index["koniec"]);
 
+                        let timeEndMinutes;
+                        if (timeEnd.getMinutes() === Number(0)) {
+                            timeEndMinutes = "00";
+                        }
+                        else {
+                            timeEndMinutes = timeEnd.getMinutes();
+                        }
+
                         let roznica = timeEnd - timeStart;
                         roznica = roznica / 1000 / 60;
 
-                        let text = timeStart.getHours() + ":" + timeStart.getMinutes() + " - " + timeEnd.getHours() + ":" + timeEnd.getMinutes()
+                        let text = timeStart.getHours() + ":" + timeStart.getMinutes() + " - " + timeEnd.getHours() + ":" + timeEndMinutes
                             + "\n" + index["tytul"];
+                        let info = index["tytul"] + "\n" + "Prowadzący: " + index["imie"] + " " + index["nazwisko"] + "\n" + "Sala: " + index["3"]
+                            + " " + index["pokoj"] + "\n" + "Grupa: " + index["grupa"] + "\n" + index["formaZajec"];
+
 
                         // zliczanie do statystyk
                         if (index["formaZajec"] === "laboratorium") laboratoriumNumber++;
@@ -318,7 +329,7 @@ function show_tiles(){
 
                         const dataTD = document.querySelectorAll(".calendar_view tbody tr td:nth-child(2)");
                         dataTD.forEach(function(indexTH, indexNum){
-                            add_tile_calendar(hour, minute, roznica, 1, text, index["formaZajec"]);
+                            add_tile_calendar(hour, minute, roznica, 1, text, index["formaZajec"], info);
                         })
 
                     });
@@ -333,7 +344,19 @@ function show_tiles(){
                     let hour = timeStart.getHours();
                     let minute = timeStart.getMinutes();
                     let timeEnd = new Date(index["koniec"]);
-                    let text = timeStart.getHours() + ":" + timeStart.getMinutes() + " - " + timeEnd.getHours() + ":" + timeEnd.getMinutes() + "\n" + index["tytul"];
+                    let timeEndMinutes;
+                    if (timeEnd.getMinutes() === Number(0)) {
+                        timeEndMinutes = "00";
+                    }
+                    else {
+                        timeEndMinutes = timeEnd.getMinutes();
+                    }
+
+
+                    let text = timeStart.getHours() + ":" + timeStart.getMinutes() + " - " + timeEnd.getHours() + ":" + timeEndMinutes
+                        + "\n" + index["tytul"];
+                    let info = index["tytul"] + "\n" + "Prowadzący: " + index["imie"] + " " + index["nazwisko"] + "\n" + "Sala: " + index["3"]
+                        + " " + index["pokoj"] + "\n" + "Grupa: " + index["grupa"] + "\n" + index["formaZajec"];
 
                     current_lesson_day = index["start"].split("T")[0].split("-")[2];
                     previous_lesson_day = data[i-1] ? data[i-1]["start"].split("T")[0].split("-")[2] : null;
@@ -352,7 +375,7 @@ function show_tiles(){
                     if (current_lesson_day !== previous_lesson_day && previous_lesson_day !== null) {
                         jump_day += 840;
                     }
-                    add_tile_calendar(6, (hour-6)*60+minute+jump_day, 90, 1, text, index["formaZajec"]);
+                    add_tile_calendar(6, (hour-6)*60+minute+jump_day, 90, 1, text, index["formaZajec"], info);
                 }
             }
 
@@ -364,12 +387,23 @@ function show_tiles(){
                     let minute = timeStart.getMinutes();
 
                     let timeEnd = new Date(index["koniec"]);
+                    console.log(timeEnd.getMinutes());
+
+                    let timeEndMinutes;
+                    if (timeEnd.getMinutes() === Number(0)) {
+                        timeEndMinutes = "00";
+                    }
+                    else {
+                        timeEndMinutes = timeEnd.getMinutes();
+                    }
 
                     let roznica = timeEnd - timeStart;
                     roznica = roznica / 1000 / 60;
 
-                    let text = timeStart.getHours() + ":" + timeStart.getMinutes() + " - " + timeEnd.getHours() + ":" + timeEnd.getMinutes()
+                    let text = timeStart.getHours() + ":" + timeStart.getMinutes() + " - " + timeEnd.getHours() + ":" + timeEndMinutes
                         + "\n" + index["tytul"];
+                    let info = index["tytul"] + "\n" + "Prowadzący: " + index["imie"] + " " + index["nazwisko"] + "\n" + "Sala: " + index["3"]
+                        + " " + index["pokoj"] + "\n" + "Grupa: " + index["2"] + "\n" + index["formaZajec"];
 
                     // zliczanie do statystyk
                     if (index["formaZajec"] === "laboratorium") laboratoriumNumber++;
@@ -389,7 +423,7 @@ function show_tiles(){
                             let part = str.split(' ')[1].split('.')[0];
 
                             if (timeStart.getDate() === Number(part)){
-                                add_tile_calendar(hour, minute, roznica, indexNum, text, index["formaZajec"]);
+                                add_tile_calendar(hour, minute, roznica, indexNum, text, index["formaZajec"], info);
                             }
                         }
 
@@ -440,7 +474,7 @@ function show_tiles(){
                         let part = str.split(' ')[1].split('.')[0];
 
                         if (Number(dataKafelek) === Number(part)){
-                            add_tile_calendar(hour, minute, roznica, indexNum, text, "własnyKafelek");
+                            add_tile_calendar(hour, minute, roznica, indexNum, text, "własnyKafelek", text);
                             wlasnyKafelekNumber++;
                         }
                     }
@@ -450,7 +484,7 @@ function show_tiles(){
                 dataTD.forEach(function(indexTH){
                     let hourCheck = indexTH.previousElementSibling;
                     if (hourCheck.textContent === hour) {
-                        add_tile_calendar(hour, minute, roznica, 1, text, "własnyKafelek");
+                        add_tile_calendar(hour, minute, roznica, 1, text, "własnyKafelek", text);
                         wlasnyKafelekNumber++;
                     }
                 })
@@ -932,7 +966,7 @@ function get_table_tile_dimensions(row, column) {
 
 //Funkcja do dodawania kafelka do kalendarza
 //input: godzina startu, minuty startu, minuty trwania, nr_kolumny (od 1), tekst, forma zajec
-function add_tile_calendar(hour_start, minutes_start, minutes_duration, column, text, form) {
+function add_tile_calendar(hour_start, minutes_start, minutes_duration, column, text, form, infoText) {
     const row = hour_start - 6;
     const dims = get_table_tile_dimensions(row, column);
     //console.log(dims);
@@ -972,6 +1006,28 @@ function add_tile_calendar(hour_start, minutes_start, minutes_duration, column, 
         else {
             tile.style.backgroundColor = 'var(--color_konsultacje)';
         }
+
+        const info = document.createElement("div");
+
+        tile.addEventListener('mouseenter', () => {
+            info.className = "tile-info";
+            info.innerText = infoText;
+            info.style.visibility = "visible";
+            info.style.opacity = "1";
+
+            document.body.appendChild(info);
+        });
+
+        tile.addEventListener('mousemove', (e) => {
+            info.style.top = `${e.pageY + 10}px`;
+            info.style.left = `${e.pageX + 10}px`;
+        });
+
+        tile.addEventListener('mouseleave', () => {
+            document.body.removeChild(info);
+        });
+
+
 
         document.body.appendChild(tile);
 
