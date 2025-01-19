@@ -1,11 +1,6 @@
 //Zmienne odnoszczące się do zmiany motywu strony
 let theme = localStorage.getItem("theme");
 let current_year_read = false;
-let semestrLetniStart;
-let semestrLetniKoniec;
-
-let semestrZimowyStart;
-let semestrZimowyKoniec;
 
 //Funkcja do zwracania tablicy dat w headzie kalendarza
 function get_dates(year_input=true) {
@@ -117,7 +112,8 @@ document.addEventListener("DOMContentLoaded", () => {
     // Kalendarz jako tydzien na wejsciu
     calendarStart();
 
-    getSemestrDates();
+    // testowanie
+    //add_tile_calendar(9, 0, 90, 1, "test");
 });
 
 //Zmiana motywu strony
@@ -203,9 +199,23 @@ function resetStatistics() {
     wlasnyKafelekNumber = 0;
 }
 
+function valid_inputs(lecturer, room, subject, group, index_number) {
+    const text_format = /^[a-zA-Z\s]+$/;
+    const number_format = /^[0-9]{1,5}$/;
+    const group_format = /^[a-zA-Z0-9\sąćęłńóśźżĄĆĘŁŃÓŚŹŻ_+.\-\/]+$/;
+    const sql_test = /\bdrop\b|\btable\b|\bselect\b|\bfrom\b/i;
+
+    if (lecturer && (!text_format.test(lecturer) || sql_test.test(lecturer))) return false;
+    if (room && (!text_format.test(room) || sql_test.test(room))) return false;
+    if (subject && (!text_format.test(subject) || sql_test.test(subject))) return false;
+    if (group && (!group_format.test(group) || sql_test.test(group))) return false;
+    if (index_number && (!number_format.test(index_number))) return false;
+
+    return true;
+}
+
 function show_tiles(){
     clear_tiles_calendar();
-
 
     const wykladowca = document.getElementById("lecturer").value;
     const sala = document.getElementById("room").value;
@@ -213,6 +223,12 @@ function show_tiles(){
     const grupa = document.getElementById("group").value;
     const numerAlbumu = document.getElementById("album-number").value;
     const forma = document.getElementById("forma-zajec").value;
+
+    //Walidacja danych wejściowych
+    if (!valid_inputs(wykladowca, sala, przedmiot, grupa, numerAlbumu, forma)) {
+        alert("Wprowadź poprawne dane");
+        return;
+    }
 
     if (wykladowca.length === 0 && sala.length === 0 && przedmiot.length === 0 && grupa.length === 0 && numerAlbumu.length === 0 && forma.length === 0) {
         resetStatistics();
@@ -730,7 +746,7 @@ document.querySelector("#month_button").addEventListener("click", () => {
 
 //Semestralny widok kalendarza
 document.querySelector("#semester_button").addEventListener("click", () => {
-/*    initialize_date_range(semester=true);
+    initialize_date_range(semester=true);
     const table = document.querySelector(".calendar_view");
 
     //Head semestralnego widoku
@@ -766,51 +782,6 @@ document.querySelector("#semester_button").addEventListener("click", () => {
     table.innerHTML = semester_header + semester_body;
     const calendar = document.querySelector('.calendar');
     calendar.style.height = `80vh`;
-    calendar.id = "semestralny";
-    show_tiles();*/
-
-    initialize_date_range(semester=true);
-    const table = document.querySelector(".calendar_view");
-    let connected_table = '';
-    //let lesson_hours = ['8:30 - 10:00', '10:15 - 12:00', '14:15 - 16:00', '16:15 - 18:00', '18:15 - 19:30']
-    let current_date = new Date();
-    let week_start = current_date.getDate() - current_date.getDay() + 1;
-
-
-    for (let i = 0; i < 7; i++) {
-        //Head jednego dnia
-        let date = new Date(current_date.setDate(week_start + i)).toLocaleDateString();
-
-        const daily_header = `
-            <thead>
-                <tr>
-                    <th></th>
-                    <th>${date.split('.').slice(0,2).join('.')}</th>
-                </tr>
-            </thead>`;
-
-        //Body dziennego widoku
-        let daily_body = `<tbody>`;
-        for (let j = 0; j < 13; j++) {
-            daily_body += `<tr>`;
-            for (let k = 0; k < 2; k++) {
-                if (k === 0) {
-                    daily_body += `<td>${7+j}</td>`;
-                    continue;
-                }
-                daily_body += `<td></td>`;
-            }
-            daily_body += `</tr>`;
-        }
-        daily_body += `</tbody>`;
-
-        connected_table += daily_header + daily_body;
-    }
-
-    table.innerHTML = connected_table;
-
-    const calendar = document.querySelector('.calendar');
-    calendar.style.height = `${table.scrollHeight+250}px`;
     calendar.id = "semestralny";
     show_tiles();
 });
@@ -1133,9 +1104,8 @@ const table = document.querySelector(".calendar_view");
         [new_range, table_header] = render_head_range_semester_month(false);
     }
 
-    const calendar = document.getElementsByClassName("calendar");
     //Widok semestr
-    if (calendar.id === "semestralny") {
+    if (row_count === 16 && column_count === 8) {
         table_header = render_head_range_semester_month(true)[1];
         new_range = set_semester_range();
     }
@@ -1204,9 +1174,9 @@ document.querySelector(".calendar_range button:nth-child(3)").addEventListener("
     if (row_count === 6 && column_count === 7) {
         [new_range, table_header] = render_head_range_semester_month(false, true);
     }
-    const calendar = document.getElementsByClassName("calendar");
+
     //Widok semestr
-    if (calendar.id === "semestralny") {
+    if (row_count === 16 && column_count === 8) {
         table_header = render_head_range_semester_month(true)[1];
         new_range = set_semester_range();
     }
@@ -1232,28 +1202,6 @@ const endDateInput = document.getElementById('end-date');
 const confirmButton = document.getElementById('confirm-dates');
 const calendarRange = document.querySelector('.calendar_range span');
 const calendarView = document.querySelector('.calendar_view tbody');
-
-
-
-function getSemestrDates() {
-    fetch("semestrShow.php", {
-        method: "GET",
-    })
-        .then(response => response.json())
-        .then(data => {
-            data.forEach(function (index) {
-                if (index["name"] === "Semestr zimowy") {
-                    semestrZimowyStart = index["start"];
-                    semestrZimowyKoniec = index["end"];
-                }
-                else {
-                    semestrLetniStart = index["start"];
-                    semestrLetniKoniec = index["end"];
-                }
-            })
-        })
-}
-
 
 confirmButton.addEventListener('click', function() {
     const startDate = new Date(startDateInput.value);
