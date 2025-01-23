@@ -535,6 +535,7 @@ footer {
     background-color: var(--color_primary);
     position: fixed;
     bottom: 0;
+    z-index: 1000;
 }
 
 .cells-buttons {

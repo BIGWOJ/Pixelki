@@ -222,6 +222,7 @@ function show_tiles(){
         showStatistics();
         return;
     }
+
     if (forma === "konsultacje" && (sala.length != 0 || przedmiot.length != 0 || grupa.length != 0 || numerAlbumu.length != 0)){
         resetStatistics();
         showStatistics();
@@ -229,13 +230,14 @@ function show_tiles(){
     }
 
     const calendar = document.querySelector(".calendar");
+    var dataStart, dataEnd;
 
-    var dataStart;
+    //Obliczanie daty początkowej i końcowej dla danego zakresu kalendarza
     if (calendar.id === "dzisiejszy"){
         let data = document.querySelector(".calendar_view thead th:nth-child(2)").textContent;
         let parts = data.split(".");
         dataStart = `${parts[2]}-${parts[1]}-${parts[0]}`;
-        var dataEnd = dataStart;
+        dataEnd = dataStart;
         let dateAdd = new Date(dataEnd);
         dateAdd.setDate(dateAdd.getDate() + 1);
         dataEnd = dateAdd.toISOString().split('T')[0];
@@ -254,8 +256,6 @@ function show_tiles(){
         let dateAdd = new Date(dataEnd);
         dateAdd.setDate(dateAdd.getDate() + 1);
         dataEnd = dateAdd.toISOString().split('T')[0];
-        // console.log(dataStart);
-        // console.log(dataEnd);
     }
 
     else if (calendar.id === "tygodniowy"){
@@ -272,15 +272,30 @@ function show_tiles(){
 
         str = data[7].textContent;
         parts = str.split(" ");
-        var dataEnd = parts[1].split(".");
+        dataEnd = parts[1].split(".");
         dataEnd = dataEnd.reverse().join("-");
         dataEnd = year + "-" + dataEnd;
 
     }
 
-    else if (calendar.id === "miesieczny"){
+    else if (calendar.id === "miesieczny") {
+        let months_dict = {
+            '01': 'styczeń', '02': 'luty', '03': 'marzec', '04': 'kwiecień', '05': 'maj',
+            '06': 'czerwiec', '07': 'lipiec', '08': 'sierpień', '09': 'wrzesień',
+            '10': 'październik', '11': 'listopad', '12': 'grudzień'
+        };
 
+        const date = document.querySelector(".calendar_range span").textContent;
+        let [month_string, year] = date.split(" ");
+        let month_number = Object.keys(months_dict).find(key => months_dict[key] === month_string).padStart(2, '0');
+        year = Number(year);
+        month_number = Number(month_number);
+
+        dataStart = new Date(year, month_number-1, 2).toISOString().split('T')[0];
+        dataEnd = new Date(year, month_number, 1).toISOString().split('T')[0];
+        // console.log(dataStart, dataEnd);
     }
+
     else if (calendar.id === "semestralny"){
         if (document.querySelector(".calendar_range span").textContent === "Semestr letni"){
             dataStart = letniStart;
@@ -292,6 +307,7 @@ function show_tiles(){
         }
     }
 
+    //Pobieranie planu zajęć z bazy na podstawie filtrów oraz daty początkowej i końcowej
     fetch("process.php", {
         method: 'POST',
         headers: {
@@ -303,7 +319,7 @@ function show_tiles(){
         .then(data => {
             //Posortowanie zajęć według godziny zaczęcia
             data.sort((a, b) => new Date(a.start) - new Date(b.start));
-            console.log(data);
+            //console.log(data);
 
             if (calendar.id === "dzisiejszy") {
                     data.forEach(function(index){
@@ -449,6 +465,10 @@ function show_tiles(){
                 });
             }
 
+            else if (calendar.id === "miesieczny") {
+                console.log("miesieczny");
+            }
+
             else if (calendar.id === "semestralny") {
                 let current_lesson_day, previous_lesson_day;
                 let jump_day = 0;
@@ -526,6 +546,7 @@ function show_tiles(){
                     previousDay = previousDay.toISOString().split('T')[0];
                 }
             }
+
             showStatistics();
         })
 
@@ -601,6 +622,7 @@ function showStatistics(){
     document.getElementById("statistics-projekt-number").textContent = projektNumber.toString();
     document.getElementById("statistics-konsultacje-number").textContent = konsultacjeNumber.toString();
 }
+
 //Czyszczenie inputów filtrów po kliknięciu w przycisk "Wyczyść"
 document.querySelector(".filter-buttons button:nth-child(2)").addEventListener("click", () => {
     let filter_inputs = document.querySelectorAll(".filters input");
@@ -858,16 +880,17 @@ document.querySelector("#semester_button").addEventListener("click", () => {
 });
 
 function calendarSemestr() {
-    //initialize_date_range(true);
+    initialize_date_range(true);
     const table = document.querySelector(".calendar_view");
     let connected_table = '';
     let current_date = new Date();
-
-
     let startDate;
-    let endDate;
 
+
+    let endDate;
     const semestr = document.querySelector(".calendar_range span").textContent;
+
+    console.log(semestr);
 
     if (semestr === "Semestr letni") {
         startDate = letniStart;
