@@ -963,8 +963,8 @@ document.querySelector("#month_button").addEventListener("click", () => {
         }
         generateCalendar(year, month);
     });
-
-
+1
+    calendar.id = "miesieczny";
     generateCalendar(year, month);
     show_tiles();
 });
@@ -1033,7 +1033,8 @@ function calendarSemestr() {
 
     const dateStart = new Date(startDate);
     const dateEnd = new Date(endDate);
-    console.log(dateStart, dateEnd);
+    //console.log(dateStart, dateEnd);
+
     let roznica = (dateEnd - dateStart) / (24 * 60 * 60 * 1000);
     roznica++;
 
@@ -1100,7 +1101,8 @@ function set_calendar_head(row_count, column_count, table, next_range=false) {
         '10': 'październik', '11': 'listopad', '12': 'grudzień'
     };
     let days_shortcut = ['pon.', 'wt.', 'śr.', 'czw.', 'pt.', 'sob.', 'ndz.'];
-
+    const calendar = document.querySelector('.calendar');
+    console.log(calendar.id);
     //Widok dzisiaj
     if (column_count === 2 && row_count === 14) {
         current_dates = get_dates(true);
@@ -1117,9 +1119,10 @@ function set_calendar_head(row_count, column_count, table, next_range=false) {
         table_header = `<th></th><th>${current_dates[0]}</th>`;
        // console.log(current_dates);   //zmienna przechowujaca date danego dnia
     }
-    console.log(row_count, )
-    //Widok dzienny i miesięczny
-    if ((column_count === 2 && row_count === 98) || (row_count === 434 && column_count === 2)) {
+    // console.log(row_count, )
+
+    //Widok dzienny
+    if ((column_count === 2 && row_count === 98)) {
         console.log("Dzienny");
         let first_date = get_dates(year_input=false);
         let current_year = document.querySelector(".calendar_range span").innerHTML.split(' ')[1];
@@ -1188,8 +1191,41 @@ function set_calendar_head(row_count, column_count, table, next_range=false) {
         new_range = `${months_dict[current_dates[0].split('.')[1]]} ${year}`;
     }
 
-    //console.log(table_header);  // przechowuje daty calego tygodnia
-    //console.log(new_range)  // przechowuje dany miesiac i rok
+    //Widok miesiąc
+    if (calendar.id === "miesieczny") {
+        let months_dict = {
+            '01': 'styczeń', '02': 'luty', '03': 'marzec', '04': 'kwiecień', '05': 'maj',
+            '06': 'czerwiec', '07': 'lipiec', '08': 'sierpień', '09': 'wrzesień',
+            '10': 'październik', '11': 'listopad', '12': 'grudzień'
+        };
+
+        const date = document.querySelector(".calendar_range span").textContent;
+        let [month_string, year] = date.split(" ");
+        let month_number = Object.keys(months_dict).find(key => months_dict[key] === month_string).padStart(2, '0');
+        year = Number(year);
+        month_number = Number(month_number);
+
+        if (next_range) {
+            month_number++;
+            if (month_number > 12) {
+                month_number = 1;
+                year++;
+            }
+        }
+
+        else {
+            month_number--;
+            if (month_number < 1) {
+                month_number = 12;
+                year--;
+            }
+        }
+
+        let next_month = months_dict[month_number.toString().padStart(2, '0')];
+        console.log(`${next_month} ${year}`);
+        new_range = `${next_month} ${year}`;
+
+    }
 
     return [new_range, table_header];
 }
@@ -1375,6 +1411,7 @@ const table = document.querySelector(".calendar_view");
         <tr>`;
 
     let new_range;
+    const calendar = document.querySelector(".calendar");
 
     // Widok dzisiaj
     if (row_count === 14 && column_count === 2) {
@@ -1392,12 +1429,12 @@ const table = document.querySelector(".calendar_view");
     }
 
     // Widok miesiąc
-    if (row_count === 434 && column_count === 2) {
-        [new_range, table_header] = set_calendar_head(row_count, column_count, table);
+    if (calendar.id === "miesieczny") {
+        [new_range, table_header] = set_calendar_head(row_count, column_count, table, false);
     }
 
-    const calendar = document.querySelector(".calendar");
-    //Widok semestr
+    // const calendar = document.querySelector(".calendar");
+    // //Widok semestr
     if (calendar.id === "semestralny") {
         if (document.querySelector(".calendar_range span").innerHTML === "Semestr zimowy") new_range = "Semestr letni";
         else new_range = "Semestr zimowy";
@@ -1427,35 +1464,36 @@ document.querySelector(".calendar_range button:nth-child(3)").addEventListener("
         <tr>`;
 
     let new_range;
+    const calendar = document.querySelector(".calendar");
 
     document.querySelector(".calendar_view").addEventListener("click", (event) => {
-    const table = event.currentTarget;
-    const row = table.rows[4]; // 5th row (index 4)
-    const cell = row.cells[2]; // 3rd column (index 2)
-    if (event.target === cell) {
-        cell.classList.add("highlight");
-        const tooltip = document.createElement("div");
-        tooltip.style.position = "absolute";
-        tooltip.classList.add("tooltip");
-        tooltip.innerText = "Treść okna";
-        document.body.appendChild(tooltip);
-        const rect = cell.getBoundingClientRect();
-        tooltip.style.left = `${rect.left + window.scrollX}px`;
-        tooltip.style.top = `${rect.top + window.scrollY}px`;
-        tooltip.style.height = '100px';
-        tooltip.style.width = '100px';
-        tooltip.style.backgroundColor = 'red';
+        const table = event.currentTarget;
+        const row = table.rows[4]; // 5th row (index 4)
+        const cell = row.cells[2]; // 3rd column (index 2)
+        if (event.target === cell) {
+            cell.classList.add("highlight");
+            const tooltip = document.createElement("div");
+            tooltip.style.position = "absolute";
+            tooltip.classList.add("tooltip");
+            tooltip.innerText = "Treść okna";
+            document.body.appendChild(tooltip);
+            const rect = cell.getBoundingClientRect();
+            tooltip.style.left = `${rect.left + window.scrollX}px`;
+            tooltip.style.top = `${rect.top + window.scrollY}px`;
+            tooltip.style.height = '100px';
+            tooltip.style.width = '100px';
+            tooltip.style.backgroundColor = 'red';
 
-    } else {
-        cell.classList.remove("highlight");
-        const tooltip = document.querySelector(".tooltip");
-        if (tooltip) {
-            tooltip.remove();
+        } else {
+            cell.classList.remove("highlight");
+            const tooltip = document.querySelector(".tooltip");
+            if (tooltip) {
+                tooltip.remove();
+            }
         }
-    }
-});
+    });
     // Widok dzisiaj
-    if ( row_count === 14 && column_count === 2) {
+    if (row_count === 14 && column_count === 2) {
         [new_range, table_header] = set_calendar_head(row_count, column_count, table, true);
     }
 
@@ -1470,13 +1508,13 @@ document.querySelector(".calendar_range button:nth-child(3)").addEventListener("
     }
 
     // Widok miesiąc
-    if (row_count === 434 && column_count === 2) {
+    if (calendar.id === "miesieczny") {
         //console.log("Miesiąc");
         [new_range, table_header] = set_calendar_head(row_count, column_count, table, true);
         console.log(new_range, table_header);
     }
 
-    const calendar = document.querySelector(".calendar");
+    //const calendar = document.querySelector(".calendar");
     //Widok semestr
     if (calendar.id === "semestralny") {
         if (document.querySelector(".calendar_range span").innerHTML === "Semestr zimowy") new_range = "Semestr letni";
