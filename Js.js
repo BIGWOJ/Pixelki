@@ -882,87 +882,90 @@ function calendarStart(){
 //Miesięczny widok kalendarza
 document.querySelector("#month_button").addEventListener("click", () => {
     initialize_date_range();
+
     const table = document.querySelector(".calendar_view");
-    let connected_table = '';
-    let startDate, endDate;
-    let months_dict = {
-            '01': 'styczeń', '02': 'luty', '03': 'marzec', '04': 'kwiecień', '05': 'maj',
-            '06': 'czerwiec', '07': 'lipiec', '08': 'sierpień', '09': 'wrzesień',
-            '10': 'październik', '11': 'listopad', '12': 'grudzień'
-        };
+    const calendar = document.querySelector('.calendar');
+    const prevButton = document.getElementById("prev");
+    const nextButton = document.getElementById("next");
 
-    const date = document.querySelector(".calendar_range span").textContent;
-    let [month_string, year] = date.split(" ");
-    let month_number = Object.keys(months_dict).find(key => months_dict[key] === month_string).padStart(2, '0');
-    year = Number(year);
-    month_number = Number(month_number);
+    let currentDate = new Date();
+    let year = currentDate.getFullYear();
+    let month = currentDate.getMonth();
 
-    startDate = new Date(year, month_number-1, 2).toISOString().split('T')[0];
-    endDate = new Date(year, month_number, 1).toISOString().split('T')[0];
-    const month_day_count = Math.ceil((new Date(endDate) - new Date(startDate)) / (1000 * 60 * 60 * 24))+1;
 
-    for (let day = 1; day <= month_day_count; day++) {
-        let date = new Date(startDate);
-        date.setDate(date.getDate() + day - 1);
+    function generateCalendar(year, month) {
 
-        let formatted_date = date.toLocaleDateString();
-        const daily_header = `
+        const monthly_header = `
             <thead>
                 <tr>
-                    <th></th>
-                    <th>${formatted_date.split('.').slice(0, 2).join('.')}</th>
+                    <th>poniedziałek</th>
+                    <th>wtorek</th>
+                    <th>środa</th>
+                    <th>czwartek</th>
+                    <th>piątek</th>
+                    <th>sobota</th>
+                    <th>niedziela</th>
                 </tr>
             </thead>`;
 
-        //Body dziennego widoku
-        let daily_body = `<tbody>`;
-        for (let j = 0; j < 13; j++) {
-            daily_body += `<tr>`;
-            for (let k = 0; k < 2; k++) {
-                if (k === 0) {
-                    daily_body += `<td>${7+j}</td>`;
-                    continue;
-                }
-                daily_body += `<td></td>`;
-            }
-            daily_body += `</tr>`;
-        }
-        daily_body += `</tbody>`;
 
-        connected_table += daily_header + daily_body;
+        const firstDay = new Date(year, month, 1).getDay();
+        const daysInMonth = new Date(year, month + 1, 0).getDate();
+        const offset = (firstDay === 0 ? 6 : firstDay - 1);
+
+
+        let monthly_body = `<tbody>`;
+        let day = 1;
+
+
+        for (let i = 0; i < 6; i++) {
+            let row = "<tr>";
+            for (let j = 0; j < 7; j++) {
+                if (i === 0 && j < offset) {
+
+                    row += "<td></td>";
+                } else if (day > daysInMonth) {
+
+                    row += "<td></td>";
+                } else {
+
+                    row += `<td>${day}</td>`;
+                    day++;
+                }
+            }
+            row += "</tr>";
+            monthly_body += row;
+
+            if (day > daysInMonth) break;
+        }
+        monthly_body += `</tbody>`;
+
+        table.innerHTML = monthly_header + monthly_body;
+
+
     }
 
-    // //Head miesięcznego widoku
-    // const monthly_header = `
-    //     <thead>
-    //         <tr>
-    //             <th>poniedziałek</th>
-    //             <th>wtorek</th>
-    //             <th>środa</th>
-    //             <th>czwartek</th>
-    //             <th>piątek</th>
-    //             <th>sobota</th>
-    //             <th>niedziela</th>
-    //         </tr>
-    //     </thead>`;
-    //
-    // //Body miesięcznego widoku
-    // let monthly_body = `<tbody>`;
-    // for (let i = 0; i < 5; i++) {
-    //     monthly_body += `<tr>`;
-    //     for (let j = 0; j < 7; j++) {
-    //         let day = i * 7 + j + 1;
-    //         monthly_body += `<td>${day <= 31 ? day : ''}</td>`;
-    //     }
-    //     monthly_body += `</tr>`;
-    // }
-    // monthly_body += `</tbody>`;
-    //
-    table.innerHTML = connected_table;
-    const calendar = document.querySelector('.calendar');
-    calendar.style.height = `${table.scrollHeight+250}px`;
 
-    calendar.id = "miesieczny";
+    prevButton.addEventListener("click", () => {
+        month -= 1;
+        if (month < 0) {
+            month = 11;
+            year -= 1;
+        }
+        generateCalendar(year, month);
+    });
+
+    nextButton.addEventListener("click", () => {
+        month += 1;
+        if (month > 11) {
+            month = 0;
+            year += 1;
+        }
+        generateCalendar(year, month);
+    });
+
+
+    generateCalendar(year, month);
     show_tiles();
 });
 
