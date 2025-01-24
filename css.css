@@ -57,6 +57,7 @@
 
 .light {
     --color_primary: #7e9f60;
+    --color_primary: #7e9f60;
     --color_secondary: #006fe6;
     --color_white: #f8f9fa;
     --color_black: #333;
@@ -893,6 +894,8 @@ footer {
     .filters {
         margin-top: 0;
     }
+
+
 }
 
 @media (max-width: 767px) {
@@ -924,6 +927,10 @@ footer {
         flex-direction: column;
         width: 100%;
     }
+
+    #date-container{
+        width: 300px;
+    }
 }
 
 @media (max-width: 400px) {
@@ -933,5 +940,8 @@ footer {
 
     .legend-item {
         max-width: 100%;
+    }
+    #date-container{
+        width: 250px;
     }
 }
