@@ -22,7 +22,9 @@
 /*    display: block;*/
 /*    margin: 5px 0;*/
 /*}*/
-
+.calendar_view .range_calendar_cell {
+    background-color: red !important;
+}
 :root {
     --color_primary: #7e9f60;
     --color_secondary: #006fe6;
@@ -876,6 +878,7 @@ footer {
     flex-direction: column;
     align-items: center;
 }
+
 
 @media (min-width: 768px) {
     overflow-y: hidden;

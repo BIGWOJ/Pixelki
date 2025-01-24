@@ -156,7 +156,7 @@ document.querySelector(".theme-buttons button:nth-child(2)").addEventListener("c
 
 //Kalendarz zakresowy
 document.querySelector(".range-calendar").addEventListener("click", () => {
-    console.log("Kalendarz zakresowy\nJeszcze nie zrobione");
+    //console.log("Kalendarz zakresowy\nJeszcze nie zrobione");
 });
 
 //Zastosowanie filtrów po kliknięciu w przycisk "Filtruj"
@@ -521,14 +521,14 @@ function show_tiles(){
 
                     //Przesunięcie kafelka o dzień
                     if (current_lesson_day !== previous_lesson_day && previous_lesson_day !== null) {
-                        console.log(dayOfWeek + " dodalo 1 warunek");
+                        //console.log(dayOfWeek + " dodalo 1 warunek");
                         jump_day += 840;
                     }
 
 
                     if (dataLicznik.toISOString().split('T')[0] != timeStart.toISOString().split('T')[0] && (dayOfWeek === "Pia")){
-                        console.log("timeStart " + timeStart);
-                        console.log(dayOfWeek + " dodalo 2 warunek");
+                        //console.log("timeStart " + timeStart);
+                        //console.log(dayOfWeek + " dodalo 2 warunek");
                         jump_day += 1680;
                         dataLicznik.setDate(dataLicznik.getDate() + 2);
                     }
@@ -600,14 +600,14 @@ function show_tiles(){
 
                     //Przesunięcie kafelka o dzień
                     if (current_lesson_day !== previous_lesson_day && previous_lesson_day !== null) {
-                        console.log(dayOfWeek + " dodalo 1 warunek");
+                        //console.log(dayOfWeek + " dodalo 1 warunek");
                         jump_day += 840;
                     }
 
 
                     if (dataLicznik.toISOString().split('T')[0] != timeStart.toISOString().split('T')[0] && (dayOfWeek === "Pia")){
-                        console.log("timeStart " + timeStart);
-                        console.log(dayOfWeek + " dodalo 2 warunek");
+                        //console.log("timeStart " + timeStart);
+                        //console.log(dayOfWeek + " dodalo 2 warunek");
                         jump_day += 1680;
                         dataLicznik.setDate(dataLicznik.getDate() + 2);
                     }
@@ -1102,7 +1102,7 @@ function set_calendar_head(row_count, column_count, table, next_range=false) {
     };
     let days_shortcut = ['pon.', 'wt.', 'śr.', 'czw.', 'pt.', 'sob.', 'ndz.'];
     const calendar = document.querySelector('.calendar');
-    console.log(calendar.id);
+
     //Widok dzisiaj
     if (column_count === 2 && row_count === 14) {
         current_dates = get_dates(true);
@@ -1222,7 +1222,6 @@ function set_calendar_head(row_count, column_count, table, next_range=false) {
         }
 
         let next_month = months_dict[month_number.toString().padStart(2, '0')];
-        console.log(`${next_month} ${year}`);
         new_range = `${next_month} ${year}`;
 
     }
@@ -1511,10 +1510,8 @@ document.querySelector(".calendar_range button:nth-child(3)").addEventListener("
     if (calendar.id === "miesieczny") {
         //console.log("Miesiąc");
         [new_range, table_header] = set_calendar_head(row_count, column_count, table, true);
-        console.log(new_range, table_header);
     }
 
-    //const calendar = document.querySelector(".calendar");
     //Widok semestr
     if (calendar.id === "semestralny") {
         if (document.querySelector(".calendar_range span").innerHTML === "Semestr zimowy") new_range = "Semestr letni";
@@ -1550,43 +1547,53 @@ const calendarRange = document.querySelector('.calendar_range span');
 const calendarView = document.querySelector('.calendar_view tbody');
 
 confirmButton.addEventListener('click', function() {
+    document.getElementById("date-container").style.display = "none";
     const startDate = new Date(startDateInput.value);
     const endDate = new Date(endDateInput.value);
+    //console.log(startDate, endDate);
+    //console.log(startDate < endDate);
+
+    //Walidacja zakresu dat
+    if (!(startDate < endDate)) {
+        alert("Data początkowa musi być wcześniejsza od daty końcowej");
+        return;
+    }
 
     if (startDate && endDate) {
         calendarRange.textContent = `${startDateInput.value} - ${endDateInput.value}`;
         updateCalendarView(startDate, endDate);
     }
-
 });
 
 function updateCalendarView(startDate, endDate) {
+    const calendar = document.querySelector('.calendar');
     calendarView.innerHTML = '';
 
     let currentDate = new Date(startDate);
     let daysInRange = [];
 
-
     while (currentDate <= endDate) {
         daysInRange.push(new Date(currentDate));
         currentDate.setDate(currentDate.getDate() + 1);
     }
-
+    //console.log(daysInRange);
 
     let startDay = startDate.getDay();
     if (startDay === 0) startDay = 7;
-    console.log(startDay, endDate);
+    // console.log(startDay, endDate);
     const headerDays = ['Pon', 'Wt', 'Śr', 'Czw', 'Pt', 'So', 'Nd'];
     let updatedHeader = headerDays.slice(startDay - 1).concat(headerDays.slice(0, startDay - 1));
 
     //Nagłowki
     const tableHeader = document.querySelector('.calendar_view thead tr');
-    tableHeader.innerHTML = updatedHeader.map(day => `<th>${day}</th>`).join('');
+    updatedHeader = updatedHeader.map(day => `<th>${day}</th>`).join('');
+    tableHeader.innerHTML = `<th></th>` + updatedHeader;
+    tableHeader.style.backgroundColor = 'red';
 
     //Grupowanie dni w tygodnie
     let weeks = [];
     let currentWeek = [];
-    daysInRange.forEach(function(date, index) {
+    daysInRange.forEach(function (date, index) {
         currentWeek.push(date.getDate());
         if (currentWeek.length === 7 || index === daysInRange.length - 1) {
             weeks.push(currentWeek);
@@ -1595,15 +1602,38 @@ function updateCalendarView(startDate, endDate) {
     });
 
     //Dodawanie dni do tabeli
-    weeks.forEach(function(week) {
+    weeks.forEach(function (week) {
         let row = document.createElement('tr');
-        week.forEach(function(day) {
+        week.forEach(function (day) {
             let cell = document.createElement('td');
             cell.textContent = day || '';
             row.appendChild(cell);
         });
         calendarView.appendChild(row);
     });
+
+    //Resetowanie tła dla wszystkich komórek
+    let cells = document.querySelectorAll('.calendar_view td');
+    cells.forEach(cell => {
+        cell.style.backgroundColor = 'var(--color_background)';
+    });
+
+    //Podświetlanie dni z zakresu
+    let week_count = 0;
+
+    for (let day = 0; day < daysInRange.length; day++) {
+        if (day % 7 === 0) {
+            week_count += 1;
+        }
+
+        const column = (day % 7) + 1;
+        const cell = document.querySelector(`.calendar_view tr:nth-child(${week_count}) td:nth-child(${column + 1})`);
+
+        if (cell) {
+            cell.style.backgroundColor = '#a5bc8f';
+        }
+    }
+    calendar.id = "custom";
 }
 
 if (theme === "dark") {
