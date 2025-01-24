@@ -293,7 +293,7 @@ function show_tiles(){
 
         dataStart = new Date(year, month_number-1, 2).toISOString().split('T')[0];
         dataEnd = new Date(year, month_number, 1).toISOString().split('T')[0];
-        // console.log(dataStart, dataEnd);
+         //console.log(dataStart, dataEnd);
     }
 
     else if (calendar.id === "semestralny"){
@@ -466,7 +466,84 @@ function show_tiles(){
             }
 
             else if (calendar.id === "miesieczny") {
-                console.log("miesieczny");
+                //console.log("miesieczny");
+                //console.log(data);
+                let current_lesson_day, previous_lesson_day;
+                let jump_day = 0;
+                let jump_day_licznik = 0;
+                let indexLicznik = data[0];
+                let previousDay = new Date(indexLicznik["start"]);
+                previousDay = previousDay.toISOString().split('T')[0];
+                let dataLicznik = new Date(indexLicznik["start"]);
+                for (let i = 0; i < data.length; i++) {
+                    let index = data[i];
+                    let timeStart = new Date(index["start"]);
+                    let hour = timeStart.getHours();
+                    let minute = timeStart.getMinutes();
+                    let timeEnd = new Date(index["koniec"]);
+                    let timeEndMinutes;
+                    if (timeEnd.getMinutes() === Number(0)) {
+                        timeEndMinutes = "00";
+                    }
+                    else {
+                        timeEndMinutes = timeEnd.getMinutes();
+                    }
+
+                    const daysOfWeek = ["Pon", "Wto", "Śro", "Czw", "Pia", "Sob", "Nie"];
+                    const dayOfWeek = daysOfWeek[(dataLicznik.getDay() + 6) % 7];
+
+
+
+
+                    let roznica = timeEnd - timeStart;
+                    roznica = roznica / 1000 / 60;
+
+                    let text = timeStart.getHours() + ":" + timeStart.getMinutes() + " - " + timeEnd.getHours() + ":" + timeEndMinutes
+                        + "\n" + index["tytul"];
+                    let info = index["tytul"] + "\n" + "Prowadzący: " + index["imie"] + " " + index["nazwisko"] + "\n" + "Sala: " + index["3"]
+                        + " " + index["pokoj"] + "\n" + "Grupa: " + index["2"] + "\n" + index["formaZajec"];
+
+                    current_lesson_day = index["start"].split("T")[0].split("-")[2];
+                    previous_lesson_day = data[i-1] ? data[i-1]["start"].split("T")[0].split("-")[2] : null;
+
+                    // zliczanie do statystyk
+                    if (index["formaZajec"] === "laboratorium") laboratoriumNumber++;
+                    else if (index["formaZajec"] === "wykład") wykladNumber++;
+                    else if (index["formaZajec"] === "lektorat") lektoratNumber++;
+                    else if (index["formaZajec"] === "audytoryjne") audytoriumNumber++;
+                    else if (index["formaZajec"] === "projekt") projektNumber++;
+                    else if (index["formaZajec"] === "własnyKafelek") wlasnyKafelekNumber++;
+                    else if (index["opis"].includes("Konsultacje")) konsultacjeNumber++;
+                    //
+
+
+
+
+                    //Przesunięcie kafelka o dzień
+                    if (current_lesson_day !== previous_lesson_day && previous_lesson_day !== null) {
+                        console.log(dayOfWeek + " dodalo 1 warunek");
+                        jump_day += 840;
+                    }
+
+
+                    if (dataLicznik.toISOString().split('T')[0] != timeStart.toISOString().split('T')[0] && (dayOfWeek === "Pia")){
+                        console.log("timeStart " + timeStart);
+                        console.log(dayOfWeek + " dodalo 2 warunek");
+                        jump_day += 1680;
+                        dataLicznik.setDate(dataLicznik.getDate() + 2);
+                    }
+
+
+                    add_tile_calendar(6, (hour-6)*60+minute+jump_day+jump_day_licznik, roznica, 1, text, index["formaZajec"], info);
+
+
+                    if (previousDay != timeStart.toISOString().split('T')[0]) {
+                        dataLicznik.setDate(dataLicznik.getDate() + 1);
+                    }
+                    previousDay = new Date(timeStart);
+                    previousDay = previousDay.toISOString().split('T')[0];
+                }
+
             }
 
             else if (calendar.id === "semestralny") {
@@ -806,35 +883,85 @@ function calendarStart(){
 document.querySelector("#month_button").addEventListener("click", () => {
     initialize_date_range();
     const table = document.querySelector(".calendar_view");
+    let connected_table = '';
+    let startDate, endDate;
+    let months_dict = {
+            '01': 'styczeń', '02': 'luty', '03': 'marzec', '04': 'kwiecień', '05': 'maj',
+            '06': 'czerwiec', '07': 'lipiec', '08': 'sierpień', '09': 'wrzesień',
+            '10': 'październik', '11': 'listopad', '12': 'grudzień'
+        };
 
-    //Head miesięcznego widoku
-    const monthly_header = `
-        <thead>
-            <tr>
-                <th>poniedziałek</th>
-                <th>wtorek</th>
-                <th>środa</th>
-                <th>czwartek</th>
-                <th>piątek</th>
-                <th>sobota</th>
-                <th>niedziela</th>
-            </tr>
-        </thead>`;
+    const date = document.querySelector(".calendar_range span").textContent;
+    let [month_string, year] = date.split(" ");
+    let month_number = Object.keys(months_dict).find(key => months_dict[key] === month_string).padStart(2, '0');
+    year = Number(year);
+    month_number = Number(month_number);
 
-    //Body miesięcznego widoku
-    let monthly_body = `<tbody>`;
-    for (let i = 0; i < 5; i++) {
-        monthly_body += `<tr>`;
-        for (let j = 0; j < 7; j++) {
-            let day = i * 7 + j + 1;
-            monthly_body += `<td>${day <= 31 ? day : ''}</td>`;
+    startDate = new Date(year, month_number-1, 2).toISOString().split('T')[0];
+    endDate = new Date(year, month_number, 1).toISOString().split('T')[0];
+    const month_day_count = Math.ceil((new Date(endDate) - new Date(startDate)) / (1000 * 60 * 60 * 24))+1;
+
+    for (let day = 1; day <= month_day_count; day++) {
+        let date = new Date(startDate);
+        date.setDate(date.getDate() + day - 1);
+
+        let formatted_date = date.toLocaleDateString();
+        const daily_header = `
+            <thead>
+                <tr>
+                    <th></th>
+                    <th>${formatted_date.split('.').slice(0, 2).join('.')}</th>
+                </tr>
+            </thead>`;
+
+        //Body dziennego widoku
+        let daily_body = `<tbody>`;
+        for (let j = 0; j < 13; j++) {
+            daily_body += `<tr>`;
+            for (let k = 0; k < 2; k++) {
+                if (k === 0) {
+                    daily_body += `<td>${7+j}</td>`;
+                    continue;
+                }
+                daily_body += `<td></td>`;
+            }
+            daily_body += `</tr>`;
         }
-        monthly_body += `</tr>`;
-    }
-    monthly_body += `</tbody>`;
+        daily_body += `</tbody>`;
 
-    table.innerHTML = monthly_header + monthly_body;
+        connected_table += daily_header + daily_body;
+    }
+
+    // //Head miesięcznego widoku
+    // const monthly_header = `
+    //     <thead>
+    //         <tr>
+    //             <th>poniedziałek</th>
+    //             <th>wtorek</th>
+    //             <th>środa</th>
+    //             <th>czwartek</th>
+    //             <th>piątek</th>
+    //             <th>sobota</th>
+    //             <th>niedziela</th>
+    //         </tr>
+    //     </thead>`;
+    //
+    // //Body miesięcznego widoku
+    // let monthly_body = `<tbody>`;
+    // for (let i = 0; i < 5; i++) {
+    //     monthly_body += `<tr>`;
+    //     for (let j = 0; j < 7; j++) {
+    //         let day = i * 7 + j + 1;
+    //         monthly_body += `<td>${day <= 31 ? day : ''}</td>`;
+    //     }
+    //     monthly_body += `</tr>`;
+    // }
+    // monthly_body += `</tbody>`;
+    //
+    table.innerHTML = connected_table;
     const calendar = document.querySelector('.calendar');
+    calendar.style.height = `${table.scrollHeight+250}px`;
+
     calendar.id = "miesieczny";
     show_tiles();
 });
@@ -875,7 +1002,7 @@ getDatesSemestr();
 
 //Semestralny widok kalendarza
 document.querySelector("#semester_button").addEventListener("click", () => {
-    document.querySelector(".calendar_range span").innerHTML = "Semestr letni";
+    //document.querySelector(".calendar_range span").innerHTML = "Semestr letni";
     calendarSemestr();
 });
 
@@ -890,7 +1017,7 @@ function calendarSemestr() {
     let endDate;
     const semestr = document.querySelector(".calendar_range span").textContent;
 
-    console.log(semestr);
+    //console.log(semestr);
 
     if (semestr === "Semestr letni") {
         startDate = letniStart;
@@ -903,6 +1030,7 @@ function calendarSemestr() {
 
     const dateStart = new Date(startDate);
     const dateEnd = new Date(endDate);
+    console.log(dateStart, dateEnd);
     let roznica = (dateEnd - dateStart) / (24 * 60 * 60 * 1000);
     roznica++;
 
@@ -986,9 +1114,10 @@ function set_calendar_head(row_count, column_count, table, next_range=false) {
         table_header = `<th></th><th>${current_dates[0]}</th>`;
        // console.log(current_dates);   //zmienna przechowujaca date danego dnia
     }
-
-    //Widok dzienny
-    if (column_count === 2 && row_count === 98) {
+    console.log(row_count, )
+    //Widok dzienny i miesięczny
+    if ((column_count === 2 && row_count === 98) || (row_count === 434 && column_count === 2)) {
+        console.log("Dzienny");
         let first_date = get_dates(year_input=false);
         let current_year = document.querySelector(".calendar_range span").innerHTML.split(' ')[1];
         first_date = new Date(parseInt(current_year), first_date[0].split('.')[1] - 1, first_date[0].split('.')[0]);
@@ -1106,9 +1235,10 @@ function render_head_range_semester_month(semester=false, next_range=false) {
         }
     }
 
-    for (let i = 0; i < 7; i++) {
-        table_header += `<th>${days[i]}</th>`;
-    }
+    table_header += `<th></th><th>${month_after.getMonth()} ${month_after.getFullYear()}</th>`;
+    // for (let i = 0; i < 7; i++) {
+    //     table_header += `<th>${days[i]}</th>`;
+    // }
 
     //console.log(new_range)  // wyswietla miesiac i rok
 
@@ -1259,8 +1389,8 @@ const table = document.querySelector(".calendar_view");
     }
 
     // Widok miesiąc
-    if (row_count === 6 && column_count === 7) {
-        [new_range, table_header] = render_head_range_semester_month(false);
+    if (row_count === 434 && column_count === 2) {
+        [new_range, table_header] = set_calendar_head(row_count, column_count, table);
     }
 
     const calendar = document.querySelector(".calendar");
@@ -1288,7 +1418,7 @@ document.querySelector(".calendar_range button:nth-child(3)").addEventListener("
     const table = document.querySelector(".calendar_view");
     let row_count = table.rows.length;
     let column_count = table.rows[0].cells.length;
-
+    //console.log(row_count, column_count);
     let table_header = `
     <thead>
         <tr>`;
@@ -1337,8 +1467,10 @@ document.querySelector(".calendar_range button:nth-child(3)").addEventListener("
     }
 
     // Widok miesiąc
-    if (row_count === 6 && column_count === 7) {
-        [new_range, table_header] = render_head_range_semester_month(false, true);
+    if (row_count === 434 && column_count === 2) {
+        //console.log("Miesiąc");
+        [new_range, table_header] = set_calendar_head(row_count, column_count, table, true);
+        console.log(new_range, table_header);
     }
 
     const calendar = document.querySelector(".calendar");
@@ -1358,7 +1490,6 @@ document.querySelector(".calendar_range button:nth-child(3)").addEventListener("
         calendarSemestr();
     }
     show_tiles();
-
 
 });
 
