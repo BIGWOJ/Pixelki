@@ -307,6 +307,12 @@ function show_tiles(){
         }
     }
 
+    else if (calendar.id === "custom") {
+        dataStart = document.getElementById("start-date").value;
+        dataEnd = document.getElementById("end-date").value;
+        // console.log(dataStart, dataEnd);
+    }
+
     //Pobieranie planu zajęć z bazy na podstawie filtrów oraz daty początkowej i końcowej
     fetch("process.php", {
         method: 'POST',
@@ -319,8 +325,9 @@ function show_tiles(){
         .then(data => {
             //Posortowanie zajęć według godziny zaczęcia
             data.sort((a, b) => new Date(a.start) - new Date(b.start));
-            //console.log(data);
+            console.log(data);
 
+            //Wyświetlanie kafelków dla danego typu kalendarza
             if (calendar.id === "dzisiejszy") {
                     data.forEach(function(index){
                         let timeStart = new Date(index["start"]);
@@ -622,6 +629,20 @@ function show_tiles(){
                     previousDay = new Date(timeStart);
                     previousDay = previousDay.toISOString().split('T')[0];
                 }
+            }
+
+            else if (calendar.id === "custom") {
+                let current_day, day;
+                let day_info = {};
+                for (let lesson = 0; lesson < data.length; lesson++) {
+                    current_day = new Date(data[lesson]["start"]).toISOString().split('T')[0].split("-")[2];
+                    console.log(current_day);
+                    if (!day_info[current_day]) {
+                        day_info[current_day] = [];
+                    }
+                    day_info[current_day].push(data[lesson]["tytul"]);
+                }
+                add_tile_calendar()
             }
 
             showStatistics();
@@ -1550,8 +1571,6 @@ confirmButton.addEventListener('click', function() {
     document.getElementById("date-container").style.display = "none";
     const startDate = new Date(startDateInput.value);
     const endDate = new Date(endDateInput.value);
-    //console.log(startDate, endDate);
-    //console.log(startDate < endDate);
 
     //Walidacja zakresu dat
     if (!(startDate < endDate)) {
@@ -1576,19 +1595,17 @@ function updateCalendarView(startDate, endDate) {
         daysInRange.push(new Date(currentDate));
         currentDate.setDate(currentDate.getDate() + 1);
     }
-    //console.log(daysInRange);
 
     let startDay = startDate.getDay();
     if (startDay === 0) startDay = 7;
-    // console.log(startDay, endDate);
+
     const headerDays = ['Pon', 'Wt', 'Śr', 'Czw', 'Pt', 'So', 'Nd'];
     let updatedHeader = headerDays.slice(startDay - 1).concat(headerDays.slice(0, startDay - 1));
 
     //Nagłowki
     const tableHeader = document.querySelector('.calendar_view thead tr');
     updatedHeader = updatedHeader.map(day => `<th>${day}</th>`).join('');
-    tableHeader.innerHTML = `<th></th>` + updatedHeader;
-    tableHeader.style.backgroundColor = 'red';
+    tableHeader.innerHTML = `</th>` + updatedHeader;
 
     //Grupowanie dni w tygodnie
     let weeks = [];
@@ -1612,6 +1629,33 @@ function updateCalendarView(startDate, endDate) {
         calendarView.appendChild(row);
     });
 
+    const table = document.querySelector(".calendar_view");
+    let current_date = new Date();
+    let week_start = current_date.getDate() - current_date.getDay() + 1;
+    let days_shortcut = ['pon.', 'wt.', 'śr.', 'czw.', 'pt.', 'sob.', 'ndz.'];
+
+    // Nagłówki tygodniowego widoku (bez kolumny godzin)
+    let weekly_header = `<thead><tr>`;
+
+    for (let i = 0; i < 7; i++) {
+        let date = new Date(current_date.setDate(week_start + i)).toLocaleDateString(undefined, { month: '2-digit', day: '2-digit' });
+        weekly_header += `<th>${headerDays[i]}</th>`;
+    }
+
+    weekly_header += `</tr></thead>`;
+
+    let weekly_body = `<tbody>`;
+    for (let i = 0; i < 12; i++) {
+        weekly_body += `<tr>`;
+        for (let j = 0; j < 7; j++) {
+            weekly_body += `<td style="height: 50px;"></td>`;
+        }
+        weekly_body += `</tr>`;
+    }
+    weekly_body += `</tbody>`;
+
+    table.innerHTML = weekly_header + weekly_body;
+
     //Resetowanie tła dla wszystkich komórek
     let cells = document.querySelectorAll('.calendar_view td');
     cells.forEach(cell => {
@@ -1626,13 +1670,15 @@ function updateCalendarView(startDate, endDate) {
             week_count += 1;
         }
 
-        const column = (day % 7) + 1;
+        const column = (day % 7);
         const cell = document.querySelector(`.calendar_view tr:nth-child(${week_count}) td:nth-child(${column + 1})`);
 
         if (cell) {
             cell.style.backgroundColor = '#a5bc8f';
+            cell.textContent = daysInRange[day].getDate();
         }
     }
+
     calendar.id = "custom";
 }
 
