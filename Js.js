@@ -943,7 +943,8 @@ document.querySelector("#month_button").addEventListener("click", () => {
 
     function generateCalendar(year, month) {
 
-        const monthly_header = `
+        if (calendar.id === "miesieczny") {
+            const monthly_header = `
             <thead>
                 <tr>
                     <th>poniedziałek</th>
@@ -957,38 +958,40 @@ document.querySelector("#month_button").addEventListener("click", () => {
             </thead>`;
 
 
-        const firstDay = new Date(year, month, 1).getDay();
-        const daysInMonth = new Date(year, month + 1, 0).getDate();
-        const offset = (firstDay === 0 ? 6 : firstDay - 1);
+            const firstDay = new Date(year, month, 1).getDay();
+            const daysInMonth = new Date(year, month + 1, 0).getDate();
+            const offset = (firstDay === 0 ? 6 : firstDay - 1);
 
 
-        let monthly_body = `<tbody>`;
-        let day = 1;
+            let monthly_body = `<tbody>`;
+            let day = 1;
 
 
-        for (let i = 0; i < 6; i++) {
-            let row = "<tr>";
-            for (let j = 0; j < 7; j++) {
-                if (i === 0 && j < offset) {
+            for (let i = 0; i < 6; i++) {
+                let row = "<tr>";
+                for (let j = 0; j < 7; j++) {
+                    if (i === 0 && j < offset) {
 
-                    row += "<td></td>";
-                } else if (day > daysInMonth) {
+                        row += "<td></td>";
+                    } else if (day > daysInMonth) {
 
-                    row += "<td></td>";
-                } else {
+                        row += "<td></td>";
+                    } else {
 
-                    row += `<td>${day}</td>`;
-                    day++;
+                        row += `<td>${day}</td>`;
+                        day++;
+                    }
                 }
+                row += "</tr>";
+                monthly_body += row;
+
+                if (day > daysInMonth) break;
             }
-            row += "</tr>";
-            monthly_body += row;
+            monthly_body += `</tbody>`;
 
-            if (day > daysInMonth) break;
+            table.innerHTML = monthly_header + monthly_body;
         }
-        monthly_body += `</tbody>`;
 
-        table.innerHTML = monthly_header + monthly_body;
 
 
     }
@@ -1011,7 +1014,7 @@ document.querySelector("#month_button").addEventListener("click", () => {
         }
         generateCalendar(year, month);
     });
-1
+
     calendar.id = "miesieczny";
     generateCalendar(year, month);
     show_tiles();
@@ -1053,12 +1056,12 @@ getDatesSemestr();
 
 //Semestralny widok kalendarza
 document.querySelector("#semester_button").addEventListener("click", () => {
-    //document.querySelector(".calendar_range span").innerHTML = "Semestr letni";
+    document.querySelector(".calendar_range span").innerHTML = "Semestr letni";
     calendarSemestr();
 });
 
 function calendarSemestr() {
-    initialize_date_range(true);
+    //initialize_date_range(true);
     const table = document.querySelector(".calendar_view");
     let connected_table = '';
     let current_date = new Date();
@@ -1571,6 +1574,8 @@ document.querySelector(".calendar_range button:nth-child(3)").addEventListener("
             }
         }
     });
+
+
     // Widok dzisiaj
     if (row_count === 14 && column_count === 2) {
         [new_range, table_header] = set_calendar_head(row_count, column_count, table, true);
@@ -1615,7 +1620,6 @@ document.querySelector(".calendar_range button:nth-child(3)").addEventListener("
 document.getElementById("calendar-button").addEventListener("click", () => {
     document.getElementById("date-container").style.display = "block";
 });
-
 document.getElementById("close-modal").addEventListener("click", () => {
     document.getElementById("date-container").style.display = "none";
 });
@@ -1625,6 +1629,7 @@ const endDateInput = document.getElementById('end-date');
 const confirmButton = document.getElementById('confirm-dates');
 const calendarRange = document.querySelector('.calendar_range span');
 const calendarView = document.querySelector('.calendar_view tbody');
+
 
 confirmButton.addEventListener('click', function() {
     document.getElementById("date-container").style.display = "none";
