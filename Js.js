@@ -1588,8 +1588,6 @@ confirmButton.addEventListener('click', function() {
 
 function updateCalendarView(startDate, endDate) {
 
-
-
     const calendar = document.querySelector('.calendar');
     calendarView.innerHTML = '';
 
@@ -1639,27 +1637,27 @@ function updateCalendarView(startDate, endDate) {
     let week_start = current_date.getDate() - current_date.getDay() + 1;
     let days_shortcut = ['pon.', 'wt.', 'śr.', 'czw.', 'pt.', 'sob.', 'ndz.'];
 
-    // Nagłówki tygodniowego widoku (bez kolumny godzin)
-    let weekly_header = `<thead><tr>`;
+    // // Nagłówki tygodniowego widoku (bez kolumny godzin)
+    // let weekly_header = `<thead><tr>`;
+    //
+    // for (let i = 0; i < 7; i++) {
+    //     let date = new Date(current_date.setDate(week_start + i)).toLocaleDateString(undefined, { month: '2-digit', day: '2-digit' });
+    //     weekly_header += `<th>${headerDays[i]}</th>`;
+    // }
 
-    for (let i = 0; i < 7; i++) {
-        let date = new Date(current_date.setDate(week_start + i)).toLocaleDateString(undefined, { month: '2-digit', day: '2-digit' });
-        weekly_header += `<th>${headerDays[i]}</th>`;
-    }
-
-    weekly_header += `</tr></thead>`;
-
-    let weekly_body = `<tbody>`;
-    for (let i = 0; i < 12; i++) {
-        weekly_body += `<tr>`;
-        for (let j = 0; j < 7; j++) {
-            weekly_body += `<td style="height: 50px;"></td>`;
-        }
-        weekly_body += `</tr>`;
-    }
-    weekly_body += `</tbody>`;
-
-    table.innerHTML = weekly_header + weekly_body;
+    // weekly_header += `</tr></thead>`;
+    //
+    // let weekly_body = `<tbody>`;
+    // for (let i = 0; i < 12; i++) {
+    //     weekly_body += `<tr>`;
+    //     for (let j = 0; j < 7; j++) {
+    //         weekly_body += `<td style="height: 50px;"></td>`;
+    //     }
+    //     weekly_body += `</tr>`;
+    // }
+    // weekly_body += `</tbody>`;
+    //
+    // table.innerHTML = weekly_header + weekly_body;
 
     //Resetowanie tła dla wszystkich komórek
     let cells = document.querySelectorAll('.calendar_view td');
@@ -1705,6 +1703,27 @@ document.getElementById("confirm-dates").addEventListener("click", () => {
 
         prevButton.style.display = "block";
         nextButton.style.display = "block";
+    });
+});
+
+//Widoczność ikony kalnedarza tylko przy miesiącu
+function toggleCalendarButton(view) {
+    const calendarButton = document.getElementById("calendar-button");
+
+    if (view === "month") {
+        calendarButton.style.display = "block";
+    } else {
+        calendarButton.style.display = "none";
+    }
+}
+
+["week_button", "daily_button", "today_button", "semester_button", "month_button"].forEach(buttonId => {
+    document.getElementById(buttonId).addEventListener("click", () => {
+        if (buttonId === "month_button") {
+            toggleCalendarButton("month");
+        } else {
+            toggleCalendarButton("other");
+        }
     });
 });
 
