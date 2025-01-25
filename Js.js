@@ -310,9 +310,12 @@ function show_tiles(){
     else if (calendar.id === "custom") {
         dataStart = document.getElementById("start-date").value;
         dataEnd = document.getElementById("end-date").value;
-        // console.log(dataStart, dataEnd);
+        let dataEnd2 = new Date(dataEnd);
+        dataEnd2.setDate(dataEnd2.getDate() + 1);
+        dataEnd = dataEnd2.toISOString().split('T')[0];
     }
 
+    //console.log(dataStart, dataEnd);
     //Pobieranie planu zajęć z bazy na podstawie filtrów oraz daty początkowej i końcowej
     fetch("process.php", {
         method: 'POST',
@@ -632,24 +635,49 @@ function show_tiles(){
             }
 
             else if (calendar.id === "custom") {
-                let current_day, day;
-                let day_info = {};
+                let current_day, start_hour, end_hour, lesson_name;
+                //Tworzenie hash mapy dla dni z zajęciami
+                let days_info = {};
+
+                for (let day = 1; day <= 31; day++) {
+                    let dayString = day.toString().padStart(2, '0');
+                    if (!days_info[dayString]) {
+                        days_info[dayString] = [];
+                    }
+                }
+
                 for (let lesson = 0; lesson < data.length; lesson++) {
                     current_day = new Date(data[lesson]["start"]).toISOString().split('T')[0].split("-")[2];
-                    console.log(current_day);
-                    if (!day_info[current_day]) {
-                        day_info[current_day] = [];
+                    if (!days_info[current_day]) {
+                        days_info[current_day] = [];
                     }
-                    day_info[current_day].push(data[lesson]["tytul"]);
+
+                    lesson_name = data[lesson]["tytul"];
+                    start_hour = new Date(data[lesson]["start"]).toLocaleString().split(",")[1].split(":").slice(0,2).join(":");
+                    end_hour = new Date(data[lesson]["koniec"]).toLocaleString().split(",")[1].split(":").slice(0,2).join(":");
+                    days_info[current_day].push(lesson_name + " " + start_hour + " - " + end_hour);
                 }
-                add_tile_calendar()
+
+
+                //Przechodzenie przez wszystkie komórki
+                const cells = document.querySelectorAll(".calendar_view td");
+                cells.forEach(cell => {
+                    // console.log(cell.innerText);
+                    console.log(cell.innerHTML + days_info[cell.innerText]);
+                });
+
+                // days_info.forEach(function(day_info, index){
+                //     console.log(day_info[index]);
+                //     // if (day_info) {
+                //     //     day_info = day_info.join("\n");
+                //     //     add_tile_calendar(7, 0, 60, a, "", "", day_info);
+                //     //     a+=1;
+                //     // }
+                // });
             }
 
             showStatistics();
         })
-
-
-
 
     if (forma.length === 0 || forma === "własnyKafelek"){
         ulubione.forEach(function(indexUlub){
@@ -704,7 +732,6 @@ function show_tiles(){
 
         });
     }
-
 
     document.getElementById("statistics-wlasny-kafelek-number").textContent = wlasnyKafelekNumber.toString();
     resetStatistics();
@@ -1337,12 +1364,13 @@ function get_table_tile_dimensions(row, column) {
 function add_tile_calendar(hour_start, minutes_start, minutes_duration, column, text, form, infoText) {
     const row = hour_start - 6;
     const dims = get_table_tile_dimensions(row, column);
-    //console.log(dims);
+
     let tile_upper_line = minutes_start / 60;
     tile_upper_line *= dims.height;
 
     const coordinates = get_table_tile_coordinates(row, column);
     const tile_duration_hour = minutes_duration / 60;
+    const calendar = document.querySelector('.calendar');
 
     if (coordinates) {
         const tile = document.createElement('div');
@@ -1375,27 +1403,58 @@ function add_tile_calendar(hour_start, minutes_start, minutes_duration, column, 
             tile.style.backgroundColor = 'var(--color_konsultacje)';
         }
 
+        if (calendar.id === "custom") {
+            tile.style.backgroundColor = '';
+        }
         const info = document.createElement("div");
 
-        tile.addEventListener('mouseenter', () => {
-            info.className = "tile-info";
-            info.innerText = infoText;
-            info.style.visibility = "visible";
-            info.style.opacity = "1";
+        //Widok kalendarza zakresowego
+        if (calendar.id === "custom") {
+            tile.addEventListener('click', () => {
+                info.className = "tile-info";
+                info.innerText = infoText;
+                info.style.visibility = "visible";
+                info.style.opacity = "1";
 
-            document.body.appendChild(info);
-        });
+                document.body.appendChild(info);
+            });
 
-        tile.addEventListener('mousemove', (e) => {
-            info.style.top = `${e.pageY + 10}px`;
-            info.style.left = `${e.pageX + 10}px`;
-        });
+            tile.addEventListener('mousemove', (e) => {
+                info.style.top = `${e.pageY + 10}px`;
+                info.style.left = `${e.pageX + 10}px`;
+            });
 
-        tile.addEventListener('mouseleave', () => {
-            document.body.removeChild(info);
-        });
+            document.addEventListener('click', (e) => {
+                if (!tile.contains(e.target)) {
+                    info.style.visibility = "hidden";
+                    info.style.opacity = "0";
+                }
+            });
+            tile.addEventListener('mouseleave', () => {
+                document.body.removeChild(info);
+            });
+        }
 
+        //Widok wszystkich pozostałych kalendarzy
+        else {
+            tile.addEventListener('mouseenter', () => {
+                info.className = "tile-info";
+                info.innerText = infoText;
+                info.style.visibility = "visible";
+                info.style.opacity = "1";
 
+                document.body.appendChild(info);
+            });
+
+            tile.addEventListener('mousemove', (e) => {
+                info.style.top = `${e.pageY + 10}px`;
+                info.style.left = `${e.pageX + 10}px`;
+            });
+
+            tile.addEventListener('mouseleave', () => {
+                document.body.removeChild(info);
+            });
+        }
 
         document.body.appendChild(tile);
 
@@ -1625,7 +1684,7 @@ function updateCalendarView(startDate, endDate) {
         week.forEach(function (date) {
             let cell = document.createElement('td');
             cell.textContent = date.getDate();
-            cell.style.height = '50px';
+            cell.style.height = '35px';
             row.appendChild(cell);
         });
 
@@ -1633,7 +1692,7 @@ function updateCalendarView(startDate, endDate) {
         while (row.children.length < 7) {
             let emptyCell = document.createElement('td');
             emptyCell.textContent = '';
-            emptyCell.style.height = '50px';
+            emptyCell.style.height = '35px';
             row.appendChild(emptyCell);
         }
 
@@ -1691,15 +1750,12 @@ function updateCalendarView(startDate, endDate) {
             cell.textContent = daysInRange[day].getDate();
         }
     }
-
 }
-
 
 // Strzalki
 document.getElementById("confirm-dates").addEventListener("click", () => {
     const prevButton = document.getElementById("prev");
     const nextButton = document.getElementById("next");
-
 
     prevButton.style.display = "none";
     nextButton.style.display = "none";
