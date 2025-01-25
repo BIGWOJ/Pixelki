@@ -1584,10 +1584,7 @@ confirmButton.addEventListener('click', function() {
     }
 });
 
-
-
 function updateCalendarView(startDate, endDate) {
-
     const calendar = document.querySelector('.calendar');
     const calendarView = document.querySelector('.calendar_view tbody');
     calendarView.innerHTML = '';
@@ -1606,7 +1603,7 @@ function updateCalendarView(startDate, endDate) {
     const headerDays = ['Pon', 'Wt', 'Śr', 'Czw', 'Pt', 'So', 'Nd'];
     let updatedHeader = headerDays.slice(startDay - 1).concat(headerDays.slice(0, startDay - 1));
 
-    // //Nagłowki
+    //Nagłowki
     const tableHeader = document.querySelector('.calendar_view thead tr');
     const headerHtml = updatedHeader.map(day => `<th>${day}</th>`).join('');
     tableHeader.innerHTML = headerHtml;
@@ -1627,17 +1624,19 @@ function updateCalendarView(startDate, endDate) {
         let row = document.createElement('tr');
         week.forEach(function (date) {
             let cell = document.createElement('td');
-            cell.textContent = '';
+            cell.textContent = date.getDate();
             cell.style.height = '50px';
-
-            if (date >= startDate && date <= endDate) {
-                cell.style.backgroundColor = '#a5bc8f'; // Zielony kafelek
-                cell.textContent = date.getDate(); // Liczba dnia w zielonych kafelkach
-            }
-
-
             row.appendChild(cell);
         });
+
+        // Dopełnianie tygodnia pustymi komórkami, jeśli jest mniej niż 7 dni
+        while (row.children.length < 7) {
+            let emptyCell = document.createElement('td');
+            emptyCell.textContent = '';
+            emptyCell.style.height = '50px';
+            row.appendChild(emptyCell);
+        }
+
         calendarView.appendChild(row);
     });
 
