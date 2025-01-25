@@ -22,9 +22,7 @@
 /*    display: block;*/
 /*    margin: 5px 0;*/
 /*}*/
-.calendar_view .range_calendar_cell {
-    background-color: red !important;
-}
+
 :root {
     --color_primary: #7e9f60;
     --color_secondary: #006fe6;
@@ -851,34 +849,6 @@ footer {
     border-radius: 15px;
     text-align: center;
 }
-
-.semestr-container {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    background-color: var(--color_beige);
-    gap: 20px;
-    flex-direction: column;
-    border: 1px solid black;
-    padding: 10px;
-}
-
-.semestr-now {
-    position: absolute;
-    top: 10%;
-    left: 50%;
-    transform: translate(-50%, 0%);
-    border: 1px solid black;
-    padding: 10px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-}
-
 
 @media (min-width: 768px) {
     overflow-y: hidden;
