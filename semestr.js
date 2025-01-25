@@ -3,12 +3,15 @@ function changeSemestrDate() {
     const dateStart = document.getElementById("semestr-start").value;
     const dateEnd = document.getElementById("semestr-end").value;
 
+    if (dateStart >= dateEnd) {
+        alert("Data rozpoczęcia semestru nie może być późniejsza niż data zakończenia!");
+        return;
+    }
+
     if (semestr === "" || dateStart === "" || dateEnd === "") {
         alert("Wypelnij wszystkie pola!");
         return;
     }
-
-    console.log(dateStart);
 
     fetch("semestr.php", {
         method: 'POST',
