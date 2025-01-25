@@ -1584,7 +1584,12 @@ confirmButton.addEventListener('click', function() {
     }
 });
 
+
+
 function updateCalendarView(startDate, endDate) {
+
+
+
     const calendar = document.querySelector('.calendar');
     calendarView.innerHTML = '';
 
@@ -1681,6 +1686,28 @@ function updateCalendarView(startDate, endDate) {
 
     calendar.id = "custom";
 }
+
+
+// Strzalki
+document.getElementById("confirm-dates").addEventListener("click", () => {
+    const prevButton = document.getElementById("prev");
+    const nextButton = document.getElementById("next");
+
+
+    prevButton.style.display = "none";
+    nextButton.style.display = "none";
+});
+
+["week_button", "today_button", "daily_button", "semester_button", "month_button"].forEach(buttonId => {
+    document.getElementById(buttonId).addEventListener("click", () => {
+        const prevButton = document.getElementById("prev");
+        const nextButton = document.getElementById("next");
+
+        prevButton.style.display = "block";
+        nextButton.style.display = "block";
+    });
+});
+
 
 if (theme === "dark") {
     document.querySelector("body").classList.add("dark");
