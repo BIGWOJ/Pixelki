@@ -1589,6 +1589,7 @@ confirmButton.addEventListener('click', function() {
 function updateCalendarView(startDate, endDate) {
 
     const calendar = document.querySelector('.calendar');
+    const calendarView = document.querySelector('.calendar_view tbody');
     calendarView.innerHTML = '';
 
     let currentDate = new Date(startDate);
@@ -1605,16 +1606,16 @@ function updateCalendarView(startDate, endDate) {
     const headerDays = ['Pon', 'Wt', 'Śr', 'Czw', 'Pt', 'So', 'Nd'];
     let updatedHeader = headerDays.slice(startDay - 1).concat(headerDays.slice(0, startDay - 1));
 
-    //Nagłowki
+    // //Nagłowki
     const tableHeader = document.querySelector('.calendar_view thead tr');
-    updatedHeader = updatedHeader.map(day => `<th>${day}</th>`).join('');
-    tableHeader.innerHTML = `</th>` + updatedHeader;
+    const headerHtml = updatedHeader.map(day => `<th>${day}</th>`).join('');
+    tableHeader.innerHTML = headerHtml;
 
     //Grupowanie dni w tygodnie
     let weeks = [];
     let currentWeek = [];
     daysInRange.forEach(function (date, index) {
-        currentWeek.push(date.getDate());
+        currentWeek.push(date);
         if (currentWeek.length === 7 || index === daysInRange.length - 1) {
             weeks.push(currentWeek);
             currentWeek = [];
@@ -1624,29 +1625,39 @@ function updateCalendarView(startDate, endDate) {
     //Dodawanie dni do tabeli
     weeks.forEach(function (week) {
         let row = document.createElement('tr');
-        week.forEach(function (day) {
+        week.forEach(function (date) {
             let cell = document.createElement('td');
-            cell.textContent = day || '';
+            cell.textContent = '';
+            cell.style.height = '50px';
+
+            if (date >= startDate && date <= endDate) {
+                cell.style.backgroundColor = '#a5bc8f'; // Zielony kafelek
+                cell.textContent = date.getDate(); // Liczba dnia w zielonych kafelkach
+            }
+
+
             row.appendChild(cell);
         });
         calendarView.appendChild(row);
     });
 
-    const table = document.querySelector(".calendar_view");
-    let current_date = new Date();
-    let week_start = current_date.getDate() - current_date.getDay() + 1;
-    let days_shortcut = ['pon.', 'wt.', 'śr.', 'czw.', 'pt.', 'sob.', 'ndz.'];
+    calendar.id = "custom";
 
-    // // Nagłówki tygodniowego widoku (bez kolumny godzin)
+    // const table = document.querySelector(".calendar_view");
+    // let current_date = new Date();
+    // let week_start = current_date.getDate() - current_date.getDay() + 1;
+    // let days_shortcut = ['pon.', 'wt.', 'śr.', 'czw.', 'pt.', 'sob.', 'ndz.'];
+    //
+    // // // Nagłówki tygodniowego widoku (bez kolumny godzin)
     // let weekly_header = `<thead><tr>`;
     //
     // for (let i = 0; i < 7; i++) {
     //     let date = new Date(current_date.setDate(week_start + i)).toLocaleDateString(undefined, { month: '2-digit', day: '2-digit' });
     //     weekly_header += `<th>${headerDays[i]}</th>`;
     // }
-
-    // weekly_header += `</tr></thead>`;
     //
+    // weekly_header += `</tr></thead>`;
+    // //
     // let weekly_body = `<tbody>`;
     // for (let i = 0; i < 12; i++) {
     //     weekly_body += `<tr>`;
@@ -1657,7 +1668,7 @@ function updateCalendarView(startDate, endDate) {
     // }
     // weekly_body += `</tbody>`;
     //
-    // table.innerHTML = weekly_header + weekly_body;
+    // table.innerHTML =  weekly_header + weekly_body;
 
     //Resetowanie tła dla wszystkich komórek
     let cells = document.querySelectorAll('.calendar_view td');
@@ -1682,7 +1693,6 @@ function updateCalendarView(startDate, endDate) {
         }
     }
 
-    calendar.id = "custom";
 }
 
 
