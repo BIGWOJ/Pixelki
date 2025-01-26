@@ -1,44 +1,69 @@
-:root {
-    --color_primary: #7e9f60;
-    --color_secondary: #006fe6;
-    --color_white: #f8f9fa;
-    --color_black: #333;
-    --color_beige: #faf9f6;
-    --color_border_gray: #ddd;
-}
-
 body {
+    font-family: sans-serif;
+    background-color: #f4f4f4;
     margin: 0;
     padding: 0;
-    box-sizing: border-box;
+    color: #333;
 }
 
-.semestr-container {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    background-color: var(--color_beige);
-    gap: 20px;
-    flex-direction: column;
-    border: 1px solid var(--color_black);
-    padding: 10px;
+h1, label {
+    color: #7E9F60;
 }
 
-.semestr-now {
-    position: absolute;
-    top: 10%;
-    left: 50%;
-    transform: translate(-50%, 0%);
-    border: 1px solid var(--color_black);
-    background-color: var(--color_beige);
+.semestr-now, .semestr-container {
+    max-width: 600px;
+    margin: 20px auto;
+    padding: 20px;
+    background-color: #ffffff;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.semestr-now label {
+    font-weight: bold;
+    display: block;
+}
+
+#semestr-zimowy-date, #semestr-letni-date {
+    display: block;
+    font-size: 1rem;
+    color: #555;
+
+}
+
+.semestr-container label {
+    display: block;
+    margin: 10px 5px;
+    font-size: 1rem;
+}
+
+select, button {
+    width: 100%;
     padding: 10px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
+    margin-bottom: 15px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    font-size: 1rem;
+}
+input[type="date"]{
+    width: 80%;
+    padding: 10px;
+    margin-bottom: 15px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    font-size: 1rem;
+}
+button {
+    background-color: #7E9F60;
+    color: #fff;
+    border: none;
+    cursor: pointer;
+
+}
+
+button:hover {
+    background-color: #6B8A53;
 }
 
 footer {
@@ -47,8 +72,37 @@ footer {
     padding: 15px 0;
     border-top: 1px solid var(--color_border_gray);
     width: 100%;
-    background-color: var(--color_primary);
+    background-color: #7E9F60;
     position: fixed;
     bottom: 0;
     z-index: 1000;
 }
+
+@media (max-width: 768px) {
+    .semestr-now, .semestr-container {
+        padding: 15px;
+    }
+
+    label, select, input[type="date"], button {
+        font-size: 0.9rem;
+    }
+
+    button {
+        padding: 8px;
+    }
+}
+
+@media (max-width: 480px) {
+    .semestr-now, .semestr-container {
+        padding: 10px;
+    }
+
+    label, select, input[type="date"], button {
+        font-size: 0.8rem;
+    }
+
+    button {
+        padding: 6px;
+    }
+}
+
