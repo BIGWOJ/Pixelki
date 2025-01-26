@@ -53,7 +53,7 @@ function getCurrentFilterValues() {
         subject: document.getElementById('subject').value,
         group: document.getElementById('group').value,
         albumNumber: document.getElementById('album-number').value,
-        classType: document.getElementById('forma-zajec').value,
+        classType: document.getElementById('class-type').value,
     };
 }
 

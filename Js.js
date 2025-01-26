@@ -209,7 +209,7 @@ function show_tiles(){
     const przedmiot = document.getElementById("subject").value;
     const grupa = document.getElementById("group").value;
     const numerAlbumu = document.getElementById("album-number").value;
-    const forma = document.getElementById("forma-zajec").value;
+    const forma = document.getElementById("class-type").value;
 
     //Walidacja danych wejściowych
     if (!valid_inputs(wykladowca, sala, przedmiot, grupa, numerAlbumu, forma)) {
@@ -769,6 +769,7 @@ document.querySelector(".filter-buttons button:nth-child(2)").addEventListener("
     filter_inputs.forEach(input => {
         input.value = "";
     });
+    document.getElementById('class-type').value = "";
 });
 
 //Dzisiejszy dzień widok kalendarza
