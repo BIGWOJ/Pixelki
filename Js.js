@@ -313,6 +313,7 @@ function show_tiles(){
         let dataEnd2 = new Date(dataEnd);
         dataEnd2.setDate(dataEnd2.getDate() + 1);
         dataEnd = dataEnd2.toISOString().split('T')[0];
+        // console.log(dataStart, dataEnd);
     }
 
     //console.log(dataStart, dataEnd);
@@ -328,7 +329,7 @@ function show_tiles(){
         .then(data => {
             //Posortowanie zajęć według godziny zaczęcia
             data.sort((a, b) => new Date(a.start) - new Date(b.start));
-            console.log(data);
+            //console.log(data);
 
             //Wyświetlanie kafelków dla danego typu kalendarza
             if (calendar.id === "dzisiejszy") {
@@ -660,20 +661,29 @@ function show_tiles(){
 
 
                 //Przechodzenie przez wszystkie komórki
+                let column_counter = 0;
+                let row_counter = 0;
+                let day_info;
                 const cells = document.querySelectorAll(".calendar_view td");
                 cells.forEach(cell => {
-                    // console.log(cell.innerText);
-                    console.log(cell.innerHTML + days_info[cell.innerText]);
-                });
+                    if (cell.innerHTML.length === 1) {
+                        cell.innerHTML = "0" + cell.innerHTML;
+                    }
+                    if (days_info[cell.innerText]) {
+                        day_info = days_info[cell.innerText].join("\n");
+                    }
+                    else {
+                        day_info = "";
+                    }
 
-                // days_info.forEach(function(day_info, index){
-                //     console.log(day_info[index]);
-                //     // if (day_info) {
-                //     //     day_info = day_info.join("\n");
-                //     //     add_tile_calendar(7, 0, 60, a, "", "", day_info);
-                //     //     a+=1;
-                //     // }
-                // });
+
+                    add_tile_calendar(7, 60*row_counter, 60, column_counter, "", "", day_info, false);
+                    column_counter += 1;
+                    if (column_counter === 7) {
+                        column_counter = 0;
+                        row_counter += 1;
+                    }
+                });
             }
 
             showStatistics();
@@ -1364,7 +1374,7 @@ function get_table_tile_dimensions(row, column) {
 
 //Funkcja do dodawania kafelka do kalendarza
 //input: godzina startu, minuty startu, minuty trwania, nr_kolumny (od 1), tekst, forma zajec
-function add_tile_calendar(hour_start, minutes_start, minutes_duration, column, text, form, infoText) {
+function add_tile_calendar(hour_start, minutes_start, minutes_duration, column, text, form, infoText, render_border=True) {
     const row = hour_start - 6;
     const dims = get_table_tile_dimensions(row, column);
 
@@ -1410,6 +1420,10 @@ function add_tile_calendar(hour_start, minutes_start, minutes_duration, column, 
             tile.style.backgroundColor = '';
         }
         const info = document.createElement("div");
+
+        if (!render_border) {
+            tile.style.border = "none";
+        }
 
         //Widok kalendarza zakresowego
         if (calendar.id === "custom") {
