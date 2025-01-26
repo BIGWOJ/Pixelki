@@ -103,8 +103,9 @@ body {
     left: 50%;
     transform: translate(-50%, -50%);
     border-radius: 40px;
-    background-color: var(--color_primary);
-    border: 1px solid #ccc;
+    background-color: #b9c7ac;;
+    /*background-color: var(--color_primary);*/
+    border: 2px solid #325019;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
     padding: 40px;
     z-index: 1000;
@@ -369,6 +370,11 @@ main {
     height: 30vh;
 }
 
+
+#confirm-dates, #close-modal {
+    border: 3px solid #7e9f60;
+
+}
 .calendar {
     flex: 2;
     background-color: var(--color_beige);
@@ -458,6 +464,12 @@ main {
     justify-content: center;
     margin-top: 10px;
 }
+
+#start-date, #end-date{
+
+    border: 3px solid #7e9f60;
+}
+
 
 .statistics {
     background-color: var(--color_beige);
