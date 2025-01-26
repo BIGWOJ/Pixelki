@@ -676,7 +676,6 @@ function show_tiles(){
                         day_info = "";
                     }
 
-
                     add_tile_calendar(7, 60*row_counter, 60, column_counter, "", "", day_info, false);
                     column_counter += 1;
                     if (column_counter === 7) {
@@ -1374,7 +1373,7 @@ function get_table_tile_dimensions(row, column) {
 
 //Funkcja do dodawania kafelka do kalendarza
 //input: godzina startu, minuty startu, minuty trwania, nr_kolumny (od 1), tekst, forma zajec
-function add_tile_calendar(hour_start, minutes_start, minutes_duration, column, text, form, infoText, render_border=True) {
+function add_tile_calendar(hour_start, minutes_start, minutes_duration, column, text, form, infoText, render_border=true) {
     const row = hour_start - 6;
     const dims = get_table_tile_dimensions(row, column);
 
