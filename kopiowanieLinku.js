@@ -4,7 +4,7 @@ function generateLink() {
     const przedmiot = document.getElementById("subject").value;
     const grupa = document.getElementById("group").value;
     const numerAlbumu = document.getElementById("album-number").value;
-    const forma = document.getElementById("forma-zajec").value;
+    const forma = document.getElementById("class-type").value;
 
     const baseUrl = window.location.href.split("?")[0];
 
@@ -31,7 +31,7 @@ function generateLink() {
     }
 
     if (forma != "") {
-        url = url + `forma-zajec=${encodeURIComponent(forma)}`;
+        url = url + `class-type=${encodeURIComponent(forma)}`;
     }
 
     navigator.clipboard.writeText(url).then(() => {
@@ -51,7 +51,7 @@ function paramsEnter() {
     const subject = params.get("subject");
     const group = params.get("group");
     const albumNumber = params.get("album-number");
-    const classType = params.get("forma-zajec");
+    const classType = params.get("class-type");
 
     // console.log(params.get("lecturer"));
 
@@ -60,7 +60,7 @@ function paramsEnter() {
     document.getElementById("subject").value = params.get("subject");
     document.getElementById("group").value = params.get("group");
     document.getElementById("album-number").value = params.get("album-number");
-    document.getElementById("forma-zajec").value = params.get("forma-zajec");
+    document.getElementById("class-type").value = params.get("class-type");
 
     // pozniej dodac wyswietlanie od razu planu jak sie wejdzie na strone
 }
