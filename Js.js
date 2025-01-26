@@ -681,7 +681,6 @@ function show_tiles(){
                         day_info = "";
                     }
 
-
                     add_tile_calendar(7, 60*row_counter, 60, column_counter, "", "", day_info, false);
                     column_counter += 1;
                     if (column_counter === 7) {
@@ -699,19 +698,20 @@ function show_tiles(){
 
             let str = indexUlub["timeFrom"];
             let hour = str.split(':')[0];
-            let minute = str.split(':')[1];
+            let minuteStart = str.split(':')[1];
 
             str = indexUlub["timeTo"];
             let hourEnd = str.split(':')[0];
+            let minuteEnd = str.split(':')[1];
 
-            let startTime = '2025-01-01T' + hour + ":00";
+            let startTime = '2025-01-01T' + hour + ':' + minuteStart + ":00";
             startTime = new Date(startTime);
 
-            let endTime = '2025-01-01T' + hourEnd + ":00";
+            let endTime = '2025-01-01T' + hourEnd + ':' + minuteEnd + ':00';
             endTime = new Date(endTime);
+            let lesson_duration = endTime - startTime;
 
-            let roznica = endTime - startTime;
-            roznica = roznica / 1000 / 60;
+            lesson_duration /= 60000 ;
 
             let dataKafelek = new Date(indexUlub["date"]);
             dataKafelek = dataKafelek.getDate();
@@ -729,7 +729,7 @@ function show_tiles(){
                         let part = str.split(' ')[1].split('.')[0];
 
                         if (Number(dataKafelek) === Number(part)){
-                            add_tile_calendar(hour, minute, roznica, indexNum, text, "własnyKafelek", text);
+                            add_tile_calendar(hour, minuteStart, lesson_duration, indexNum, text, "własnyKafelek", text);
                             wlasnyKafelekNumber++;
                         }
                     }
@@ -739,7 +739,7 @@ function show_tiles(){
                 dataTD.forEach(function(indexTH){
                     let hourCheck = indexTH.previousElementSibling;
                     if (hourCheck.textContent === hour) {
-                        add_tile_calendar(hour, minute, roznica, 1, text, "własnyKafelek", text);
+                        add_tile_calendar(hour, minuteStart, lesson_duration, 1, text, "własnyKafelek", text);
                         wlasnyKafelekNumber++;
                     }
                 })
@@ -1379,7 +1379,8 @@ function get_table_tile_dimensions(row, column) {
 
 //Funkcja do dodawania kafelka do kalendarza
 //input: godzina startu, minuty startu, minuty trwania, nr_kolumny (od 1), tekst, forma zajec
-function add_tile_calendar(hour_start, minutes_start, minutes_duration, column, text, form, infoText, render_border= true) {
+
+function add_tile_calendar(hour_start, minutes_start, minutes_duration, column, text, form, infoText, render_border=true) {
     const row = hour_start - 6;
     const dims = get_table_tile_dimensions(row, column);
 

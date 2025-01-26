@@ -459,7 +459,7 @@ main {
     margin-top: 10px;
 }
 
-.legend, .statistics {
+.statistics {
     background-color: var(--color_beige);
     padding: 10px;
     margin-top: 20px;
@@ -476,43 +476,43 @@ main {
     display: none;
 }
 
-.legend-item, .statistics-item {
+.statistics-item {
     padding: 0 10px;
     border-radius: 10px;
     color: white;
 }
 
-#legend-audytorium, #statistics-audytorium {
+#statistics-audytorium {
     background-color: var(--color_audytorium);
     border: 1px solid var(--color_audytorium);
 }
 
-#legend-konsultacje, #statistics-konsultacje {
+#statistics-konsultacje {
     background-color: var(--color_konsultacje);
     border: 1px solid var(--color_konsultacje);
 }
 
-#legend-laboratorium, #statistics-laboratorium {
+#statistics-laboratorium {
     background-color: var(--color_laby);
     border: 1px solid var(--color_laby);
 }
 
-#legend-lektorat, #statistics-lektorat {
+#statistics-lektorat {
     background-color: var(--color_lektorat);
     border: 1px solid var(--color_lektorat);
 }
 
-#legend-wyklad, #statistics-wyklad {
+#statistics-wyklad {
     background-color: var(--color_wyklad);
     border: 1px solid var(--color_wyklad);
 }
 
-#legend-projekt, #statistics-projekt {
+#statistics-projekt {
     background-color: var(--color_projekt);
     border: 1px solid var(--color_projekt);
 }
 
-#legend-wlasny-kafelek, #statistics-wlasny-kafelek {
+#statistics-wlasny-kafelek {
     background-color: var(--color_kafelek);
     border: 1px solid var(--color_kafelek);
 }
@@ -911,13 +911,6 @@ footer {
 }
 
 @media (max-width: 400px) {
-    .legend {
-        flex-direction: column;
-    }
-
-    .legend-item {
-        max-width: 100%;
-    }
     #date-container{
         width: 250px;
     }
