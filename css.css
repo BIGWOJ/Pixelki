@@ -1,28 +1,3 @@
-/* Formy zajęć lista checkboxów */
-/*.dropdown {*/
-/*    position: relative;*/
-/*    display: inline-block;*/
-/*}*/
-
-/*.dropdown-content {*/
-/*    display: none;*/
-/*    position: absolute;*/
-/*    background-color: #f9f9f9;*/
-/*    min-width: 200px;*/
-/*    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);*/
-/*    z-index: 1;*/
-/*    padding: 10px;*/
-/*}*/
-
-/*.dropdown:hover .dropdown-content {*/
-/*    display: block;*/
-/*}*/
-
-/*.dropdown-content label {*/
-/*    display: block;*/
-/*    margin: 5px 0;*/
-/*}*/
-
 :root {
     --color_primary: #7e9f60;
     --color_secondary: #006fe6;
@@ -103,8 +78,7 @@ body {
     left: 50%;
     transform: translate(-50%, -50%);
     border-radius: 40px;
-    background-color: #b9c7ac;;
-    /*background-color: var(--color_primary);*/
+    background-color: #b9c7ac;
     border: 2px solid #325019;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
     padding: 40px;
@@ -247,9 +221,7 @@ h2{
 
 .fas.fa-heart {
     color: white;
-    /*display: block;*/
     text-align: center;
-    /*margin: 0 auto;*/
     cursor: pointer;
 }
 
@@ -304,7 +276,6 @@ i {
     color: var(--color_black);
     border-style: solid;
     border-color: var(--color_primary);
-    /*font-weight: bold;*/
     padding: 8px 12px;
     cursor: pointer;
     border-radius: 4px;
@@ -321,11 +292,6 @@ i {
     background-color: var(--color_primary);
     color: var(--color_beige);
 }
-
-/*#semestralny, #dzienny {
-    max-height: 70vh;
-    overflow-y: auto;
-}*/
 
 #semestralny::-webkit-scrollbar, #dzienny::-webkit-scrollbar {
     width: 20px;
