@@ -293,7 +293,7 @@ function show_tiles(){
 
         dataStart = new Date(year, month_number-1, 2).toISOString().split('T')[0];
         dataEnd = new Date(year, month_number, 1).toISOString().split('T')[0];
-         //console.log(dataStart, dataEnd);
+        //console.log(dataStart, dataEnd);
     }
 
     else if (calendar.id === "semestralny"){
@@ -477,46 +477,21 @@ function show_tiles(){
             }
 
             else if (calendar.id === "miesieczny") {
-                //console.log("miesieczny");
-                //console.log(data);
-                let current_lesson_day, previous_lesson_day;
-                let jump_day = 0;
-                let jump_day_licznik = 0;
-                let indexLicznik = data[0];
-                let previousDay = new Date(indexLicznik["start"]);
-                previousDay = previousDay.toISOString().split('T')[0];
-                let dataLicznik = new Date(indexLicznik["start"]);
-                for (let i = 0; i < data.length; i++) {
-                    let index = data[i];
-                    let timeStart = new Date(index["start"]);
-                    let hour = timeStart.getHours();
-                    let minute = timeStart.getMinutes();
-                    let timeEnd = new Date(index["koniec"]);
-                    let timeEndMinutes;
-                    if (timeEnd.getMinutes() === Number(0)) {
-                        timeEndMinutes = "00";
-                    }
-                    else {
-                        timeEndMinutes = timeEnd.getMinutes();
+                let current_day, start_hour, end_hour, lesson_name;
+                //Tworzenie hash mapy dla dni z zajęciami
+
+                let days_info = {};
+
+                for (let day = 1; day <= 31; day++) {
+                    let dayString = day.toString().padStart(2, '0');
+                    if (!days_info[dayString]) {
+                        days_info[dayString] = [];
                     }
 
-                    const daysOfWeek = ["Pon", "Wto", "Śro", "Czw", "Pia", "Sob", "Nie"];
-                    const dayOfWeek = daysOfWeek[(dataLicznik.getDay() + 6) % 7];
 
+                }
 
-
-
-                    let roznica = timeEnd - timeStart;
-                    roznica = roznica / 1000 / 60;
-
-                    let text = timeStart.getHours() + ":" + timeStart.getMinutes() + " - " + timeEnd.getHours() + ":" + timeEndMinutes
-                        + "\n" + index["tytul"];
-                    let info = index["tytul"] + "\n" + "Prowadzący: " + index["imie"] + " " + index["nazwisko"] + "\n" + "Sala: " + index["3"]
-                        + " " + index["pokoj"] + "\n" + "Grupa: " + index["2"] + "\n" + index["formaZajec"];
-
-                    current_lesson_day = index["start"].split("T")[0].split("-")[2];
-                    previous_lesson_day = data[i-1] ? data[i-1]["start"].split("T")[0].split("-")[2] : null;
-
+                data.forEach(function(index) {
                     // zliczanie do statystyk
                     if (index["formaZajec"] === "laboratorium") laboratoriumNumber++;
                     else if (index["formaZajec"] === "wykład") wykladNumber++;
@@ -526,34 +501,51 @@ function show_tiles(){
                     else if (index["formaZajec"] === "własnyKafelek") wlasnyKafelekNumber++;
                     else if (index["opis"].includes("Konsultacje")) konsultacjeNumber++;
                     //
+                });
 
 
-
-
-                    //Przesunięcie kafelka o dzień
-                    if (current_lesson_day !== previous_lesson_day && previous_lesson_day !== null) {
-                        //console.log(dayOfWeek + " dodalo 1 warunek");
-                        jump_day += 840;
+                for (let lesson = 0; lesson < data.length; lesson++) {
+                    current_day = new Date(data[lesson]["start"]).toISOString().split('T')[0].split("-")[2];
+                    if (!days_info[current_day]) {
+                        days_info[current_day] = [];
                     }
 
-
-                    if (dataLicznik.toISOString().split('T')[0] != timeStart.toISOString().split('T')[0] && (dayOfWeek === "Pia")){
-                        //console.log("timeStart " + timeStart);
-                        //console.log(dayOfWeek + " dodalo 2 warunek");
-                        jump_day += 1680;
-                        dataLicznik.setDate(dataLicznik.getDate() + 2);
-                    }
+                    lesson_name = data[lesson]["tytul"];
+                    start_hour = new Date(data[lesson]["start"]).toLocaleString().split(",")[1].split(":").slice(0,2).join(":");
+                    end_hour = new Date(data[lesson]["koniec"]).toLocaleString().split(",")[1].split(":").slice(0,2).join(":");
+                    days_info[current_day].push(lesson_name + " " + start_hour + " - " + end_hour);
 
 
-                    add_tile_calendar(6, (hour-6)*60+minute+jump_day+jump_day_licznik, roznica, 1, text, index["formaZajec"], info);
-
-
-                    if (previousDay != timeStart.toISOString().split('T')[0]) {
-                        dataLicznik.setDate(dataLicznik.getDate() + 1);
-                    }
-                    previousDay = new Date(timeStart);
-                    previousDay = previousDay.toISOString().split('T')[0];
                 }
+
+
+
+
+
+                //Przechodzenie przez wszystkie komórki
+                let column_counter = 0;
+                let row_counter = 0;
+                let day_info;
+                const cells = document.querySelectorAll(".calendar_view td");
+                cells.forEach(cell => {
+                    if (cell.innerHTML.length === 1) {
+                        cell.innerHTML = "0" + cell.innerHTML;
+                    }
+                    if (days_info[cell.innerText]) {
+                        day_info = days_info[cell.innerText].join("\n");
+                    }
+                    else {
+                        day_info = "";
+                    }
+
+
+                    add_tile_calendar(7, 60*row_counter, 60, column_counter, "", "", day_info, false);
+                    column_counter += 1;
+                    if (column_counter === 7) {
+                        column_counter = 0;
+                        row_counter += 1;
+                    }
+                });
 
             }
 
@@ -647,6 +639,18 @@ function show_tiles(){
                     }
                 }
 
+                data.forEach(function(index) {
+                    // zliczanie do statystyk
+                    if (index["formaZajec"] === "laboratorium") laboratoriumNumber++;
+                    else if (index["formaZajec"] === "wykład") wykladNumber++;
+                    else if (index["formaZajec"] === "lektorat") lektoratNumber++;
+                    else if (index["formaZajec"] === "audytoryjne") audytoriumNumber++;
+                    else if (index["formaZajec"] === "projekt") projektNumber++;
+                    else if (index["formaZajec"] === "własnyKafelek") wlasnyKafelekNumber++;
+                    else if (index["opis"].includes("Konsultacje")) konsultacjeNumber++;
+                    //
+                });
+
                 for (let lesson = 0; lesson < data.length; lesson++) {
                     current_day = new Date(data[lesson]["start"]).toISOString().split('T')[0].split("-")[2];
                     if (!days_info[current_day]) {
@@ -658,6 +662,7 @@ function show_tiles(){
                     end_hour = new Date(data[lesson]["koniec"]).toLocaleString().split(",")[1].split(":").slice(0,2).join(":");
                     days_info[current_day].push(lesson_name + " " + start_hour + " - " + end_hour);
                 }
+
 
 
                 //Przechodzenie przez wszystkie komórki
@@ -1374,7 +1379,7 @@ function get_table_tile_dimensions(row, column) {
 
 //Funkcja do dodawania kafelka do kalendarza
 //input: godzina startu, minuty startu, minuty trwania, nr_kolumny (od 1), tekst, forma zajec
-function add_tile_calendar(hour_start, minutes_start, minutes_duration, column, text, form, infoText, render_border=True) {
+function add_tile_calendar(hour_start, minutes_start, minutes_duration, column, text, form, infoText, render_border= true) {
     const row = hour_start - 6;
     const dims = get_table_tile_dimensions(row, column);
 
@@ -1419,22 +1424,49 @@ function add_tile_calendar(hour_start, minutes_start, minutes_duration, column, 
         if (calendar.id === "custom") {
             tile.style.backgroundColor = '';
         }
+
+        if (calendar.id === "miesieczny") {
+            tile.style.backgroundColor = '';
+        }
         const info = document.createElement("div");
 
         if (!render_border) {
             tile.style.border = "none";
         }
 
+
+
         //Widok kalendarza zakresowego
-        if (calendar.id === "custom") {
-            tile.addEventListener('click', () => {
+        if (calendar.id === "custom" || calendar.id === "miesieczny") {
+            tile.addEventListener('mouseenter', () => {
+                info.className = "tile-info";
+                info.innerText = infoText;
+                info.style.visibility = "visible";
+                info.style.opacity = "1";
+
+
+                if (info.innerText != "" ) {
+                    document.body.appendChild(info);
+
+                }
+            });
+
+            if (infoText != "" ){
+                tile.style.backgroundColor = '#a5bc8f';
+                tile.style.opacity = "50%";
+            }
+
+
+
+            // zmienilem bo latwiej sie oglada, mozna pozniej zmienic
+/*            tile.addEventListener('click', () => {
                 info.className = "tile-info";
                 info.innerText = infoText;
                 info.style.visibility = "visible";
                 info.style.opacity = "1";
 
                 document.body.appendChild(info);
-            });
+            });*/
 
             tile.addEventListener('mousemove', (e) => {
                 info.style.top = `${e.pageY + 10}px`;
@@ -1660,6 +1692,8 @@ confirmButton.addEventListener('click', function() {
         calendarRange.textContent = `${startDateInput.value} - ${endDateInput.value}`;
         updateCalendarView(startDate, endDate);
     }
+
+    show_tiles();
 });
 
 function updateCalendarView(startDate, endDate) {
@@ -1754,7 +1788,8 @@ function updateCalendarView(startDate, endDate) {
     });
 
     //Podświetlanie dni z zakresu
-    let week_count = 0;
+    // Zakomentowalem bo niepotrzebne - Mateusz
+    /*let week_count = 0;
 
     for (let day = 0; day < daysInRange.length; day++) {
         if (day % 7 === 0) {
@@ -1768,7 +1803,7 @@ function updateCalendarView(startDate, endDate) {
             cell.style.backgroundColor = '#a5bc8f';
             cell.textContent = daysInRange[day].getDate();
         }
-    }
+    }*/
 }
 
 // Strzalki
